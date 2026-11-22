@@ -1,0 +1,42 @@
+<html><body>
+<style>
+.big { font-size: 32px; margin: 20px; }
+.small { font-size: 12px; margin: 4px; }
+</style>
+<div id="box" class="big">Test</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test getComputedStyle reflects dynamic class changes
+local el = document:getElementById("box")
+local ok = true
+local detail = ""
+
+-- Initial computed style with .big
+local cs1 = document:getComputedStyle(el)
+local fs1 = cs1:getPropertyValue("font-size")
+detail = detail .. "big.fs=" .. fs1 .. "; "
+ok = ok and (fs1 == "32px")
+
+-- Change class to .small
+el.className = "small"
+
+-- Re-compute style
+local cs2 = document:getComputedStyle(el)
+local fs2 = cs2:getPropertyValue("font-size")
+detail = detail .. "small.fs=" .. fs2 .. "; "
+ok = ok and (fs2 == "12px")
+
+-- Change inline style
+el.style:setProperty("font-size", "24px")
+local cs3 = document:getComputedStyle(el)
+local fs3 = cs3:getPropertyValue("font-size")
+detail = detail .. "inline.fs=" .. fs3 .. "; "
+ok = ok and (fs3 == "24px")
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

@@ -1,0 +1,109 @@
+<html>
+<canvas id="c" width="200" height="200" style="display:none"></canvas>
+<div id="result">WAITING</div>
+<script>
+local canvas = document:getElementById("c")
+local ctx = canvas:getContext("2d")
+local results = {}
+
+-- Test 1: filter property default is "none"
+if ctx.filter == "none" then
+    results[#results+1] = "default:PASS"
+else
+    results[#results+1] = "default:FAIL(" .. ctx.filter .. ")"
+end
+
+-- Test 2: set and get blur filter
+ctx.filter = "blur(5px)"
+if ctx.filter == "blur(5px)" then
+    results[#results+1] = "blur_set:PASS"
+else
+    results[#results+1] = "blur_set:FAIL"
+end
+
+-- Test 3: draw with blur filter (should not crash)
+ctx:fillRect(10, 10, 50, 50)
+results[#results+1] = "blur_draw:PASS"
+
+-- Test 4: brightness filter
+ctx.filter = "brightness(1.5)"
+ctx:fillRect(70, 10, 50, 50)
+results[#results+1] = "brightness:PASS"
+
+-- Test 5: contrast filter
+ctx.filter = "contrast(2)"
+ctx:fillRect(10, 70, 50, 50)
+results[#results+1] = "contrast:PASS"
+
+-- Test 6: grayscale filter
+ctx.filter = "grayscale(1)"
+ctx:fillRect(70, 70, 50, 50)
+results[#results+1] = "grayscale:PASS"
+
+-- Test 7: sepia filter
+ctx.filter = "sepia(0.8)"
+ctx:fillRect(10, 130, 50, 50)
+results[#results+1] = "sepia:PASS"
+
+-- Test 8: hue-rotate filter
+ctx.filter = "hue-rotate(90deg)"
+ctx:fillRect(70, 130, 50, 50)
+results[#results+1] = "hue_rotate:PASS"
+
+-- Test 9: invert filter
+ctx.filter = "invert(1)"
+ctx:fillRect(130, 10, 50, 50)
+results[#results+1] = "invert:PASS"
+
+-- Test 10: opacity filter
+ctx.filter = "opacity(0.5)"
+ctx:fillRect(130, 70, 50, 50)
+results[#results+1] = "opacity:PASS"
+
+-- Test 11: saturate filter
+ctx.filter = "saturate(3)"
+ctx:fillRect(130, 130, 50, 50)
+results[#results+1] = "saturate:PASS"
+
+-- Test 12: reset filter to none
+ctx.filter = "none"
+if ctx.filter == "none" then
+    results[#results+1] = "reset:PASS"
+else
+    results[#results+1] = "reset:FAIL"
+end
+
+-- Test 13: filter survives save/restore
+ctx.filter = "blur(3px)"
+ctx:save()
+ctx.filter = "none"
+ctx:restore()
+if ctx.filter == "blur(3px)" then
+    results[#results+1] = "save_restore:PASS"
+else
+    results[#results+1] = "save_restore:FAIL(" .. ctx.filter .. ")"
+end
+
+-- Test 14: multiple chained filters
+ctx.filter = "blur(2px) brightness(1.2)"
+ctx:fillRect(10, 10, 30, 30)
+results[#results+1] = "chained:PASS"
+
+-- Test 15: stroke with filter
+ctx.filter = "grayscale(0.5)"
+ctx:strokeRect(50, 50, 30, 30)
+results[#results+1] = "stroke_filter:PASS"
+
+ctx.filter = "none"
+
+local allPass = true
+for i = 1, #results do
+    if not results[i]:find("PASS") then
+        allPass = false
+        break
+    end
+end
+
+document:getElementById("result").textContent = allPass and "PASS" or table.concat(results, ",")
+</script>
+</html>

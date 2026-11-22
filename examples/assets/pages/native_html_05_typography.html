@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif; background: #f8fafc; color: #1e293b; }
+h2 { margin-bottom: 16px; }
+.card { background: white; padding: 16px; border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
+.card h3 { color: #475569; margin-bottom: 8px; font-size: 14px; }
+.sizes span { display: block; margin: 4px 0; }
+.weights span { display: block; margin: 4px 0; }
+.decorations a { margin-right: 12px; }
+.spacing { letter-spacing: 4px; }
+.line-h { line-height: 2.0; background: #f1f5f9; padding: 8px; }
+.transform-upper { text-transform: uppercase; }
+.transform-cap { text-transform: capitalize; }
+.ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 250px;
+            background: #f1f5f9; padding: 4px 8px; }
+</style></head><body>
+<h2>Typography Demo</h2>
+<div class="card">
+  <h3>Font Sizes</h3>
+  <div class="sizes">
+    <span style="font-size:12px;">12px — Small text</span>
+    <span style="font-size:16px;">16px — Body text</span>
+    <span style="font-size:24px;">24px — Heading</span>
+    <span style="font-size:36px;">36px — Large heading</span>
+  </div>
+</div>
+<div class="card">
+  <h3>Font Weights</h3>
+  <div class="weights">
+    <span style="font-weight:300;">Light (300)</span>
+    <span style="font-weight:400;">Regular (400)</span>
+    <span style="font-weight:600;">Semi-bold (600)</span>
+    <span style="font-weight:700;">Bold (700)</span>
+  </div>
+</div>
+<div class="card">
+  <h3>Text Decoration</h3>
+  <div class="decorations">
+    <a style="text-decoration:underline;color:#3b82f6;">Underline</a>
+    <a style="text-decoration:line-through;color:#ef4444;">Line-through</a>
+    <a style="text-decoration:overline;color:#10b981;">Overline</a>
+  </div>
+</div>
+<div class="card">
+  <h3>Letter Spacing &amp; Line Height</h3>
+  <p class="spacing">L E T T E R S P A C I N G</p>
+  <p class="line-h">Line height 2.0 — this text has double spacing between lines for readability.</p>
+</div>
+<div class="card">
+  <h3>Text Transform &amp; Overflow</h3>
+  <p class="transform-upper">uppercase transform</p>
+  <p class="transform-cap">capitalize each word</p>
+  <p class="ellipsis">This is a very long text that should be truncated with an ellipsis at the end.</p>
+</div>
+</body></html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script>
+-- E1: Document-level addEventListener and dispatchEvent
+local received = false
+document:addEventListener("myevent", function(e)
+    received = true
+end)
+
+document:dispatchEvent("myevent")
+
+if received then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = "document event not received"
+end
+</script>
+</body>
+</html>

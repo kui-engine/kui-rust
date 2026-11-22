@@ -1,0 +1,111 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="root">Hello<span id="mid">World</span>Tail</div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local root = document:getElementById("root")
+
+-- childNodes returns all nodes (text + element)
+local nodes = root:childNodes()
+if #nodes < 3 then ok = false; msg = msg .. "childNodes<3(" .. #nodes .. "); " end
+
+-- Find text and element nodes
+local textNode = nil
+local elemNode = nil
+for _, n in ipairs(nodes) do
+    if n.nodeType == 3 and textNode == nil then textNode = n end
+    if n.nodeType == 1 and elemNode == nil then elemNode = n end
+end
+
+-- Node.textContent read
+if textNode == nil then
+    ok = false; msg = msg .. "no textNode; "
+else
+    if type(textNode.textContent) ~= "string" then ok = false; msg = msg .. "textNode.textContent not string; " end
+end
+
+-- Node.parentNode (on Node usertype — text node)
+if textNode then
+    local p = textNode.parentNode
+    if p == nil then ok = false; msg = msg .. "parentNode nil; " end
+end
+
+-- Node.parentElement() (on Node usertype — text node)
+if textNode then
+    local pe = textNode:parentElement()
+    if pe == nil then ok = false; msg = msg .. "parentElement nil; "
+    elseif pe.id ~= "root" then ok = false; msg = msg .. "parentElement.id=" .. tostring(pe.id) .. "; "
+    end
+end
+
+-- Node.firstChild / lastChild (on Node usertype — elemNode via childNodes is Element,
+-- but the span element's childNodes should yield a text Node)
+local mid = document:getElementById("mid")
+local midNodes = mid:childNodes()
+if #midNodes >= 1 then
+    local innerText = midNodes[1]
+    -- innerText is a Node (text node). Test Node-level sibling traversal on it.
+    -- Since it's the only child, previousSibling and nextSibling should be nil
+    if innerText.nodeType ~= 3 then ok = false; msg = msg .. "innerText.nodeType=" .. innerText.nodeType .. "; " end
+
+    -- Node.parentNode on inner text node
+    local ip = innerText.parentNode
+    if ip == nil then ok = false; msg = msg .. "innerText.parentNode nil; " end
+end
+
+-- Node.textContent write
+if textNode then
+    textNode.textContent = "Modified"
+    if textNode.textContent ~= "Modified" then ok = false; msg = msg .. "textContent write failed; " end
+end
+
+-- Node.nodeName for text node
+if textNode then
+    if textNode.nodeName ~= "#text" then ok = false; msg = msg .. "textNode.nodeName=" .. tostring(textNode.nodeName) .. "; " end
+end
+
+-- Node.ownerDocument
+if textNode then
+    local od = textNode:ownerDocument()
+    if od == nil then ok = false; msg = msg .. "ownerDocument nil; " end
+end
+
+-- Node.isConnected
+if textNode then
+    if textNode.isConnected ~= true then ok = false; msg = msg .. "isConnected not true; " end
+end
+
+-- Node.hasChildNodes (text node has no children)
+if textNode then
+    if textNode:hasChildNodes() ~= false then ok = false; msg = msg .. "textNode hasChildNodes; " end
+end
+
+-- Node.childCount (text node = 0)
+if textNode then
+    if textNode.childCount ~= 0 then ok = false; msg = msg .. "textNode childCount=" .. tostring(textNode.childCount) .. "; " end
+end
+
+-- Node.getRootNode
+if textNode then
+    local rn = textNode:getRootNode()
+    if rn == nil then ok = false; msg = msg .. "getRootNode nil; " end
+end
+
+-- Node.nextSibling / previousSibling — test on text node
+-- root has: "Hello" <span> "Tail" — textNode is "Hello", its nextSibling should be <span>
+if textNode then
+    local ns = textNode.nextSibling
+    if ns == nil then ok = false; msg = msg .. "nextSibling nil; " end
+end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

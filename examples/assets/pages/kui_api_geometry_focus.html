@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — geometry, scroll &amp; focus</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 14px 18px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 8px; }
+#tour-result { padding: 6px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 10px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.panel { background: white; border-radius: 10px; padding: 10px 12px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 3px; }
+.note { color: #64748b; margin-bottom: 6px; font-size: 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+button { padding: 4px 9px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 11px; background: #f1f5f9; padding: 5px 7px;
+       border-radius: 5px; color: #334155; min-height: 24px; }
+
+/* Box geometry: two boxes with known padding / border / margin inside a positioned frame. */
+#geo-frame { position: relative; border: 2px solid #cbd5e1; padding: 8px; border-radius: 4px; }
+#geo-box { box-sizing: content-box; width: 200px; height: 40px; padding: 12px; border: 6px solid #93c5fd;
+           margin: 10px; background: #eff6ff; font-size: 12px; }
+#geo-bb { box-sizing: border-box; width: 200px; height: 50px; padding: 10px; border: 4px solid #fca5a5;
+          margin: 0 10px 10px 10px; background: #fef2f2; font-size: 12px; }
+
+/* Scrolling: a 600x400 content block inside a small scroll box. */
+#scroller { width: 100%; height: 120px; overflow: auto; border: 1px solid #cbd5e1; border-radius: 4px; }
+#scroll-content { width: 600px; height: 400px; }
+#scroll-content .row { height: 40px; line-height: 40px; padding-left: 10px; border-bottom: 1px solid #e2e8f0; }
+#scroll-content .row.odd { background: #f8fafc; }
+
+/* Anchored positioning: the popup is fixed, placed next to the anchor button. */
+#pos-stage { position: relative; height: 128px; border: 1px dashed #cbd5e1; border-radius: 6px; }
+#pos-anchor { position: absolute; left: 70px; top: 30px; width: 90px; height: 30px; background: #7c3aed; }
+#pos-popup { position: fixed; left: 0; top: 0; width: 110px; height: 30px; line-height: 30px;
+             text-align: center; border-radius: 6px; background: #fde68a; color: #92400e;
+             box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-size: 12px; }
+
+/* Text measurement. */
+#measure-span { display: inline-block; font-family: "Segoe UI", sans-serif; font-size: 16px; }
+#measure-sample { font-family: "Segoe UI", sans-serif; font-size: 16px; padding: 6px 0;
+                  white-space: nowrap; overflow: hidden; }
+
+/* Focus: three focusable controls and one plain div. */
+.focus-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+#f-btn { background: #64748b; }
+#f-input { width: 90px; padding: 3px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; }
+#f-div, #f-plain { padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; }
+#f-div:focus { background: #dbeafe; border-color: #3b82f6; }
+
+/* Pointer capture. */
+#cap-box { height: 46px; line-height: 46px; text-align: center; border: 2px dashed #cbd5e1;
+           border-radius: 6px; color: #64748b; }
+#cap-box.captured { border-color: #16a34a; background: #dcfce7; color: #166534; }
+#cap-other { margin-top: 6px; height: 26px; line-height: 26px; text-align: center; background: #f1f5f9;
+             border-radius: 6px; color: #64748b; font-size: 12px; }
+
+.log-title { margin: 10px 0 4px; font-size: 14px; }
+#log-box { height: 150px; overflow: auto; background: white; border-radius: 6px; }
+#tour-log { border-collapse: collapse; width: 100%; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 2px 8px; font-family: Consolas, monospace;
+               font-size: 11px; }
+#tour-log tr.bad td { color: #b91c1c; }
+</style></head><body>
+<h1>KUI API — geometry, scroll &amp; focus</h1>
+<p class="lead">Layout geometry read back through the C ABI (and the Go / Rust wrappers): box metrics,
+scrolling, anchored placement, text measurement, focus and pointer capture. On start the host runs
+every call once and checks it against the CSS on this page; the buttons repeat the calls by hand.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-geo">
+    <h2>Box metrics</h2>
+    <div class="api">get_bounding_rect · get_client_metrics · get_offset_metrics</div>
+    <p class="note">Blue: content-box 200×40, padding 12, border 6, margin 10. Red: border-box 200×50,
+      padding 10, border 4. The frame (border 2, padding 8) is their offset parent.</p>
+    <div id="geo-frame">
+      <div id="geo-box">content-box</div>
+      <div id="geo-bb">border-box</div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-geo-show">Show metrics</button>
+      <button id="btn-geo-pad">Toggle padding</button>
+    </div>
+    <div class="out" id="geo-out">—</div>
+  </section>
+
+  <section class="panel" id="p-scroll">
+    <h2>Scrolling</h2>
+    <div class="api">get_scroll_metrics · set_scroll_position · scroll_by · scroll_into_view · start_momentum_scroll</div>
+    <p class="note">A 600×400 block in a 120px-high scroll box.</p>
+    <div id="scroller"><div id="scroll-content">
+      <div class="row" id="row-0">Row 0</div><div class="row odd">Row 1</div><div class="row">Row 2</div>
+      <div class="row odd">Row 3</div><div class="row">Row 4</div><div class="row odd">Row 5</div>
+      <div class="row">Row 6</div><div class="row odd">Row 7</div><div class="row">Row 8</div>
+      <div class="row odd" id="row-9">Row 9</div>
+    </div></div>
+    <div class="toolbar">
+      <button id="btn-scroll-down">Scroll by +40</button>
+      <button id="btn-scroll-right">Scroll right +50</button>
+      <button id="btn-scroll-end">To the end</button>
+      <button id="btn-scroll-top">To top</button>
+    </div>
+    <div class="out" id="scroll-out">left=0 top=0</div>
+  </section>
+
+  <section class="panel" id="p-pos">
+    <h2>Anchored placement</h2>
+    <div class="api">position_relative_to (placement, offset, flip, clamp)</div>
+    <p class="note">The yellow fixed popup is placed next to the purple anchor.</p>
+    <div id="pos-stage"><div id="pos-anchor"></div></div>
+    <div id="pos-popup">popup</div>
+    <div class="toolbar">
+      <button id="btn-pos-below">Below (start)</button>
+      <button id="btn-pos-right">Right (center)</button>
+      <button id="btn-pos-left">Left (end)</button>
+    </div>
+    <div class="out" id="pos-out">—</div>
+  </section>
+
+  <section class="panel" id="p-measure">
+    <h2>Text measurement</h2>
+    <div class="api">measure_text (font size / weight → width, ascent, descent, line height)</div>
+    <p class="note">The host measures the sample with the same shaping as layout.</p>
+    <div><span id="measure-span">Hello KUI</span></div>
+    <div id="measure-sample">Hello KUI</div>
+    <div class="toolbar">
+      <button id="btn-measure-smaller">Smaller</button>
+      <button id="btn-measure-larger">Larger</button>
+      <button id="btn-measure-bold">Toggle bold</button>
+    </div>
+    <div class="out" id="measure-out">—</div>
+  </section>
+
+  <section class="panel" id="p-focus">
+    <h2>Focus</h2>
+    <div class="api">focus · blur · has_focus</div>
+    <p class="note">A button, an input and a div with tabindex can take focus; the plain div cannot.</p>
+    <div class="focus-row">
+      <button id="f-btn">Button</button><input id="f-input" value="text"><div id="f-div" tabindex="0">tabindex div</div><div id="f-plain">plain div</div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-focus-input">Focus input</button>
+      <button id="btn-focus-div">Focus div</button>
+      <button id="btn-focus-plain">Focus plain</button>
+      <button id="btn-focus-blur">Focus + blur input</button>
+    </div>
+    <div class="out" id="focus-out">—</div>
+  </section>
+
+  <section class="panel" id="p-capture">
+    <h2>Pointer capture</h2>
+    <div class="api">set_pointer_capture · has_pointer_capture · release_pointer_capture</div>
+    <p class="note">While the box holds pointer 1 (the mouse) it turns green and receives the mouse
+      moves made anywhere. Releasing a mouse button ends the capture by itself, so the next button
+      press already shows it released.</p>
+    <div id="cap-box">capture target</div>
+    <div id="cap-other">somewhere else</div>
+    <div class="toolbar">
+      <button id="btn-cap-set">Capture</button>
+      <button id="btn-cap-release">Release</button>
+      <button id="btn-cap-state">State</button>
+    </div>
+    <div class="out" id="cap-out">captured=no</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<div id="log-box"><table id="tour-log"></table></div>
+</body></html>

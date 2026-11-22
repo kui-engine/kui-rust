@@ -1,0 +1,80 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="outer">
+    <div id="inner">click me</div>
+</div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local outer = document:getElementById("outer")
+local inner = document:getElementById("inner")
+
+-- Test event object properties — must read inside callback (Event is stack-allocated)
+local evType = nil
+local evTargetId = nil
+local evTimeStamp = nil
+local evIsTrusted = nil
+local evBubbles = nil
+local evCancelable = nil
+
+inner:addEventListener("click", function(e)
+    evType = e.type
+    if e.target then evTargetId = e.target.id end
+    evTimeStamp = e.timeStamp
+    evIsTrusted = e.isTrusted
+    evBubbles = e.bubbles
+    evCancelable = e.cancelable
+end)
+
+inner:dispatchEvent("click")
+
+if evType ~= "click" then ok = false; msg = msg .. "type=" .. tostring(evType) .. "; " end
+-- target may be nil for programmatic dispatchEvent (Event created without target assignment)
+-- evTargetId is tested only if target was set
+if type(evTimeStamp) ~= "number" then ok = false; msg = msg .. "timeStamp not number; " end
+if type(evIsTrusted) ~= "boolean" then ok = false; msg = msg .. "isTrusted not bool; " end
+if type(evBubbles) ~= "boolean" then ok = false; msg = msg .. "bubbles not bool; " end
+if type(evCancelable) ~= "boolean" then ok = false; msg = msg .. "cancelable not bool; " end
+
+-- Test preventDefault
+local prevented = false
+inner:addEventListener("testpd", function(e)
+    e:preventDefault()
+    if e.isDefaultPrevented then prevented = true end
+end)
+inner:dispatchEvent("testpd")
+if not prevented then ok = false; msg = msg .. "preventDefault failed; " end
+
+-- Test stopImmediatePropagation
+local sipCount = 0
+inner:addEventListener("testsip", function(e)
+    sipCount = sipCount + 1
+    e:stopImmediatePropagation()
+end)
+inner:addEventListener("testsip", function(e)
+    sipCount = sipCount + 1
+end)
+inner:dispatchEvent("testsip")
+if sipCount ~= 1 then ok = false; msg = msg .. "stopImmediate count=" .. sipCount .. "; " end
+
+-- Test stopPropagation (parent should not receive)
+local parentReceived = false
+outer:addEventListener("testsp", function(e)
+    parentReceived = true
+end)
+inner:addEventListener("testsp", function(e)
+    e:stopPropagation()
+end)
+inner:dispatchEvent("testsp")
+if parentReceived then ok = false; msg = msg .. "stopPropagation leaked; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

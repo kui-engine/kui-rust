@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { margin-bottom: 16px; color: #1e293b; }
+.track { display: flex; align-items: center; margin: 8px 0; }
+.track .name { width: 140px; font-size: 13px; color: #64748b; }
+.track .bar { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; position: relative; }
+.track .dot { width: 20px; height: 20px; border-radius: 50%; background: #3b82f6;
+              position: absolute; top: -6px; left: 0; }
+.track:nth-child(2) .dot { background: #10b981; transition: left 2s ease; }
+.track:nth-child(3) .dot { background: #f59e0b; transition: left 2s linear; }
+.track:nth-child(4) .dot { background: #ef4444; transition: left 2s ease-in; }
+.track:nth-child(5) .dot { background: #8b5cf6; transition: left 2s ease-out; }
+.track:nth-child(6) .dot { background: #ec4899; transition: left 2s ease-in-out; }
+.track:nth-child(7) .dot { background: #06b6d4; transition: left 2s cubic-bezier(0.68,-0.55,0.27,1.55); }
+.btn { margin-top: 16px; padding: 10px 24px; background: #3b82f6; color: white;
+       border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+</style></head><body>
+<h2>Transition Timing Functions</h2>
+<div id="tracks">
+  <div class="track"><span class="name">ease</span><div class="bar"><div class="dot" id="d1"></div></div></div>
+  <div class="track"><span class="name">linear</span><div class="bar"><div class="dot" id="d2"></div></div></div>
+  <div class="track"><span class="name">ease-in</span><div class="bar"><div class="dot" id="d3"></div></div></div>
+  <div class="track"><span class="name">ease-out</span><div class="bar"><div class="dot" id="d4"></div></div></div>
+  <div class="track"><span class="name">ease-in-out</span><div class="bar"><div class="dot" id="d5"></div></div></div>
+  <div class="track"><span class="name">cubic-bezier</span><div class="bar"><div class="dot" id="d6"></div></div></div>
+</div>
+<button class="btn" id="goBtn">Animate</button>
+</body></html>

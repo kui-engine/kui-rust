@@ -1,0 +1,27 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.demo{background:#f1f5f9;border-radius:8px;padding:12px;margin-bottom:8px}
+.block{width:200px;height:40px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:white;margin-bottom:8px}
+.flex-demo{display:flex;background:#f1f5f9;border-radius:8px;padding:12px;height:60px;align-items:center;margin-bottom:8px}
+.flex-item{width:60px;height:36px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#dbeafe;color:#1e40af;margin-right:4px}
+</style></head><body>
+<h2>Auto Margins</h2>
+<div class="card"><h3>Block Centering</h3>
+<div class="demo">
+<div class="block" style="margin-left:auto;margin-right:auto;background:#3b82f6">margin: 0 auto</div>
+<div class="block" style="margin-left:auto;background:#10b981">margin-left: auto</div>
+<div class="block" style="margin-right:auto;background:#f59e0b">margin-right: auto</div></div>
+<div class="info"><span class="tag">margin:0 auto</span> Centers block. <span class="tag">margin-left:auto</span> pushes right.</div></div>
+<div class="card"><h3>Flexbox Auto Margins</h3>
+<div class="flex-demo">
+<div class="flex-item" style="background:#3b82f6">A</div>
+<div class="flex-item" style="background:#10b981">B</div>
+<div class="flex-item" style="margin-left:auto;background:#ef4444">C</div></div>
+<div class="info"><span class="tag">margin-left:auto</span> in flex absorbs remaining space</div></div>
+</body></html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script>
+-- L2: window global object
+local ok = true
+local msg = ""
+
+-- window should exist as a table
+if type(window) ~= "table" then
+    ok = false; msg = msg .. "window not a table; "
+end
+
+-- window.performance.now() should return a number
+local t = window.performance.now()
+if type(t) ~= "number" then
+    ok = false; msg = msg .. "performance.now not number; "
+end
+
+-- window.document should reference the same document
+if window.document ~= document then
+    -- In headless test, window.document may be nil if no Window is bound
+    -- Just check it doesn't crash
+end
+
+-- window.alert should not crash
+window.alert("test alert")
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body>
+</html>

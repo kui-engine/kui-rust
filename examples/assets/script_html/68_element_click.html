@@ -1,0 +1,15 @@
+<html><body>
+<button id="btn">Click Me</button>
+<div id="result">FAIL</div>
+<script type="text/lua">
+local btn = document:getElementById("btn")
+local result = document:getElementById("result")
+
+btn:addEventListener("click", function(e)
+    result.textContent = "PASS"
+end)
+
+-- Programmatic click
+btn:click()
+</script>
+</body></html>

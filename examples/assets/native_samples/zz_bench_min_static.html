@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { margin: 0; padding: 32px; background: #1a1a2e; color: #eee; font-family: "Segoe UI", sans-serif; }
+h1 { color: #00d4ff; }
+.box { background: #16213e; border: 1px solid #0f3460; border-radius: 8px; padding: 16px; margin-top: 12px; }
+</style>
+</head>
+<body>
+    <h1>Pure Static Page</h1>
+    <p>This page has no CSS animation, no transition, no image, no script, no canvas.</p>
+    <div class="box">If KUI still consumes 100% CPU on this page, the root cause is NOT the active-animation registry.</div>
+    <div class="box">It would mean some other code path is calling scheduleRepaint() unconditionally each frame.</div>
+</body>
+</html>

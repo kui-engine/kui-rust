@@ -1,0 +1,57 @@
+<html><body>
+<div id="list"></div>
+<div id="result"></div>
+<script>
+-- Mini todo app: create items, mark done, count
+local listEl = document:getElementById("list")
+local todos = {}
+
+function addTodo(text)
+    local item = document:createElement("div")
+    item:setAttribute("class", "todo")
+    item.textContent = text
+    listEl:appendChild(item)
+    table.insert(todos, { text = text, done = false, el = item })
+end
+
+function markDone(idx)
+    if todos[idx] then
+        todos[idx].done = true
+        todos[idx].el:addClass("done")
+    end
+end
+
+function countDone()
+    local n = 0
+    for _, t in ipairs(todos) do
+        if t.done then n = n + 1 end
+    end
+    return n
+end
+
+-- Add 3 items
+addTodo("Buy milk")
+addTodo("Write code")
+addTodo("Ship feature")
+
+-- Mark first two as done
+markDone(1)
+markDone(2)
+
+local ok = (#todos == 3)
+    and (countDone() == 2)
+    and (todos[1].el:hasClass("done") == true)
+    and (todos[3].el:hasClass("done") == false)
+
+-- Verify DOM structure
+local kids = listEl:children()
+ok = ok and (#kids == 3)
+    and (kids[1].textContent == "Buy milk")
+    and (kids[3].textContent == "Ship feature")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS"
+else r.textContent = "FAIL"
+end
+</script>
+</body></html>

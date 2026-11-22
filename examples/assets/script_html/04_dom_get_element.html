@@ -1,0 +1,22 @@
+<html><body>
+<div id="target">Hello</div>
+<div id="itemA">A</div>
+<div id="itemB">B</div>
+<div id="result"></div>
+<script>
+local el = document:getElementById("target")
+local ok = (el ~= nil) and (el.textContent == "Hello")
+
+local a = document:getElementById("itemA")
+local b = document:getElementById("itemB")
+ok = ok and (a ~= nil) and (a.textContent == "A")
+ok = ok and (b ~= nil) and (b.textContent == "B")
+
+-- Test body() accessor
+local body = document:body()
+ok = ok and (body ~= nil)
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

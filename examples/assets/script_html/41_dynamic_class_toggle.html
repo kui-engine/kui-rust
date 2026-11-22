@@ -1,0 +1,40 @@
+<html><body>
+<div id="box" class="a b">Test</div>
+<div id="result"></div>
+<script>
+-- Test dynamic class add/remove/has
+local el = document:getElementById("box")
+local ok = true
+
+-- Initial classes
+ok = ok and el:hasClass("a")
+ok = ok and el:hasClass("b")
+ok = ok and not el:hasClass("c")
+
+-- Add class
+el:addClass("c")
+ok = ok and el:hasClass("c")
+
+-- Remove class
+el:removeClass("a")
+ok = ok and not el:hasClass("a")
+ok = ok and el:hasClass("b")
+ok = ok and el:hasClass("c")
+
+-- className property
+local cn = el.className
+ok = ok and (cn:find("b") ~= nil)
+ok = ok and (cn:find("c") ~= nil)
+ok = ok and (cn:find("a") == nil)
+
+-- Set className directly
+el.className = "x y z"
+ok = ok and el:hasClass("x")
+ok = ok and el:hasClass("y")
+ok = ok and el:hasClass("z")
+ok = ok and not el:hasClass("b")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

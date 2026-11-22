@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.card h3{font-size:14px;color:#64748b;margin-bottom:12px}
+.tc{display:flex;flex-wrap:wrap;gap:6px;padding:8px;border:2px solid #e2e8f0;border-radius:8px;min-height:48px;align-items:center}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;background:#dbeafe;color:#1e40af}
+.tag:nth-child(3n+2){background:#dcfce7;color:#166534}
+.tag:nth-child(3n+3){background:#fef3c7;color:#92400e}
+.sug{margin-top:12px;font-size:13px;color:#94a3b8}
+.sug span{cursor:pointer;padding:2px 8px;border-radius:4px;background:#f1f5f9;margin:2px;display:inline-block;font-size:12px}
+.sug span:hover{background:#dbeafe;color:#1e40af}
+</style></head><body>
+<h2>Tag Input</h2>
+<div class="card"><h3>Click suggestions to add tags</h3>
+<div class="tc" id="tags">
+<div class="tag">HTML</div><div class="tag">CSS</div><div class="tag">C++</div>
+</div>
+<div class="sug">Suggestions:
+<span id="s0">JavaScript</span> <span id="s1">Lua</span> <span id="s2">WebGL</span>
+<span id="s3">Flexbox</span> <span id="s4">Grid</span> <span id="s5">Canvas</span>
+</div></div>
+</body></html>

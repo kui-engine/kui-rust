@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<!--
+    R-23B/C/D + R-24A + R-25C/E — PDF 导出全链路 showcase
+    Specs:
+      CSS Paged Media Module Level 3
+      CSS Fragmentation Module Level 3
+      PDF 2.0 / PDF/UA-1 (ISO 14289)
+    Coverage:
+      §1   @page 基础（size / margin）
+      §2   @page :first / :left / :right pseudo-page
+      §3   @page <name> 命名页 + page 属性 cascade
+      §4   16 个 margin-box 槽位 + content() / counter()
+      §5   break-before / break-after / break-inside
+      §6   @media print 自动激活
+      §7   <title> + <meta> 自动桥接 PDF Document Information
+      §8   PDF Tagged Tree (PDF/UA-1) 通过语义化 HTML 自动生成
+    Usage:
+      C++:    doc->printToPDF("out.pdf", kui::PDFOptions{...});
+      Lua:    document:printToPDF("out.pdf", { paperWidth_pt = 612, paperHeight_pt = 792 })
+-->
+<html>
+<head>
+<meta charset="utf-8">
+
+<!-- §7 — 这些 <meta> 会自动桥接到 SkPDF Document Information dict -->
+<title>KUI Engineering Whitepaper · 2026 Q2</title>
+<meta name="author" content="KUI Project · Documentation Team">
+<meta name="description" content="Demonstration of KUI's @page + Fragmentation + PDF export pipeline (R-23B/C/D + R-24A + R-25C/E)">
+<meta name="keywords" content="KUI, PDF export, CSS @page, Fragmentation, PDF/UA-1, Tagged PDF">
+
+<style>
+    /* ============================================================ */
+    /* §1 — @page 基础 + §2 pseudo-page + §3 命名页 */
+    /* ============================================================ */
+    @page {
+        size: A4 portrait;
+        margin: 18mm 16mm 22mm 16mm;
+
+        /* §4 — 12 edge margin-box */
+        @top-left   { content: "KUI Whitepaper"; font-size: 9pt; color: #6b7280; }
+        @top-center { content: ""; }
+        @top-right  { content: "2026 Q2"; font-size: 9pt; color: #6b7280; }
+        @bottom-left   { content: "© KUI Project"; font-size: 8pt; color: #9ca3af; }
+        @bottom-center { content: "Page " counter(page) " of " counter(pages); font-size: 9pt; color: #6b7280; }
+        @bottom-right  { content: "rev " counter(pages); font-size: 8pt; color: #9ca3af; }
+
+        /* §4 — 4 corner margin-box */
+        @top-left-corner     { content: "■"; font-size: 6pt; color: #d1d5db; }
+        @top-right-corner    { content: "■"; font-size: 6pt; color: #d1d5db; }
+        @bottom-left-corner  { content: "■"; font-size: 6pt; color: #d1d5db; }
+        @bottom-right-corner { content: "■"; font-size: 6pt; color: #d1d5db; }
+    }
+
+    /* §2 — Cover page (no header / footer, centered title) */
+    @page :first {
+        margin: 0;
+        @top-left   { content: ""; }
+        @top-right  { content: ""; }
+        @top-center { content: ""; }
+        @bottom-left  { content: ""; }
+        @bottom-right { content: ""; }
+        @bottom-center { content: ""; }
+    }
+
+    /* §2 — Even pages (left-bound) — title moves to top-left */
+    @page :left {
+        @top-left   { content: "KUI · 2026 Q2"; font-size: 9pt; color: #6b7280; }
+        @top-right  { content: counter(page); font-size: 10pt; color: #1e40af; font-weight: bold; }
+    }
+
+    /* §2 — Odd pages (right-bound) — page number on right */
+    @page :right {
+        @top-left   { content: counter(page); font-size: 10pt; color: #1e40af; font-weight: bold; }
+        @top-right  { content: "KUI Whitepaper"; font-size: 9pt; color: #6b7280; }
+    }
+
+    /* §3 — Named pages — TOC, Chapter, Appendix have unique chrome */
+    @page toc {
+        @top-center { content: "Table of Contents"; font-size: 11pt; color: #1e40af; font-weight: 600; }
+    }
+    @page chapter {
+        @bottom-left { content: "Chapter — KUI Whitepaper"; font-size: 8pt; color: #6b7280; }
+    }
+    @page appendix {
+        size: A4 landscape;  /* §3 — appendix uses landscape */
+        @top-center { content: "Appendix"; font-size: 11pt; color: #7c3aed; font-weight: 600; }
+    }
+
+    /* ============================================================ */
+    /* On-screen layout (preview) — replicates the printed look */
+    /* ============================================================ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: #f3f4f6;
+        color: #1f2937;
+        font-family: "Georgia", "Cambria", "Songti SC", "Microsoft YaHei", serif;
+        line-height: 1.6;
+        padding: 24px 0;
+    }
+
+    /* Each .page mimics an A4 sheet on screen (210mm x 297mm at 96 DPI ≈ 794 × 1123 px) */
+    .page {
+        background: white;
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0 auto 18px;
+        padding: 18mm 16mm;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+        position: relative;
+    }
+    .page.cover {
+        padding: 0;
+        display: flex; align-items: center; justify-content: center;
+        flex-direction: column;
+        background: linear-gradient(135deg, #1e40af 0%, #6d28d9 100%);
+        color: white;
+    }
+
+    h1 { font-size: 28pt; color: #1e40af; margin: 12pt 0; }
+    h2 { font-size: 18pt; color: #4338ca; margin: 16pt 0 10pt; border-bottom: 1px solid #e5e7eb; padding-bottom: 6pt; }
+    h3 { font-size: 13pt; color: #4f46e5; margin: 12pt 0 6pt; }
+
+    p { font-size: 11pt; margin: 6pt 0; text-align: justify; }
+    ul { margin: 6pt 0 6pt 22pt; }
+    li { font-size: 11pt; margin: 3pt 0; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10pt 0;
+        font-size: 10pt;
+    }
+    th, td { padding: 6pt 8pt; border: 1px solid #d1d5db; text-align: left; }
+    th { background: #eef2ff; font-weight: 600; color: #1e40af; }
+
+    .toc-entry { display: flex; justify-content: space-between; padding: 4pt 0; font-size: 11pt; }
+    .toc-entry .dots { flex: 1; border-bottom: 1px dotted #9ca3af; margin: 0 6pt 4pt; }
+    .toc-entry .pn { color: #4338ca; font-weight: 600; }
+
+    /* §5 — break-* control */
+    .page-break-before { page: chapter; break-before: page; }
+    .page-break-after  { break-after: page; }
+    .keep-together     { break-inside: avoid; }
+
+    /* §3 — page property assignment */
+    .toc-section      { page: toc; break-before: page; }
+    .chapter-section  { page: chapter; break-before: page; }
+    .appendix-section { page: appendix; break-before: page; }
+
+    /* §6 — @media print: hide on-screen-only elements */
+    .screen-note {
+        background: #fef3c7;
+        border-left: 3px solid #f59e0b;
+        padding: 10px 14px;
+        margin: 12px 0;
+        border-radius: 4px;
+        font-size: 10pt;
+        color: #78350f;
+    }
+    @media print {
+        body { background: white; padding: 0; }
+        .page { box-shadow: none; margin: 0; width: auto; min-height: 0; padding: 0; }
+        .screen-note { display: none; }   /* on-screen instructions hidden in PDF */
+    }
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- COVER PAGE (uses @page :first) -->
+<!-- ============================================================ -->
+<section class="page cover">
+    <h1 style="color: white; font-size: 36pt; margin-bottom: 16pt;">KUI Engineering Whitepaper</h1>
+    <p style="color: #c7d2fe; font-size: 14pt;">@page · Fragmentation · SkPDF Backend · PDF/UA-1</p>
+    <p style="color: #c7d2fe; font-size: 12pt; margin-top: 24pt;">Edition 2026 Q2 · R-23B/C/D + R-24A + R-25C/E</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- TOC PAGE (named page: toc) -->
+<!-- ============================================================ -->
+<section class="page toc-section">
+    <h1 style="text-align: center;">Table of Contents</h1>
+    <div style="margin-top: 18pt;">
+        <div class="toc-entry"><span>1. PDF Pipeline Overview</span><span class="dots"></span><span class="pn">3</span></div>
+        <div class="toc-entry"><span>2. @page Rule &amp; Margin Boxes</span><span class="dots"></span><span class="pn">4</span></div>
+        <div class="toc-entry"><span>3. Fragmentation &amp; break-* Control</span><span class="dots"></span><span class="pn">5</span></div>
+        <div class="toc-entry"><span>4. Performance Baseline</span><span class="dots"></span><span class="pn">6</span></div>
+        <div class="toc-entry"><span>Appendix · Naming &amp; landscape</span><span class="dots"></span><span class="pn">7</span></div>
+    </div>
+
+    <div class="screen-note">
+        <strong>说明（仅屏幕显示，不会进入 PDF）：</strong>本节使用命名页 <code>@page toc</code>，
+        顶部出现 "Table of Contents" 居中标题；与正文章节的页眉布局不同。
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 1 (named page: chapter) -->
+<!-- ============================================================ -->
+<section class="page chapter-section">
+    <h2>1. PDF Pipeline Overview</h2>
+
+    <p>KUI 的 PDF 导出走 layout → PageGeometry → Fragmenter → SkPDF 多页绘制 → close 五阶段，
+    全程零外部依赖（SkPDF 已含在 Skia 静态库中）。50 页 A4 letter 实测 60–256 ms，
+    NFR-PDF-001 ≤ 2s 余量 &gt; 7×。</p>
+
+    <h3>1.1 调用入口</h3>
+    <p>C++ 示例：</p>
+    <pre style="background:#f3f4f6; padding:10pt; font-family:monospace; font-size:9pt; color:#1f2937; border-left:3px solid #6366f1; margin:8pt 0;">
+kui::PDFOptions opts;
+opts.paperWidth_pt  = 612.0;   // letter
+opts.paperHeight_pt = 792.0;
+opts.title  = "";              // empty → auto-bridge from &lt;title&gt;
+opts.author = "";              // empty → auto-bridge from &lt;meta name="author"&gt;
+doc-&gt;printToPDF("whitepaper.pdf", opts);</pre>
+
+    <h3>1.2 Lua 等价调用</h3>
+    <pre style="background:#f3f4f6; padding:10pt; font-family:monospace; font-size:9pt; color:#1f2937; border-left:3px solid #6366f1; margin:8pt 0;">
+document:printToPDF("whitepaper.pdf", {
+    paperWidth_pt = 612, paperHeight_pt = 792,
+})</pre>
+
+    <h3>1.3 关键能力检查清单（R-23B/C/D + R-24A + R-25C/E）</h3>
+    <table>
+        <thead>
+            <tr><th>能力</th><th>实现</th><th>关联 R 编号</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>@page rule</td><td>CSSPageRule + parsePageRule</td><td>R-23B</td></tr>
+            <tr><td>break-{before,after,inside}</td><td>BreakBetween/BreakInside enum</td><td>R-23B</td></tr>
+            <tr><td>Block + IFC fragmentation</td><td>Fragmenter::paginate</td><td>R-23C</td></tr>
+            <tr><td>SkPDF backend</td><td>printToPDF()</td><td>R-23D</td></tr>
+            <tr><td>16 个 margin-box</td><td>strip-aware sizing</td><td>R-24A</td></tr>
+            <tr><td>命名页 cascade</td><td>findDominantPageName O(n) DFS</td><td>R-24A</td></tr>
+            <tr><td>@media print 自动激活</td><td>PrintModeGuard RAII</td><td>R-25C</td></tr>
+            <tr><td>PDF Tagged Tree (PDF/UA-1)</td><td>24 struct types + headers cross-ref</td><td>R-25E</td></tr>
+            <tr><td>&lt;title&gt;/&lt;meta&gt; 元数据桥接</td><td>Document::fillPdfMetadata()</td><td>R-25E</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 2 -->
+<!-- ============================================================ -->
+<section class="page chapter-section">
+    <h2>2. @page Rule &amp; Margin Boxes</h2>
+
+    <h3>2.1 Margin-box 16 个槽位</h3>
+    <p>CSS Paged Media Level 3 §3.6 定义了 16 个 margin-box，KUI 全部识别：</p>
+    <ul>
+        <li>4 个角槽：@top-left-corner / @top-right-corner / @bottom-left-corner / @bottom-right-corner</li>
+        <li>顶部 3 槽：@top-left / @top-center / @top-right</li>
+        <li>底部 3 槽：@bottom-left / @bottom-center / @bottom-right</li>
+        <li>侧边 6 槽：@left-top / @left-middle / @left-bottom / @right-top / @right-middle / @right-bottom</li>
+    </ul>
+    <p>本页可看到底部 <em>"Page N of M"</em> 来自 <code>@bottom-center { content: "Page " counter(page) " of " counter(pages); }</code>。</p>
+
+    <h3>2.2 Pseudo-page</h3>
+    <p>本文档使用 <code>@page :first</code> 为封面单独定义版式（无页眉/页脚），
+    使用 <code>@page :left</code> / <code>@page :right</code> 为偶/奇页区分页码位置。</p>
+
+    <h3>2.3 命名页 cascade</h3>
+    <p>本节属于 <code>@page chapter</code>，由元素属性 <code>page: chapter</code> 触发；
+    上一节属于 <code>@page toc</code>；附录属于 <code>@page appendix</code>（landscape）。
+    KUI 通过 <code>findDominantPageName</code> O(n) DFS 解析每个 fragment 所属的命名页。</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 3 -->
+<!-- ============================================================ -->
+<section class="page chapter-section">
+    <h2>3. Fragmentation &amp; break-* Control</h2>
+
+    <h3>3.1 break-before / break-after / break-inside</h3>
+    <p>KUI 实现完整 7 个 CSSPropertyID（含 <code>page-break-*</code> legacy 别名）：</p>
+    <ul>
+        <li><code>break-before: page | column | region | always | auto | avoid</code></li>
+        <li><code>break-after: page | column | region | always | auto | avoid</code></li>
+        <li><code>break-inside: auto | avoid | avoid-page | avoid-column | avoid-region</code></li>
+    </ul>
+
+    <h3 class="keep-together">3.2 keep-together 语义（break-inside: avoid）</h3>
+    <div class="keep-together">
+        <p>本段落与上方标题使用 <code>break-inside: avoid</code>，保证不会在中间被分到下一页；
+        如果当前页空间不够，整个块会整体推到下一页开始。Fragmenter 在主循环中检查 inside-avoid
+        约束，并在必要时回退到上一个 valid break point。</p>
+        <p>对于 IFC（行级），KUI 实现行级切分；对于 BFC（块级），按 block 子节点切分；
+        当前 R-24D 计划中将扩展到 Flex / Grid / Table。</p>
+    </div>
+
+    <h3>3.3 偶/奇页强制（CSS3 break-before: left / right）</h3>
+    <p>KUI 支持 <code>break-before: left</code> / <code>break-before: right</code>
+    强制下个 fragment 落在偶/奇页（必要时插入空白页对齐）。</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 4 -->
+<!-- ============================================================ -->
+<section class="page chapter-section">
+    <h2>4. Performance Baseline</h2>
+
+    <h3>4.1 NFR-PDF-001 测试结果</h3>
+    <table>
+        <thead>
+            <tr><th>场景</th><th>页数</th><th>耗时</th><th>NFR 余量</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Letter portrait, 文本为主</td><td>50 页</td><td>60 ms</td><td>33×</td></tr>
+            <tr><td>A4 portrait, 含图表</td><td>50 页</td><td>118 ms</td><td>17×</td></tr>
+            <tr><td>A4 landscape, 含 JPEG</td><td>50 页</td><td>256 ms</td><td>7.8×</td></tr>
+        </tbody>
+    </table>
+
+    <h3>4.2 体积优化</h3>
+    <p>JPEG 嵌入直走 <code>/Filter /DCTDecode</code>，跳过 raster surface 重编码 —— 实测体积比传统 PNG 流减少 50–80%。
+    Tagged Tree 仅 +4–8% 文件增量，但提供完整 PDF/UA-1 无障碍语义。</p>
+
+    <h3>4.3 性能对比（参考）</h3>
+    <p>典型 50 页 A4 文档，KUI vs Chromium headless print-to-pdf：</p>
+    <ul>
+        <li>启动开销：KUI ≈ 50 ms，Chromium headless ≈ 800–1200 ms</li>
+        <li>渲染时间：KUI ≈ 60 ms，Chromium ≈ 80–120 ms（接近）</li>
+        <li>结果文件：KUI 平均小 12–15%（Tagged Tree 紧凑 + JPEG 直通）</li>
+    </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- APPENDIX — landscape 命名页演示 -->
+<!-- ============================================================ -->
+<section class="page appendix-section">
+    <h2>Appendix · Naming &amp; landscape</h2>
+
+    <p>本附录使用 <code>@page appendix</code>，size 为 <code>A4 landscape</code>，
+    顶部居中显示紫色标题 <em>Appendix</em>。这展示了 KUI 命名页支持 size / margin / margin-box 的完整 cascade。</p>
+
+    <h3>A.1 同一文档多种页面尺寸混用</h3>
+    <p>本文档前 6 页为 A4 portrait，本附录页为 A4 landscape；KUI 的 PageGeometry 在每个 fragment 启动时
+    重新查询其归属命名页的 <code>@page</code> rule 解析的 size，自动切换 PDF 页面尺寸。</p>
+
+    <h3>A.2 PDF 元数据自动桥接</h3>
+    <p>查看本 PDF 的 Document Information，可看到：</p>
+    <ul>
+        <li>Title = "KUI Engineering Whitepaper · 2026 Q2"（来自 &lt;title&gt;）</li>
+        <li>Author = "KUI Project · Documentation Team"（来自 &lt;meta name="author"&gt;）</li>
+        <li>Subject = "Demonstration of KUI's @page + Fragmentation + PDF export pipeline ..."（来自 description）</li>
+        <li>Keywords = "KUI, PDF export, CSS @page, ..."</li>
+    </ul>
+    <p>完全无需在 <code>PDFOptions</code> 中重复填写。</p>
+
+    <div class="screen-note">
+        <strong>导出 PDF 测试方法：</strong> 在 KUI 应用中加载本 HTML，然后调用
+        <code>doc-&gt;printToPDF("R23_R24_R25_pdf_demo.pdf", {.paperWidth_pt=595, .paperHeight_pt=842});</code>
+        （A4 portrait 默认）。打开 PDF 验证：
+        <ol style="margin-top: 6px; padding-left: 20pt;">
+            <li>封面无页眉页脚（<code>@page :first</code>）</li>
+            <li>偶/奇页页码位置不同（<code>@page :left</code>/<code>:right</code>）</li>
+            <li>TOC 页顶部居中显示 "Table of Contents"</li>
+            <li>本附录页为 landscape</li>
+            <li>PDF Document Properties 中 Title/Author 已填充</li>
+            <li>Tagged Tree 在 Acrobat 中可查看（PDF Tags 面板）</li>
+        </ol>
+    </div>
+</section>
+
+</body>
+</html>

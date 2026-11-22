@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.focus-item{padding:12px 16px;border:2px solid #e2e8f0;border-radius:8px;margin-bottom:8px;font-size:14px;color:#475569;cursor:pointer;outline:none}
+.focus-item:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2);color:#1e293b}
+input{width:100%;padding:12px 16px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;margin-bottom:8px;outline:none}
+input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2)}
+.tab-list{display:flex;gap:4px;margin-bottom:12px}
+.tab-btn{padding:10px 20px;border:2px solid #e2e8f0;border-radius:8px;background:white;font-size:13px;color:#64748b;cursor:pointer;outline:none}
+.tab-btn:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.2);background:#dbeafe}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+</style></head><body>
+<h2>Focus Management</h2>
+<div class="card"><h3>Focus Indicators</h3>
+<input type="text" placeholder="Click or Tab to focus">
+<div class="focus-item" tabindex="0">Focusable item 1</div>
+<div class="focus-item" tabindex="0">Focusable item 2</div>
+<div class="focus-item" tabindex="0">Focusable item 3</div>
+<div class="info">tabindex="0" makes elements focusable. :focus provides visual feedback.</div></div>
+<div class="card"><h3>Tab Navigation</h3>
+<div class="tab-list">
+<button class="tab-btn">Tab 1</button><button class="tab-btn">Tab 2</button>
+<button class="tab-btn">Tab 3</button><button class="tab-btn">Tab 4</button>
+</div>
+<div class="info">Tab navigates forward, Shift+Tab backward.</div></div>
+</body></html>

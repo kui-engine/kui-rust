@@ -1,0 +1,60 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="parent">
+    <div id="c1">A</div>
+    <div id="c2">B</div>
+    <div id="c3">C</div>
+</div>
+<div id="evTarget">click</div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+-- Test removeChild
+local parent = document:getElementById("parent")
+local c2 = document:getElementById("c2")
+
+local before = parent.childElementCount
+if before ~= 3 then ok = false; msg = msg .. "before=" .. before .. "; " end
+
+local removed = parent:removeChild(c2)
+if removed == nil then ok = false; msg = msg .. "removeChild returned nil; " end
+
+local after = parent.childElementCount
+if after ~= 2 then ok = false; msg = msg .. "after=" .. after .. "; " end
+
+-- Verify remaining children
+local ch = parent:children()
+if #ch ~= 2 then ok = false; msg = msg .. "children=" .. #ch .. "; "
+else
+    if ch[1].id ~= "c1" then ok = false; msg = msg .. "ch[1]=" .. ch[1].id .. "; " end
+    if ch[2].id ~= "c3" then ok = false; msg = msg .. "ch[2]=" .. ch[2].id .. "; " end
+end
+
+-- Test removeEventListener by ID
+local evTarget = document:getElementById("evTarget")
+local count = 0
+local listenerId = evTarget:addEventListener("click", function(e)
+    count = count + 1
+end)
+
+-- Fire once — should increment
+evTarget:dispatchEvent("click")
+if count ~= 1 then ok = false; msg = msg .. "count1=" .. count .. "; " end
+
+-- Remove listener by ID
+evTarget:removeEventListener("click", listenerId)
+
+-- Fire again — should NOT increment
+evTarget:dispatchEvent("click")
+if count ~= 1 then ok = false; msg = msg .. "countAfterRemove=" .. count .. "; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>ENH-P1-003 · 系统托盘图标 (TrayIcon)</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --fg: #e2e8f0;
+    --primary: #38bdf8;
+    --accent: #f472b6;
+    --code: #1e293b;
+    --border: #334155;
+    --success: #34d399;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.7;
+  }
+  h1 {
+    font-size: 28px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0 0 8px;
+  }
+  .meta { color: #94a3b8; font-size: 13px; margin-bottom: 24px; }
+  h2 {
+    font-size: 18px; color: var(--primary);
+    border-left: 3px solid var(--primary);
+    padding-left: 10px; margin: 28px 0 12px;
+  }
+  pre {
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+  }
+  code { color: var(--accent); }
+  .panel {
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 4px 6px 4px 0;
+    background: var(--primary);
+    color: #0f172a;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn.accent { background: var(--accent); }
+  .btn.success { background: var(--success); }
+  .status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    background: var(--code);
+    border: 1px solid var(--border);
+    margin-left: 8px;
+  }
+  .status.active { background: rgba(52, 211, 153, 0.2); border-color: var(--success); }
+  .log {
+    background: #020617;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 12px;
+    height: 160px;
+    overflow-y: auto;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 12px;
+  }
+  .log-entry { margin: 2px 0; }
+  .log-entry.click { color: var(--primary); }
+  .log-entry.right { color: var(--accent); }
+  .log-entry.dbl   { color: var(--success); }
+  .log-entry.balloon { color: #fde047; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { background: var(--code); color: var(--primary); }
+</style>
+</head>
+<body>
+
+<h1>ENH-P1-003 · 系统托盘图标 (TrayIcon)</h1>
+<div class="meta">
+  KUI Native Desktop API · Win32 Shell_NotifyIcon 桥接 · 与 NativeMenuBar 对称设计
+</div>
+
+<h2>§1 API 概览</h2>
+<p>每个 <code>Window</code> 内置一个 <code>TrayIcon</code> 实例,通过 <code>window:trayIcon()</code> 暴露(C++)或 <code>window.tray</code> 暴露(Lua)。</p>
+
+<table>
+  <tr><th>方法</th><th>说明</th></tr>
+  <tr><td><code>create(cfg)</code></td><td>注册到 Shell,显示图标</td></tr>
+  <tr><td><code>destroy()</code></td><td>从 Shell 删除</td></tr>
+  <tr><td><code>setTooltip(s)</code> / <code>tooltip()</code></td><td>Hover 提示</td></tr>
+  <tr><td><code>setIcon(path)</code></td><td>更新图标(.ico)</td></tr>
+  <tr><td><code>setVisible(b)</code> / <code>isVisible()</code></td><td>显示/隐藏</td></tr>
+  <tr><td><code>onClick(fn)</code></td><td>左键单击</td></tr>
+  <tr><td><code>onDoubleClick(fn)</code></td><td>左键双击</td></tr>
+  <tr><td><code>onRightClick(fn)</code></td><td>右键(自动弹出 contextMenu)</td></tr>
+  <tr><td><code>onBalloonClick(fn)</code></td><td>气球通知被点击</td></tr>
+  <tr><td><code>setContextMenu(items)</code></td><td>右键菜单(数组)</td></tr>
+  <tr><td><code>showBalloon(t, m, iconType, ms)</code></td><td>系统气球/Toast 通知</td></tr>
+</table>
+
+<h2>§2 Lua 完整使用示例</h2>
+<pre><code>-- 创建托盘图标
+window.tray:create{
+    icon    = "assets/app.ico",
+    tooltip = "KUI App — running"
+}
+
+-- 单击切换窗口可见性
+window.tray:onClick(function()
+    if window.isVisible then window:hide() else window:show() end
+end)
+
+-- 右键弹出菜单
+window.tray:setContextMenu({
+    { text = "Show / Hide", onClick = function()
+        if window.isVisible then window:hide() else window:show() end
+    end },
+    { isSeparator = true },
+    { text = "Settings ...", onClick = function() openSettings() end },
+    { isSeparator = true },
+    { text = "Quit", onClick = function() window:close() end }
+})
+
+-- 后台任务完成后弹气球
+function onSyncDone()
+    window.tray:showBalloon("KUI", "Background sync complete", 1)
+end</code></pre>
+
+<h2>§3 C++ 完整使用示例</h2>
+<pre><code>#include &lt;kui/platform/window.h&gt;
+#include &lt;kui/platform/tray_icon.h&gt;
+
+auto window = Window::create({ .title = "KUI App", .width = 800, .height = 600 });
+TrayIcon&amp; tray = window-&gt;trayIcon();
+
+tray.create(window.get(), { .iconPath = "app.ico", .tooltip = "KUI App" });
+tray.onClick([&amp;] {
+    if (window-&gt;isVisible()) window-&gt;hide(); else window-&gt;show();
+});
+
+MenuBarDef ctx;
+ctx.addMenu("", {
+    MenuItemDef("Show / Hide", [&amp;] { /* ... */ }),
+    MenuItemDef::separator(),
+    MenuItemDef("Quit",        [&amp;] { window-&gt;close(); })
+});
+tray.setContextMenu(ctx);
+
+tray.showBalloon("KUI", "Saved", 1 /* info */);</code></pre>
+
+<h2>§4 实时演示(纯 Lua 模拟事件)</h2>
+
+<div class="panel">
+  <p>本页面通过 <code>simulate*</code> 测试入口在浏览器/KUI 中模拟托盘事件,
+     无需真正点击任务栏图标。点击下方按钮触发对应模拟事件:</p>
+
+  <button class="btn"         id="btnClick">模拟单击</button>
+  <button class="btn"         id="btnDbl">模拟双击</button>
+  <button class="btn accent"  id="btnRight">模拟右键</button>
+  <button class="btn success" id="btnBalloon">模拟气球点击</button>
+  <span class="status" id="trayState">TrayIcon: 未创建</span>
+
+  <div class="log" id="log"></div>
+</div>
+
+<h2>§5 命令 ID 段位与 NativeMenuBar 共存</h2>
+<p>WM_COMMAND 命令 ID 在 KUI 内分段管理,避免冲突:</p>
+<table>
+  <tr><th>范围</th><th>所有者</th><th>说明</th></tr>
+  <tr><td>40000-49999</td><td>NativeMenuBar (ENH-P0-003)</td><td>菜单栏菜单项</td></tr>
+  <tr><td>50000-59999</td><td>TrayIcon contextMenu (ENH-P1-003)</td><td>托盘右键菜单</td></tr>
+  <tr><td>60000+</td><td>预留</td><td>未来 ContextMenu / Toolbar 等</td></tr>
+</table>
+
+<h2>§6 测试覆盖</h2>
+<table>
+  <tr><th>测试套件</th><th>测试数</th><th>覆盖</th></tr>
+  <tr><td><code>test_tray_icon</code> (C++)</td><td>20 PASSED</td><td>构造/移动/RAII destroy/回调注册替换/tooltip UTF-8/menu cmdId 路由/lifecycle</td></tr>
+  <tr><td><code>test_lua_api</code> (Lua/sol2)</td><td>5 PASSED</td><td>namespace/method-shape/no-window-safe/optional-args/mixed-menu-items</td></tr>
+</table>
+
+<script>
+// 该样例使用 Lua 在 KUI 中触发模拟事件;若在纯浏览器查看,只有 UI,无回调。
+// 在 KUI 中加载本页面后,Lua 脚本如下可启用真实托盘:
+//
+//   window.tray:create{ icon = "assets/app.ico", tooltip = "KUI Demo" }
+//   window.tray:onClick(function() document.getElementById('log').innerHTML += '<div class="log-entry click">Click triggered</div>' end)
+
+const log = document.getElementById('log');
+function addLog(cls, text) {
+    const ts = new Date().toLocaleTimeString();
+    const div = document.createElement('div');
+    div.className = 'log-entry ' + cls;
+    div.textContent = '[' + ts + '] ' + text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+}
+
+// 在 KUI 内运行时,window.tray 真实存在;在浏览器内,模拟降级
+const isKUI = (typeof window.tray === 'object');
+document.getElementById('trayState').textContent =
+    isKUI ? 'TrayIcon: 可用 (KUI 环境)' : 'TrayIcon: 浏览器降级 (无真实托盘)';
+if (isKUI) document.getElementById('trayState').classList.add('active');
+
+document.getElementById('btnClick').addEventListener('click', () => {
+    if (isKUI && window.tray.simulateClick) window.tray.simulateClick();
+    addLog('click', '左键单击模拟');
+});
+document.getElementById('btnDbl').addEventListener('click', () => {
+    if (isKUI && window.tray.simulateDoubleClick) window.tray.simulateDoubleClick();
+    addLog('dbl', '左键双击模拟');
+});
+document.getElementById('btnRight').addEventListener('click', () => {
+    if (isKUI && window.tray.simulateRightClick) window.tray.simulateRightClick();
+    addLog('right', '右键点击模拟(在 KUI 中会触发 contextMenu 弹出)');
+});
+document.getElementById('btnBalloon').addEventListener('click', () => {
+    if (isKUI && window.tray.simulateBalloonClick) window.tray.simulateBalloonClick();
+    addLog('balloon', '气球通知点击模拟');
+});
+
+addLog('click', 'TrayIcon Demo 页面就绪');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<html><body>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Script 1: set global
+scriptOrder = "1"
+</script>
+<script>
+-- Script 2: append
+scriptOrder = scriptOrder .. ",2"
+</script>
+<script>
+-- Script 3: append and verify order
+scriptOrder = scriptOrder .. ",3"
+local r = document:getElementById("result")
+if scriptOrder == "1,2,3" then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL"
+    document:getElementById("detail").textContent = scriptOrder
+end
+</script>
+</body></html>

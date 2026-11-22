@@ -1,0 +1,17 @@
+<html><body>
+<div id="box" style="color:green;margin:10px;padding:5px"></div>
+<div id="result"></div>
+<script>
+local el = document:getElementById("box")
+-- Dimension values serialize exactly
+local ok = (el.style:getProperty("margin") == "10px")
+    and (el.style:getProperty("padding") == "5px")
+
+-- Non-existent property returns empty string
+local missing = el.style:getProperty("z-index")
+ok = ok and (missing == "" or missing == nil)
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

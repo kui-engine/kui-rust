@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#1a1a2e; overflow:hidden; }
+</style>
+</head>
+<body>
+<canvas id="game" width="800" height="600"></canvas>
+<script type="text/lua">
+print("[TankLua] Script start")
+local canvas = document:getElementById("game")
+local ctx = canvas:getContext("2d")
+local W, H = canvas.canvasWidth, canvas.canvasHeight
+local PI = math.pi
+
+local keys = {}
+local dt = 1/60
+local TANK_W, TANK_H = 24, 32
+local TANK_SPEED = 120
+local TURN_SPEED = 3.0
+local BULLET_R = 4
+local BULLET_SPEED = 300
+local FIRE_CD = 0.6
+local BULLET_LIFE = 2.5
+local TANK_HP = 5
+local AI_DETECT = 250
+local AI_FIRE = 200
+
+math.randomseed(math.floor(window.performance.now()) % 2147483647)
+
+local function clamp(v, lo, hi) return math.max(lo, math.min(hi, v)) end
+local function dist(a, b) return math.sqrt((a.x-b.x)^2 + (a.y-b.y)^2) end
+local function normAngle(a)
+    while a > PI do a = a - 2*PI end
+    while a < -PI do a = a + 2*PI end
+    return a
+end
+local function rectOverlap(ax,ay,aw,ah, bx,by,bw,bh)
+    return math.abs(ax-bx) < (aw+bw)/2 and math.abs(ay-by) < (ah+bh)/2
+end
+
+local function makeTank(x, y, heading, isPlayer)
+    return { x=x, y=y, heading=heading, turret=0, hp=TANK_HP, maxHp=TANK_HP,
+             cd=1.5, alive=true, isPlayer=isPlayer,
+             aiState="patrol", aiTimer=0, patrolDir=0 }
+end
+
+local player = makeTank(W/2-120, H/2+120, 0, true)
+local ai     = makeTank(W/2+120, H/2-120, PI, false)
+local bullets = {}
+local obstacles = {}
+local playerScore, aiScore = 0, 0
+
+for i=1,10 do
+    obstacles[i] = {
+        x = math.random(60, W-60), y = math.random(60, H-60),
+        w = math.random(20,50), h = math.random(20,50)
+    }
+end
+
+local function fire(tank)
+    if tank.cd > 0 or not tank.alive then return end
+    local angle = tank.heading + tank.turret
+    bullets[#bullets+1] = {
+        x=tank.x+math.sin(angle)*20, y=tank.y-math.cos(angle)*20,
+        vx=math.sin(angle)*BULLET_SPEED, vy=-math.cos(angle)*BULLET_SPEED,
+        life=BULLET_LIFE, fromPlayer=tank.isPlayer
+    }
+    tank.cd = FIRE_CD
+end
+
+local function respawn(tank)
+    tank.hp = TANK_HP; tank.alive = true; tank.cd = 2.0
+    if tank.isPlayer then tank.x, tank.y = W/2-120, H/2+120; tank.heading = 0
+    else tank.x = math.random(80,W-80); tank.y = math.random(80,H-80); tank.heading = math.random()*2*PI; tank.aiState = "patrol" end
+end
+
+-- Check if a tank (center x,y, size TANK_W x TANK_H) collides with any obstacle
+local function tankHitsObstacle(tx, ty)
+    for _, obs in ipairs(obstacles) do
+        local ocx, ocy = obs.x + obs.w/2, obs.y + obs.h/2
+        if rectOverlap(tx, ty, TANK_W+2, TANK_H+2, ocx, ocy, obs.w, obs.h) then
+            return true
+        end
+    end
+    return false
+end
+
+local function updateTank(tank)
+    if not tank.alive then return end
+    tank.cd = tank.cd - dt
+    tank.x = clamp(tank.x, 30, W-30); tank.y = clamp(tank.y, 30, H-30)
+end
+
+local function moveTank(tank, dx, dy)
+    local nx, ny = tank.x + dx, tank.y + dy
+    -- Try full move first
+    if not tankHitsObstacle(nx, ny) then
+        tank.x, tank.y = nx, ny
+        return
+    end
+    -- Try sliding along X only
+    if dx ~= 0 and not tankHitsObstacle(tank.x + dx, tank.y) then
+        tank.x = tank.x + dx
+        return
+    end
+    -- Try sliding along Y only
+    if dy ~= 0 and not tankHitsObstacle(tank.x, tank.y + dy) then
+        tank.y = tank.y + dy
+    end
+    -- Blocked in both axes: stay put
+end
+
+local function updatePlayer()
+    if not player.alive then return end
+    local move, turn = 0, 0
+    if keys["w"] or keys["W"] then move = move + 1 end
+    if keys["s"] or keys["S"] then move = move - 1 end
+    if keys["a"] or keys["A"] then turn = turn - 1 end
+    if keys["d"] or keys["D"] then turn = turn + 1 end
+    player.heading = player.heading + turn * TURN_SPEED * dt
+    local dx = math.sin(player.heading) * move * TANK_SPEED * dt
+    local dy = -math.cos(player.heading) * move * TANK_SPEED * dt
+    moveTank(player, dx, dy)
+    if keys["q"] or keys["Q"] then player.turret = player.turret - 2.5*dt end
+    if keys["e"] or keys["E"] then player.turret = player.turret + 2.5*dt end
+    if keys[" "] then fire(player) end
+    updateTank(player)
+end
+
+local function updateAI()
+    if not ai.alive then ai.cd = ai.cd - dt; if ai.cd <= 0 then respawn(ai) end; return end
+    ai.cd = ai.cd - dt
+    local d = dist(ai, player)
+    if ai.aiState == "patrol" then
+        ai.aiTimer = ai.aiTimer - dt
+        if ai.aiTimer <= 0 then ai.patrolDir = (math.random()-0.5)*2*PI; ai.aiTimer = math.random()*3+1 end
+        ai.heading = ai.heading + clamp(normAngle(ai.patrolDir - ai.heading), -TURN_SPEED*dt, TURN_SPEED*dt)
+        local adx = math.sin(ai.heading)*TANK_SPEED*0.4*dt
+        local ady = -math.cos(ai.heading)*TANK_SPEED*0.4*dt
+        moveTank(ai, adx, ady)
+        if player.alive and d < AI_DETECT then ai.aiState = "chase" end
+    elseif ai.aiState == "chase" then
+        local target = math.atan(player.x - ai.x, -(player.y - ai.y))
+        ai.heading = ai.heading + clamp(normAngle(target - ai.heading), -TURN_SPEED*dt, TURN_SPEED*dt)
+        ai.turret = normAngle(target - ai.heading)
+        local adx2 = math.sin(ai.heading)*TANK_SPEED*0.6*dt
+        local ady2 = -math.cos(ai.heading)*TANK_SPEED*0.6*dt
+        moveTank(ai, adx2, ady2)
+        if d < AI_FIRE then ai.aiState = "attack" elseif d > AI_DETECT*1.5 then ai.aiState = "patrol"; ai.aiTimer = 0 end
+    elseif ai.aiState == "attack" then
+        local target = math.atan(player.x - ai.x, -(player.y - ai.y))
+        ai.turret = normAngle(target - ai.heading)
+        ai.heading = ai.heading + clamp(normAngle(target - ai.heading), -TURN_SPEED*0.3*dt, TURN_SPEED*0.3*dt)
+        if player.alive then fire(ai) end
+        if d > AI_FIRE*1.3 then ai.aiState = "chase" end
+    end
+    updateTank(ai)
+end
+
+local function updateBullets()
+    local i = 1
+    while i <= #bullets do
+        local b = bullets[i]; b.x = b.x + b.vx*dt; b.y = b.y + b.vy*dt; b.life = b.life - dt
+        local remove = b.life <= 0 or b.x < 0 or b.x > W or b.y < 0 or b.y > H
+        if not b.fromPlayer and player.alive and dist(b, player) < 18 then
+            player.hp = player.hp - 1; remove = true
+            if player.hp <= 0 then player.alive = false; aiScore = aiScore + 1; player.cd = 3 end
+        end
+        if b.fromPlayer and ai.alive and dist(b, ai) < 18 then
+            ai.hp = ai.hp - 1; remove = true
+            if ai.hp <= 0 then ai.alive = false; playerScore = playerScore + 1; ai.cd = 3 end
+        end
+        for _, obs in ipairs(obstacles) do
+            if rectOverlap(b.x,b.y,BULLET_R*2,BULLET_R*2, obs.x+obs.w/2,obs.y+obs.h/2,obs.w,obs.h) then remove = true; break end
+        end
+        if remove then table.remove(bullets, i) else i = i + 1 end
+    end
+    if not player.alive then player.cd = player.cd - dt; if player.cd <= 0 then respawn(player) end end
+end
+
+local function drawTank(tank, bodyColor, turretColor)
+    if not tank.alive then return end
+    ctx:save(); ctx:translate(tank.x, tank.y); ctx:rotate(tank.heading)
+    ctx.fillStyle = bodyColor; ctx:fillRect(-TANK_W/2, -TANK_H/2, TANK_W, TANK_H)
+    ctx.fillStyle = "#333"; ctx:fillRect(-TANK_W/2-3, -TANK_H/2, 4, TANK_H); ctx:fillRect(TANK_W/2-1, -TANK_H/2, 4, TANK_H)
+    ctx:rotate(tank.turret); ctx.fillStyle = turretColor
+    ctx:beginPath(); ctx:arc(0, 0, 10, 0, 2*PI); ctx:fill()
+    ctx:fillRect(-3, -28, 6, 20); ctx:restore()
+end
+
+local function render()
+    ctx.fillStyle = "#16213e"; ctx:fillRect(0, 0, W, H)
+    ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 1
+    for x=0,W,40 do ctx:beginPath(); ctx:moveTo(x,0); ctx:lineTo(x,H); ctx:stroke() end
+    for y=0,H,40 do ctx:beginPath(); ctx:moveTo(0,y); ctx:lineTo(W,y); ctx:stroke() end
+    ctx.strokeStyle = "#4a5568"; ctx.lineWidth = 3; ctx:strokeRect(10, 10, W-20, H-20)
+    ctx.fillStyle = "#374151"; ctx.strokeStyle = "#4b5563"; ctx.lineWidth = 1
+    for _, obs in ipairs(obstacles) do ctx:fillRect(obs.x,obs.y,obs.w,obs.h); ctx:strokeRect(obs.x,obs.y,obs.w,obs.h) end
+    for _, b in ipairs(bullets) do
+        ctx.fillStyle = b.fromPlayer and "#60a5fa" or "#f87171"
+        ctx:beginPath(); ctx:arc(b.x, b.y, BULLET_R, 0, 2*PI); ctx:fill()
+    end
+    drawTank(player, "#2563eb", "#3b82f6"); drawTank(ai, "#dc2626", "#ef4444")
+    ctx.font = "14px sans-serif"; ctx.fillStyle = "#fbbf24"; ctx.textAlign = "left"
+    ctx:fillText("Player HP: " .. player.hp .. "/" .. TANK_HP .. "  Score: " .. playerScore .. " : " .. aiScore, 20, H-20)
+    ctx:fillText("WASD=Move Q/E=Turret Space=Fire", W-300, H-20)
+end
+
+document:addEventListener("keydown", function(e) keys[e.key] = true end)
+document:addEventListener("keyup", function(e) keys[e.key] = false end)
+
+setInterval(function()
+    dt = 1/60
+    updatePlayer(); updateAI(); updateBullets(); render()
+end, 16)
+print("[TankLua] Game loop started")
+</script>
+</body>
+</html>

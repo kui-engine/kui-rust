@@ -1,0 +1,25 @@
+<html><body>
+<div id="b1">Box1</div>
+<div id="b2">Box2</div>
+<div id="b3">Box3</div>
+<div id="result"></div>
+<script>
+-- Test multiple getElementById calls and element properties
+local b1 = document:getElementById("b1")
+local b2 = document:getElementById("b2")
+local b3 = document:getElementById("b3")
+
+local ok = (b1 ~= nil) and (b1.textContent == "Box1")
+    and (b2 ~= nil) and (b2.textContent == "Box2")
+    and (b3 ~= nil) and (b3.textContent == "Box3")
+    and (b1:getAttribute("id") == "b1")
+
+-- Test children traversal
+local body = document:body()
+local kids = body:children()
+ok = ok and (#kids >= 4)  -- at least b1,b2,b3,result
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

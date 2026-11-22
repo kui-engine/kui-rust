@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+    R-25B Phase 3 — Vertical writing-mode emphasis focus.
+    Used by tooling for visual verification (kui_screenshot --full-page).
+-->
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: #ffffff;
+        color: #1f2937;
+        font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+        padding: 24px;
+        line-height: 2.2;
+    }
+    .col {
+        display: inline-block;
+        margin: 12px;
+        padding: 12px;
+        /* Force a wider physical width so the emphasis mark glyphs have
+           visible room on either side of the rotated column.  Without
+           an explicit width KUI lays vertical-rl text into a column the
+           same width as the line height, which can squeeze marks behind
+           the padding — explicit width gives them breathing room. */
+        width: 90px;
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        font-size: 32px;
+        height: 360px;
+        vertical-align: top;
+    }
+    .vrl-right {
+        writing-mode: vertical-rl;
+        text-emphasis-style: filled dot;
+        text-emphasis-color: #ef4444;
+        text-emphasis-position: over right;
+    }
+    .vrl-left {
+        writing-mode: vertical-rl;
+        text-emphasis-style: filled circle;
+        text-emphasis-color: #2563eb;
+        text-emphasis-position: over left;
+    }
+    .vlr-right {
+        writing-mode: vertical-lr;
+        text-emphasis-style: filled dot;
+        text-emphasis-color: #16a34a;
+        text-emphasis-position: over right;
+    }
+    .horizontal-ref {
+        font-size: 32px;
+        margin-bottom: 16px;
+        text-emphasis-style: filled sesame;
+        text-emphasis-color: #ef4444;
+    }
+</style>
+</head>
+<body>
+    <div class="horizontal-ref">水平参照 着重号示例</div>
+    <div>
+        <div id="c1" class="col vrl-right">竖排着重号</div>
+        <div id="c2" class="col vrl-left">竖排着重号</div>
+        <div id="c3" class="col vlr-right">竖排着重号</div>
+    </div>
+</body>
+</html>

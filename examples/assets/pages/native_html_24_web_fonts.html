@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html><head><style>
+/* @font-face src: local(...) —— 复用系统已装字体,免文件 IO。
+   多源时按 CSS 标准 fallback:先 local() 命中系统字体,未装再走 url()。 */
+@font-face {
+  font-family: "DemoMono";
+  src: local("Consolas"), local("Courier New");
+  font-display: swap;          /* descriptor 已解析存储(当前不改变渲染) */
+}
+@font-face {
+  font-family: "DemoUI";
+  src: local("Segoe UI"), local("Arial");
+}
+@font-face {
+  font-family: "DemoSerif";
+  src: local("Georgia"), local("Times New Roman");
+  unicode-range: U+0000-00FF;  /* descriptor 已解析存储(当前不做码点级选择) */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 28px; background: #0f172a; color: #e2e8f0;
+       font-family: "DemoUI", "Segoe UI", sans-serif; }
+.tag { display:inline-block; padding:4px 12px; border-radius:12px;
+       background:#1e3a8a; color:#bfdbfe; font-size:12px; font-weight:600;
+       letter-spacing:.5px; margin-bottom:14px; }
+h1 { font-size: 28px; margin-bottom: 6px; }
+.sub { color:#94a3b8; font-size:14px; margin-bottom:22px; }
+
+.specimen { background:#1e293b; border:1px solid #334155; border-radius:12px;
+            padding:18px 22px; margin-bottom:16px; }
+.specimen .lbl { font-size:12px; color:#93c5fd; text-transform:uppercase;
+                 letter-spacing:1px; margin-bottom:8px; }
+.s-mono  { font-family:"DemoMono", monospace; font-size:22px; }
+.s-ui    { font-family:"DemoUI", sans-serif;  font-size:22px; }
+.s-serif { font-family:"DemoSerif", serif;    font-size:22px; }
+
+#status { background:#020617; border:1px solid #334155; border-radius:10px;
+          padding:14px 18px; margin-top:18px;
+          font-family:"DemoMono","Cascadia Code",Consolas,monospace;
+          font-size:13px; color:#86efac; white-space:pre-wrap; line-height:1.7; }
+.note { margin-top:16px; color:#64748b; font-size:12px; line-height:1.6; }
+code { background:#1e293b; padding:1px 6px; border-radius:4px; color:#fcd34d;
+       font-family:"DemoMono",Consolas,monospace; }
+</style></head>
+<body>
+<span class="tag">KUI-038 · SDK 3.15.0 · CSS 字体子系统</span>
+<h1>@font-face <code>src: local()</code> + document.fonts</h1>
+<p class="sub">三个 @font-face 用 <code>local()</code> 复用系统字体(免文件 IO),
+   下方用 Lua 调用 CSS Font Loading API 子集并监听 loadingdone。</p>
+
+<div class="specimen">
+  <div class="lbl">DemoMono — local(Consolas)</div>
+  <div class="s-mono">The quick brown fox 0123456789 {[()]}</div>
+</div>
+<div class="specimen">
+  <div class="lbl">DemoUI — local(Segoe UI)</div>
+  <div class="s-ui">The quick brown fox jumps over the lazy dog</div>
+</div>
+<div class="specimen">
+  <div class="lbl">DemoSerif — local(Georgia)</div>
+  <div class="s-serif">The quick brown fox jumps over the lazy dog</div>
+</div>
+
+<div id="status">document.fonts: 等待脚本执行...</div>
+
+<p class="note">
+  诚实标注:<code>font-display</code> 与 <code>unicode-range</code> descriptor 已解析存储,
+  但因 KUI @font-face 为同步加载(无 FOUT/FOIT)、TypefaceFontProvider 按 family 注册,
+  二者当前不产生可观察渲染差异。详见 <code>sdk/cpp/docs/css-fonts.md</code>。
+</p>
+
+<script>
+-- CSS Font Loading API 子集(KUI-038)。@font-face 同步加载,故 check 立即反映
+-- 注册状态、load/ready 立即就绪、loadingdone 在加载完成后即时派发。
+-- 注意:document.fonts.* 是无 self 的函数,用点号调用(非冒号)。
+local statusEl = document:getElementById("status")
+local lines = {}
+local function line(s) lines[#lines + 1] = s; statusEl.textContent = table.concat(lines, "\n") end
+
+line("[document.fonts] CSS Font Loading API 子集探测:")
+
+-- check(family):该字体是否已注册(@font-face 加载完成)。
+for _, fam in ipairs({ "DemoMono", "DemoUI", "DemoSerif", "NotInstalledFont" }) do
+    local ok = document.fonts.check(fam)
+    line(string.format("  check(%-18s) = %s", '"' .. fam .. '"', tostring(ok)))
+end
+
+-- load(family, cb):主动加载 + 回调(同步立即触发)。
+document.fonts.load("DemoMono", function(ok)
+    line("  load(\"DemoMono\") 回调: ok = " .. tostring(ok))
+end)
+
+-- ready(cb):所有字体就绪回调(同步立即触发)。
+document.fonts.ready(function()
+    line("  ready() 回调: 全部字体就绪")
+end)
+
+-- loadingdone:@font-face 加载完成事件(document 级)。
+document:addEventListener("loadingdone", function(e)
+    line("  事件 loadingdone 已派发")
+end)
+
+print("[web-fonts demo] document.fonts 探测完成")
+</script>
+</body></html>

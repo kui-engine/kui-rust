@@ -1,0 +1,159 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="200" height="200"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: translate moves drawing origin
+ctx:clearRect(0, 0, 200, 200)
+ctx:save()
+ctx:translate(50, 50)
+ctx.fillStyle = "#ff0000"
+ctx:fillRect(0, 0, 10, 10)
+ctx:restore()
+-- Pixel at (55,55) should be red (translated from 0,0)
+local px1 = ctx:getImageData(55, 55, 1, 1)
+if px1 == nil then fail("T1: nil")
+else
+    local r = px1:get(1)
+    if r < 200 then fail("T1: translate red="..tostring(r)) end
+end
+-- Pixel at (5,5) should be clear (original 0,0 was translated)
+local px1b = ctx:getImageData(5, 5, 1, 1)
+if px1b ~= nil then
+    local a = px1b:get(4)
+    if a > 50 then fail("T1: translate origin alpha="..tostring(a)) end
+end
+
+-- T2: scale doubles the size
+ctx:clearRect(0, 0, 200, 200)
+ctx:save()
+ctx:scale(2, 2)
+ctx.fillStyle = "#00ff00"
+ctx:fillRect(0, 0, 10, 10)
+ctx:restore()
+-- A 10x10 rect scaled 2x becomes 20x20, so (15,15) should be green
+local px2 = ctx:getImageData(15, 15, 1, 1)
+if px2 == nil then fail("T2: nil")
+else
+    local g = px2:get(2)
+    if g < 200 then fail("T2: scale green="..tostring(g)) end
+end
+
+-- T3: rotate 90 degrees
+ctx:clearRect(0, 0, 200, 200)
+ctx:save()
+ctx:translate(50, 50)
+ctx:rotate(math.pi / 2)
+ctx.fillStyle = "#0000ff"
+ctx:fillRect(0, 0, 30, 5)
+ctx:restore()
+-- After 90deg rotation at (50,50), the rect (0,0,30,5) maps to vertical
+-- x in [45..50], y in [50..80]
+local px3 = ctx:getImageData(48, 65, 1, 1)
+if px3 == nil then fail("T3: nil")
+else
+    local b = px3:get(3)
+    if b < 150 then fail("T3: rotate blue="..tostring(b)) end
+end
+
+-- T4: save/restore properly isolates state
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#ff0000"
+ctx:save()
+ctx.fillStyle = "#00ff00"
+ctx:save()
+ctx.fillStyle = "#0000ff"
+ctx:restore()
+-- After one restore, should be back to green
+ctx:fillRect(0, 0, 10, 10)
+ctx:restore()
+local px4 = ctx:getImageData(5, 5, 1, 1)
+if px4 == nil then fail("T4: nil")
+else
+    local g = px4:get(2)
+    if g < 200 then fail("T4: save/restore green="..tostring(g)) end
+end
+
+-- T5: setTransform replaces current matrix
+ctx:clearRect(0, 0, 200, 200)
+ctx:save()
+ctx:translate(100, 100) -- this should be overridden
+ctx:setTransform(1, 0, 0, 1, 10, 10) -- identity + translate(10,10)
+ctx.fillStyle = "#ff00ff"
+ctx:fillRect(0, 0, 10, 10)
+ctx:restore()
+local px5 = ctx:getImageData(15, 15, 1, 1)
+if px5 == nil then fail("T5: nil")
+else
+    local r = px5:get(1); local b = px5:get(3)
+    if r < 200 or b < 200 then fail("T5: setTransform r="..tostring(r).." b="..tostring(b)) end
+end
+
+-- T6: resetTransform resets to identity
+ctx:clearRect(0, 0, 200, 200)
+ctx:save()
+ctx:translate(80, 80)
+ctx:resetTransform()
+ctx.fillStyle = "#ffff00"
+ctx:fillRect(0, 0, 10, 10)
+ctx:restore()
+-- Should draw at origin (0,0) since transform was reset
+local px6 = ctx:getImageData(5, 5, 1, 1)
+if px6 == nil then fail("T6: nil")
+else
+    local r = px6:get(1); local g = px6:get(2)
+    if r < 200 or g < 200 then fail("T6: resetTransform r="..tostring(r).." g="..tostring(g)) end
+end
+
+-- T7: getTransform returns current matrix
+ctx:save()
+ctx:resetTransform()
+local t = ctx:getTransform()
+if t == nil then fail("T7: getTransform nil")
+elseif type(t) ~= "table" then fail("T7: getTransform type="..type(t))
+else
+    -- Identity matrix: a=1,b=0,c=0,d=1,e=0,f=0
+    if t.a ~= nil then
+        if math.abs(t.a - 1) > 0.01 then fail("T7: a="..tostring(t.a)) end
+        if math.abs(t.d - 1) > 0.01 then fail("T7: d="..tostring(t.d)) end
+        if math.abs(t.e) > 0.01 then fail("T7: e="..tostring(t.e)) end
+    end
+end
+ctx:restore()
+
+-- T8: transform concatenates with current matrix
+ctx:clearRect(0, 0, 200, 200)
+ctx:save()
+ctx:translate(20, 20)
+ctx:transform(1, 0, 0, 1, 10, 10) -- additional translate(10,10)
+ctx.fillStyle = "#00ffff"
+ctx:fillRect(0, 0, 10, 10)
+ctx:restore()
+-- Should draw at (30,30) = translate(20,20) + transform translate(10,10)
+local px8 = ctx:getImageData(35, 35, 1, 1)
+if px8 == nil then fail("T8: nil")
+else
+    local g = px8:get(2); local b = px8:get(3)
+    if g < 200 or b < 200 then fail("T8: transform g="..tostring(g).." b="..tostring(b)) end
+end
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "transform ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

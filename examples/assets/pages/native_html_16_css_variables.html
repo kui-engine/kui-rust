@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html><head><style>
+:root {
+  --primary: #3b82f6; --primary-dark: #2563eb;
+  --bg: #f8fafc; --surface: #ffffff;
+  --text: #1e293b; --text-muted: #64748b;
+  --radius: 12px; --gap: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif;
+       background: var(--bg); color: var(--text); }
+h2 { margin-bottom: var(--gap); }
+.card { background: var(--surface); padding: 20px; border-radius: var(--radius);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: var(--gap); }
+.btn { padding: 10px 24px; background: var(--primary); color: white;
+       border-radius: calc(var(--radius) / 2); border: none; cursor: pointer;
+       font-size: 14px; font-weight: 600; }
+.btn:hover { background: var(--primary-dark); }
+.theme-dark {
+  --primary: #818cf8; --primary-dark: #6366f1;
+  --bg: #0f172a; --surface: #1e293b;
+  --text: #f8fafc; --text-muted: #94a3b8;
+}
+.swatch { display: inline-block; width: 80px; height: 40px; border-radius: 8px;
+          margin: 4px; vertical-align: middle; }
+.info { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
+</style></head><body>
+<h2>CSS Custom Properties</h2>
+<div class="card">
+  <h3 style="margin-bottom:8px;">Theme Colors</h3>
+  <div><span class="swatch" style="background:var(--primary);"></span>
+       <span class="swatch" style="background:var(--primary-dark);"></span>
+       <span class="swatch" style="background:var(--bg);border:1px solid #cbd5e1;"></span>
+       <span class="swatch" style="background:var(--surface);border:1px solid #cbd5e1;"></span></div>
+  <p class="info">Variables defined in :root and used throughout.</p>
+</div>
+<div class="card">
+  <button class="btn" id="themeBtn">Toggle Dark Theme</button>
+  <p class="info" style="margin-top:8px;">Click to switch between light and dark themes using CSS variables.</p>
+</div>
+</body></html>

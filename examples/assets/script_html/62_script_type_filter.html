@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script type="text/javascript">
+-- This should NOT execute (type=text/javascript)
+document:getElementById("result").textContent = "JS_EXECUTED"
+</script>
+<script type="text/lua">
+-- This SHOULD execute (type=text/lua)
+document:getElementById("result").textContent = "PASS"
+</script>
+</body>
+</html>

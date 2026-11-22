@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script>
+-- S3: DOMContentLoaded fires after all scripts execute
+local ready = false
+document:addEventListener("DOMContentLoaded", function(e)
+    ready = true
+    document:getElementById("result").textContent = "PASS"
+end)
+-- At this point DOMContentLoaded has NOT fired yet (scripts still executing)
+if ready then
+    document:getElementById("detail").textContent = "fired too early"
+end
+</script>
+</body>
+</html>

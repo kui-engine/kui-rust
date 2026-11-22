@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — popups, toasts &amp; input pickers</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 14px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 8px; }
+#tour-result { padding: 7px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 10px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.panel { background: white; border-radius: 10px; padding: 10px 12px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.wide { grid-column: span 2; }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 6px; min-height: 32px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+button { padding: 4px 7px; border: none; border-radius: 4px; background: #3b82f6; color: white;
+         font-size: 11px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 5px 8px;
+       border-radius: 5px; color: #334155; min-height: 24px; margin-bottom: 6px; }
+/* Tooltip anchor: the host shows its tooltip below this box (anchor rect read with
+   element_get_bounding_rect). Nothing clickable sits below it. */
+#tip-anchor { width: 160px; height: 28px; line-height: 28px; text-align: center;
+              border-radius: 6px; background: #e0e7ff; color: #3730a3; font-weight: 600; }
+#tip-title { display: inline-block; margin-left: 8px; color: #64748b; text-decoration: underline; }
+.tip-row { display: flex; align-items: center; margin-bottom: 44px; }
+/* The host opens its context menu at this box's top-left corner (read with
+   element_get_bounding_rect). The markers sit where the menu's first two items land
+   (items are 28px high under a 4px padding, the menu is at least 140px wide); the case clicks
+   them to choose an item. */
+#menu-spot { position: relative; width: 220px; height: 96px; border: 1px dashed #94a3b8;
+             border-radius: 6px; background: #f8fafc; color: #94a3b8; margin-bottom: 6px; }
+#menu-spot .hint { position: absolute; left: 150px; top: 8px; width: 64px; font-size: 11px; }
+.hit { position: absolute; left: 60px; width: 20px; height: 20px; }
+#menu-hit-1 { top: 8px; }
+#menu-hit-2 { top: 36px; }
+/* Input pickers: buttons on the left, inputs on the right so the picker panel (opened under
+   an input) never covers a button. */
+.pick { display: flex; gap: 16px; }
+.pick .left { width: 330px; }
+.pick .right { width: 300px; }
+.field { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.field label { width: 96px; color: #64748b; font-size: 12px; }
+.field input { width: 180px; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 4px;
+               font-size: 12px; }
+.field input[type="color"] { width: 56px; height: 28px; padding: 0; border: none; }
+.log-title { margin: 6px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+#scratch { display: none; }
+</style></head><body>
+<h1>KUI API — popups, toasts &amp; input pickers</h1>
+<p class="lead">The document's floating layers driven from the host: toasts, tooltips, context
+menus (drawn over the page by the popup manager) and the date / time / colour picker panel of
+&lt;input&gt;. Every call is checked against the state read back.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-toast">
+    <h2>Toasts</h2>
+    <div class="api">show_toast · get_toast_count · dismiss_toast · dismiss_all_toasts</div>
+    <p class="note">In-document notifications (bottom-right). The count includes toasts still
+      playing their exit animation.</p>
+    <div class="toolbar">
+      <button id="btn-toast-show">Show toast</button>
+      <button id="btn-toast-dismiss">Dismiss last</button>
+      <button id="btn-toast-clear">Dismiss all</button>
+      <button id="btn-toast-count">Count</button>
+    </div>
+    <div class="out" id="toast-out">count=0</div>
+  </section>
+
+  <section class="panel" id="p-tip">
+    <h2>Tooltip</h2>
+    <div class="api">show_tooltip · set/get_tooltip_theme · set/get_tooltip_delay · dismiss_popup</div>
+    <p class="note">A tooltip below the anchor (viewport rect). The delay applies to title=""
+      tooltips on hover.</p>
+    <div class="toolbar">
+      <button id="btn-tip-show">Show tooltip</button>
+      <button id="btn-tip-hide">Hide (dismiss_popup)</button>
+      <button id="btn-tip-theme">Toggle theme</button>
+      <button id="btn-tip-delay">Cycle delay</button>
+    </div>
+    <div class="out" id="tip-out">theme=default delay=500</div>
+    <div class="tip-row"><div id="tip-anchor">Anchor</div>
+      <span id="tip-title" title="A title tooltip, shown after the hover delay">hover me</span></div>
+  </section>
+
+  <section class="panel" id="p-menu">
+    <h2>Context menu</h2>
+    <div class="api">show_context_menu · set/get_default_context_menu_enabled</div>
+    <p class="note">Right-click the box: the host's menu, or the built-in default menu when it
+      is enabled. Choosing an item reports its id.</p>
+    <div class="toolbar">
+      <button id="btn-menu-show">Show menu</button>
+      <button id="btn-menu-default">Toggle default menu</button>
+    </div>
+    <div class="out" id="menu-out">default=off</div>
+    <div id="menu-spot"><span class="hint">right-click here</span>
+      <div class="hit" id="menu-hit-1"></div><div class="hit" id="menu-hit-2"></div></div>
+  </section>
+
+  <section class="panel" id="p-popups">
+    <h2>Popup layer state</h2>
+    <div class="api">has_popups · has_popup_of_type · dismiss_popups_of_type · dismiss_popup ·
+      dismiss_all_popups</div>
+    <p class="note">Shows the tooltip and the menu together, then removes them by type, by id or
+      all at once.</p>
+    <div class="toolbar">
+      <button id="btn-pop-both">Show both</button>
+      <button id="btn-pop-tip-off">Dismiss tooltips</button>
+      <button id="btn-pop-menu-id">Dismiss menu by id</button>
+      <button id="btn-pop-clear">Dismiss all</button>
+    </div>
+    <div class="out" id="pop-out">popups=0 tooltip=0 menu=0</div>
+  </section>
+
+  <section class="panel wide" id="p-pick">
+    <h2>Input pickers</h2>
+    <div class="api">element_open_input_picker · get_input_picker_state · get_input_picker_target ·
+      set_input_picker_month / _time / _color_hsv · commit_input_picker · close_input_picker ·
+      set_input_picker_enabled</div>
+    <div class="pick">
+      <div class="left">
+        <p class="note">Each "pick" button opens the panel for an input, sets it and commits;
+          the input's value (read with the script engine) is shown below.</p>
+        <div class="toolbar">
+          <button id="btn-pick-date">Open date picker</button>
+          <button id="btn-pick-close">Close picker</button>
+          <button id="btn-pick-time">Pick 18:45</button>
+          <button id="btn-pick-dtl">Pick 2027-01, 22:10</button>
+          <button id="btn-pick-color">Pick green</button>
+          <button id="btn-pick-toggle">Toggle enabled</button>
+        </div>
+        <div class="out" id="pick-out">open=0</div>
+        <div class="out" id="pick-values">-</div>
+      </div>
+      <div class="right">
+        <div class="field"><label>date</label><input type="date" id="in-date" value="2025-03-21"></div>
+        <div class="field"><label>time</label><input type="time" id="in-time" value="14:30"></div>
+        <div class="field"><label>datetime-local</label><input type="datetime-local" id="in-dtl" value="2025-03-21T14:30"></div>
+        <div class="field"><label>color</label><input type="color" id="in-color" value="#3b82f6"></div>
+        <div class="field"><label>text</label><input type="text" id="in-text" value="no panel"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="scratch"><div id="not-input">not an input</div></div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+</body></html>

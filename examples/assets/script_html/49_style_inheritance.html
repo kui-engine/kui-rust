@@ -1,0 +1,47 @@
+<html><body>
+<style>
+#parent { font-size: 20px; color: red; }
+#child { margin: 5px; }
+</style>
+<div id="parent">
+  <div id="child">Child text</div>
+</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test CSS inheritance: child inherits font-size and color from parent
+local parent = document:getElementById("parent")
+local child = document:getElementById("child")
+local ok = true
+local detail = ""
+
+-- Parent computed style
+local pcs = document:getComputedStyle(parent)
+local pfs = pcs:getPropertyValue("font-size")
+detail = detail .. "parent.fs=" .. pfs .. "; "
+ok = ok and (pfs == "20px")
+
+-- Child should inherit font-size from parent
+local ccs = document:getComputedStyle(child)
+local cfs = ccs:getPropertyValue("font-size")
+detail = detail .. "child.fs=" .. cfs .. "; "
+ok = ok and (cfs == "20px")
+
+-- Child has its own margin (non-inherited)
+local cm = ccs:getPropertyValue("margin-top")
+detail = detail .. "child.mt=" .. cm .. "; "
+ok = ok and (cm == "5px")
+
+-- Override child font-size inline
+child.style:setProperty("font-size", "14px")
+local ccs2 = document:getComputedStyle(child)
+local cfs2 = ccs2:getPropertyValue("font-size")
+detail = detail .. "child.fs2=" .. cfs2 .. "; "
+ok = ok and (cfs2 == "14px")
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

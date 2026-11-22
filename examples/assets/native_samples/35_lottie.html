@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; text-align: center; }
+    .code { background: #0f172a; padding: 10px 14px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #10b981; margin-bottom: 12px; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+
+    lottie-player {
+        display: block;
+        background: #334155;
+        border-radius: 8px;
+        border: 1px solid #475569;
+    }
+</style>
+</head>
+<body>
+    <h2>Lottie Animation Player</h2>
+
+    <h3>Basic Usage</h3>
+    <div class="section">
+        <div class="code">&lt;lottie-player src="animation.json" autoplay loop&gt;&lt;/lottie-player&gt;</div>
+        <div class="row">
+            <div>
+                <lottie-player src="sample_lottie.json" autoplay loop style="width: 200px; height: 200px;"></lottie-player>
+                <div class="label">autoplay + loop</div>
+            </div>
+            <div>
+                <lottie-player src="sample_lottie.json" style="width: 150px; height: 150px;"></lottie-player>
+                <div class="label">static (no autoplay)</div>
+            </div>
+        </div>
+        <div style="margin-top: 12px; padding: 12px; background: #334155; border-radius: 6px; font-size: 13px; color: #94a3b8;">
+            The <span style="color: #38bdf8;">&lt;lottie-player&gt;</span> element renders Lottie JSON animations
+            using Skia's built-in Skottie module. It supports <span style="color: #10b981;">autoplay</span>,
+            <span style="color: #10b981;">loop</span>, and <span style="color: #10b981;">speed</span> attributes.
+        </div>
+    </div>
+
+    <h3>Playback Speed</h3>
+    <div class="section">
+        <div class="code">&lt;lottie-player src="anim.json" autoplay loop speed="2"&gt;</div>
+        <div class="row">
+            <div>
+                <lottie-player src="sample_lottie.json" autoplay loop speed="0.5" style="width: 120px; height: 120px;"></lottie-player>
+                <div class="label">speed=0.5 (slow)</div>
+            </div>
+            <div>
+                <lottie-player src="sample_lottie.json" autoplay loop speed="1" style="width: 120px; height: 120px;"></lottie-player>
+                <div class="label">speed=1 (normal)</div>
+            </div>
+            <div>
+                <lottie-player src="sample_lottie.json" autoplay loop speed="2" style="width: 120px; height: 120px;"></lottie-player>
+                <div class="label">speed=2 (fast)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Attributes Reference</h3>
+    <div class="section">
+        <div style="font-size: 13px; line-height: 1.8; color: #94a3b8;">
+            <div><span style="color: #38bdf8; font-family: monospace;">src</span> — Path to Lottie JSON file</div>
+            <div><span style="color: #38bdf8; font-family: monospace;">autoplay</span> — Start playing immediately</div>
+            <div><span style="color: #38bdf8; font-family: monospace;">loop</span> — Loop the animation</div>
+            <div><span style="color: #38bdf8; font-family: monospace;">speed</span> — Playback speed multiplier (default: 1)</div>
+        </div>
+    </div>
+
+    <h3>Integration Notes</h3>
+    <div class="section">
+        <div style="font-size: 13px; line-height: 1.6; color: #94a3b8;">
+            Lottie rendering uses Skia's built-in <span style="color: #10b981;">Skottie</span> module —
+            no separate third-party Lottie library is required, only a Skia build with Skottie enabled
+            (see <span style="font-family: monospace;">vcpkg-overlay-ports/skia</span>).
+            Without it, the element will render as a placeholder.
+            The animation is driven by the existing CSS animation timer (~60fps).
+        </div>
+    </div>
+</body>
+</html>

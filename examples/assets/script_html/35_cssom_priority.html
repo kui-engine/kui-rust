@@ -1,0 +1,26 @@
+<html><body>
+<div id="box"></div>
+<div id="result"></div>
+<script>
+-- Test setProperty with priority and getPropertyPriority
+local el = document:getElementById("box")
+local s = el.style
+
+-- Set property with "important" priority
+s:setProperty("color", "red", "important")
+s:setProperty("font-size", "16px")
+
+local pri1 = s:getPropertyPriority("color")
+local pri2 = s:getPropertyPriority("font-size")
+
+local ok = (pri1 == "important") and (pri2 == "")
+
+-- removeProperty should return old value
+local old = s:removeProperty("font-size")
+ok = ok and (old == "16px")
+ok = ok and (s:getPropertyValue("font-size") == "")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

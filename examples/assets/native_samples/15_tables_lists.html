@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 200px; }
+
+    /* Table styles */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    th {
+        text-align: left;
+        padding: 10px 12px;
+        background: #334155;
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 12px;
+        border-bottom: 2px solid #475569;
+    }
+    td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #334155;
+    }
+    tr:nth-child(even) td { background: #162032; }
+    tr:hover td { background: #1e3a5f; }
+
+    /* List styles */
+    ul, ol { padding-left: 24px; font-size: 14px; }
+    li { padding: 4px 0; }
+
+    .list-disc { list-style-type: disc; }
+    .list-circle { list-style-type: circle; }
+    .list-square { list-style-type: square; }
+    .list-decimal { list-style-type: decimal; }
+    .list-none { list-style-type: none; padding-left: 0; }
+
+    .list-inside { list-style-position: inside; }
+    .list-outside { list-style-position: outside; }
+
+    /* Custom list items */
+    .custom-list {
+        list-style: none;
+        padding: 0;
+    }
+    .custom-list li {
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        font-size: 13px;
+    }
+    .custom-list li::before {
+        content: "→ ";
+        color: #3b82f6;
+        font-weight: 700;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .status-active  { background: #14532d; color: #22c55e; }
+    .status-pending { background: #422006; color: #f59e0b; }
+    .status-error   { background: #450a0a; color: #ef4444; }
+</style>
+</head>
+<body>
+    <h2>Tables &amp; Lists</h2>
+
+    <h3>Data Table</h3>
+    <div class="section">
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Score</th>
+            </tr>
+            <tr>
+                <td>Alice Chen</td>
+                <td>Engineer</td>
+                <td><span class="status-badge status-active">Active</span></td>
+                <td>98</td>
+            </tr>
+            <tr>
+                <td>Bob Smith</td>
+                <td>Designer</td>
+                <td><span class="status-badge status-active">Active</span></td>
+                <td>85</td>
+            </tr>
+            <tr>
+                <td>Carol Wang</td>
+                <td>Manager</td>
+                <td><span class="status-badge status-pending">Pending</span></td>
+                <td>92</td>
+            </tr>
+            <tr>
+                <td>David Lee</td>
+                <td>QA Lead</td>
+                <td><span class="status-badge status-error">Offline</span></td>
+                <td>76</td>
+            </tr>
+            <tr>
+                <td>Eve Brown</td>
+                <td>DevOps</td>
+                <td><span class="status-badge status-active">Active</span></td>
+                <td>88</td>
+            </tr>
+        </table>
+    </div>
+
+    <h3>List Style Types</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">disc (default)</div>
+                <ul class="list-disc">
+                    <li>First item</li>
+                    <li>Second item</li>
+                    <li>Third item</li>
+                </ul>
+            </div>
+            <div class="col">
+                <div class="label">circle</div>
+                <ul class="list-circle">
+                    <li>First item</li>
+                    <li>Second item</li>
+                    <li>Third item</li>
+                </ul>
+            </div>
+            <div class="col">
+                <div class="label">square</div>
+                <ul class="list-square">
+                    <li>First item</li>
+                    <li>Second item</li>
+                    <li>Third item</li>
+                </ul>
+            </div>
+            <div class="col">
+                <div class="label">decimal (ordered)</div>
+                <ol class="list-decimal">
+                    <li>First item</li>
+                    <li>Second item</li>
+                    <li>Third item</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <h3>List Style Position</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">outside (default)</div>
+                <ul class="list-outside" style="background: #0f172a; padding: 12px 12px 12px 36px; border-radius: 4px;">
+                    <li>Bullet is outside the content area</li>
+                    <li>Text wraps cleanly aligned</li>
+                </ul>
+            </div>
+            <div class="col">
+                <div class="label">inside</div>
+                <ul class="list-inside" style="background: #0f172a; padding: 12px; border-radius: 4px;">
+                    <li>Bullet is inside the content area</li>
+                    <li>Text wraps under the bullet</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <h3>Custom Styled List (::before)</h3>
+    <div class="section">
+        <ul class="custom-list">
+            <li style="background: #162032;">Dashboard overview and analytics</li>
+            <li style="background: #1a1a2e;">User management and permissions</li>
+            <li style="background: #162032;">System configuration settings</li>
+            <li style="background: #1a1a2e;">Notification preferences</li>
+            <li style="background: #162032;">Data export and reporting tools</li>
+        </ul>
+    </div>
+
+    <h3>Nested Lists</h3>
+    <div class="section">
+        <ul style="font-size: 13px;">
+            <li>Frontend
+                <ul class="list-circle">
+                    <li>HTML / CSS</li>
+                    <li>JavaScript</li>
+                    <li>Frameworks
+                        <ul class="list-square">
+                            <li>React</li>
+                            <li>Vue</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>Backend
+                <ul class="list-circle">
+                    <li>C++</li>
+                    <li>Rust</li>
+                    <li>Go</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<html><body>
+<div id="i1">Item 1</div>
+<div id="i2">Item 2</div>
+<div id="i3">Item 3</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test direct event listeners on multiple elements
+local clicked = {}
+local ok = true
+
+local i1 = document:getElementById("i1")
+local i2 = document:getElementById("i2")
+local i3 = document:getElementById("i3")
+
+-- Add click handler to each element
+i1:addEventListener("click", function(e)
+    table.insert(clicked, "i1")
+end)
+i2:addEventListener("click", function(e)
+    table.insert(clicked, "i2")
+end)
+i3:addEventListener("click", function(e)
+    table.insert(clicked, "i3")
+end)
+
+-- Simulate clicks
+i1:dispatchEvent("click")
+i2:dispatchEvent("click")
+i3:dispatchEvent("click")
+i1:dispatchEvent("click")
+
+-- Verify all clicks captured
+ok = ok and (#clicked == 4)
+ok = ok and (clicked[1] == "i1")
+ok = ok and (clicked[2] == "i2")
+ok = ok and (clicked[3] == "i3")
+ok = ok and (clicked[4] == "i1")
+
+local detail = "clicks=" .. tostring(#clicked) .. "; "
+detail = detail .. "order=" .. table.concat(clicked, ",")
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

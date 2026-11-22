@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: #1a1d23;
+    color: #e0e4ec;
+    padding: 24px;
+}
+h1 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #7eb8ff;
+}
+h2 {
+    font-size: 16px;
+    margin: 18px 0 10px 0;
+    color: #a0b4d0;
+    border-bottom: 1px solid #2a2f3a;
+    padding-bottom: 6px;
+}
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.card {
+    background: #22262e;
+    border: 1px solid #333842;
+    border-radius: 8px;
+    padding: 16px;
+}
+.card h3 {
+    font-size: 14px;
+    color: #8ca8cc;
+    margin-bottom: 10px;
+}
+label {
+    display: block;
+    font-size: 13px;
+    color: #9aa4b4;
+    margin-bottom: 4px;
+}
+input {
+    margin-bottom: 12px;
+}
+input[type="text"], input[type="date"], input[type="time"], input[type="datetime-local"] {
+    display: block;
+    width: 100%;
+    padding: 6px 8px;
+    background: #2a2f3a;
+    border: 1px solid #3a4050;
+    border-radius: 4px;
+    color: #e0e4ec;
+    font-size: 13px;
+}
+input[type="color"] {
+    width: 60px;
+    height: 32px;
+    cursor: pointer;
+}
+input[type="file"] {
+    display: block;
+    width: 100%;
+    height: 32px;
+    font-size: 13px;
+}
+input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.output {
+    font-size: 12px;
+    color: #7a8a9a;
+    margin-top: 4px;
+    min-height: 16px;
+}
+.row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<h1>Input Pickers (ENH-P0-004)</h1>
+
+<div class="grid">
+    <!-- Date Picker -->
+    <div class="card">
+        <h3>Date Picker</h3>
+        <label>Select a date:</label>
+        <input type="date" id="date1" value="2025-03-21">
+        <div class="output" id="date1-out">Value: 2025-03-21</div>
+
+        <label>Empty date:</label>
+        <input type="date" id="date2">
+        <div class="output" id="date2-out">Value: (none)</div>
+
+        <label>Disabled date:</label>
+        <input type="date" value="2024-01-01" disabled>
+    </div>
+
+    <!-- Time Picker -->
+    <div class="card">
+        <h3>Time Picker</h3>
+        <label>Select a time:</label>
+        <input type="time" id="time1" value="14:30">
+        <div class="output" id="time1-out">Value: 14:30</div>
+
+        <label>Empty time:</label>
+        <input type="time" id="time2">
+        <div class="output" id="time2-out">Value: (none)</div>
+
+        <label>Disabled time:</label>
+        <input type="time" value="09:00" disabled>
+    </div>
+
+    <!-- DateTime-Local Picker -->
+    <div class="card">
+        <h3>DateTime-Local Picker</h3>
+        <label>Select date and time:</label>
+        <input type="datetime-local" id="dtl1" value="2025-03-21T14:30">
+        <div class="output" id="dtl1-out">Value: 2025-03-21T14:30</div>
+
+        <label>Empty datetime-local:</label>
+        <input type="datetime-local" id="dtl2">
+        <div class="output" id="dtl2-out">Value: (none)</div>
+    </div>
+
+    <!-- Color Picker -->
+    <div class="card">
+        <h3>Color Picker</h3>
+        <div class="row">
+            <label>Pick a color:</label>
+            <input type="color" id="color1" value="#3388ff">
+        </div>
+        <div class="output" id="color1-out">Value: #3388ff</div>
+
+        <div class="row">
+            <label>Default (black):</label>
+            <input type="color" id="color2">
+        </div>
+        <div class="output" id="color2-out">Value: #000000</div>
+
+        <div class="row">
+            <label>Disabled:</label>
+            <input type="color" value="#ff0000" disabled>
+        </div>
+    </div>
+
+    <!-- File Picker -->
+    <div class="card">
+        <h3>File Picker</h3>
+        <label>Choose a file:</label>
+        <input type="file" id="file1">
+        <div class="output" id="file1-out">File: (none)</div>
+
+        <label>With accept filter (.png,.jpg):</label>
+        <input type="file" id="file2" accept=".png,.jpg">
+        <div class="output" id="file2-out">File: (none)</div>
+
+        <label>Disabled:</label>
+        <input type="file" disabled>
+    </div>
+
+    <!-- Mixed: All types in one card -->
+    <div class="card">
+        <h3>All Types Summary</h3>
+        <label>Text:</label>
+        <input type="text" value="Regular text input" style="margin-bottom: 8px;">
+        <label>Range:</label>
+        <input type="range" min="0" max="100" value="50" style="width: 100%; margin-bottom: 8px;">
+        <label>Checkbox:</label>
+        <div class="row">
+            <input type="checkbox" checked> Option A
+            <input type="checkbox"> Option B
+        </div>
+        <label>Radio:</label>
+        <div class="row">
+            <input type="radio" name="grp" checked> Yes
+            <input type="radio" name="grp"> No
+        </div>
+    </div>
+</div>
+
+<p style="margin-top: 20px; color: #6a7a8a; font-size: 12px;">
+    Click any date / time / datetime-local / color input to open the picker.<br>
+    Press <b>Esc</b> or click outside to dismiss without committing.
+</p>
+
+<script>
+-- ENH-P0-004 重整 demo: 监听每个 picker input 的 input/change 事件,
+--                         实时反映用户选择到对应的 .output。
+local function bind(inputId, outputId, prefix)
+    local inp = document:getElementById(inputId)
+    local out = document:getElementById(outputId)
+    if not inp or not out then return end
+    local update = function()
+        local v = inp.value
+        if v == nil or v == "" then v = "(none)" end
+        out.textContent = prefix .. v
+    end
+    inp:addEventListener("input",  update)
+    inp:addEventListener("change", update)
+end
+
+bind("date1",  "date1-out",  "Value: ")
+bind("date2",  "date2-out",  "Value: ")
+bind("time1",  "time1-out",  "Value: ")
+bind("time2",  "time2-out",  "Value: ")
+bind("dtl1",   "dtl1-out",   "Value: ")
+bind("dtl2",   "dtl2-out",   "Value: ")
+bind("color1", "color1-out", "Value: ")
+bind("color2", "color2-out", "Value: ")
+bind("file1",  "file1-out",  "File: ")
+bind("file2",  "file2-out",  "File: ")
+</script>
+
+</body>
+</html>

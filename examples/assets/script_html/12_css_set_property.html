@@ -1,0 +1,17 @@
+<html><body>
+<div id="box" style="width:100px"></div>
+<div id="result"></div>
+<script>
+local el = document:getElementById("box")
+el.style:setProperty("font-size", "16px")
+el.style:setProperty("margin", "10px")
+el.style:setProperty("padding", "5px")
+
+local ok = (el.style:getProperty("font-size") == "16px")
+    and (el.style:getProperty("margin") == "10px")
+    and (el.style:getProperty("padding") == "5px")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.acc{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden}
+.ai{border-bottom:1px solid #e2e8f0}.ai:last-child{border-bottom:none}
+.ah{padding:16px 20px;font-size:14px;font-weight:600;color:#1e293b;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.ah:hover{background:#f8fafc}.ah .arr{font-size:12px;color:#94a3b8;transition:transform .2s}
+.ah.open .arr{transform:rotate(90deg)}
+.ab{max-height:0;overflow:hidden;transition:max-height .3s,padding .3s;font-size:13px;color:#64748b;line-height:1.7;padding:0 20px}
+.ab.open{max-height:200px;padding:0 20px 16px}
+</style></head><body>
+<h2>Accordion</h2>
+<div class="acc">
+<div class="ai"><div class="ah open" id="h0">What is KUI?<span class="arr">▶</span></div><div class="ab open" id="b0">KUI is a native C++ UI framework using HTML and CSS for building desktop applications with native performance.</div></div>
+<div class="ai"><div class="ah" id="h1">How does rendering work?<span class="arr">▶</span></div><div class="ab" id="b1">KUI uses Google Skia for high-quality 2D rendering with GPU acceleration. The layout engine implements CSS box model, flexbox, and grid.</div></div>
+<div class="ai"><div class="ah" id="h2">What scripting is supported?<span class="arr">▶</span></div><div class="ab" id="b2">KUI embeds Lua 5.4. You can manipulate the DOM, handle events, and create animations from Lua scripts.</div></div>
+<div class="ai"><div class="ah" id="h3">What platforms are supported?<span class="arr">▶</span></div><div class="ab" id="b3">Currently Windows is fully supported. macOS and Linux support are planned. Architecture is designed for portability.</div></div>
+</div></body></html>

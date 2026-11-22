@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>ENH-P1-004 · 应用内 Toast 通知</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --fg: #e2e8f0;
+    --primary: #38bdf8;
+    --accent: #f472b6;
+    --code: #1e293b;
+    --border: #334155;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --error: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px;
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.7;
+  }
+  h1 {
+    font-size: 28px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0 0 8px;
+  }
+  .meta { color: #94a3b8; font-size: 13px; margin-bottom: 24px; }
+  h2 {
+    font-size: 18px; color: var(--primary);
+    border-left: 3px solid var(--primary);
+    padding-left: 10px; margin: 28px 0 12px;
+  }
+  pre {
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 13px;
+  }
+  code { color: var(--accent); }
+  .panel {
+    background: var(--code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+  }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary);
+    color: #0f172a;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.05s;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:active { transform: scale(0.97); }
+  .btn.success { background: var(--success); }
+  .btn.warning { background: var(--warning); }
+  .btn.error   { background: var(--error); color: white; }
+  .btn.outline { background: transparent; color: var(--fg); border: 1px solid var(--border); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  th { background: var(--code); color: var(--primary); }
+
+  /* 演示用:覆盖默认 Toast UA 样式(可选)*/
+  /* 此处仅展示 — 默认样式已经满足需要;作者可按需覆盖 */
+  kui-toast.kui-toast-fancy {
+    background: linear-gradient(135deg, #312e81, #4338ca);
+    border-left-color: #a78bfa;
+  }
+</style>
+</head>
+<body>
+
+<h1>ENH-P1-004 · 应用内 Toast 通知</h1>
+<div class="meta">
+  In-App Toast / Notification · DOM-driven · 跨平台 · 与 ENH-P1-003 系统级 Balloon 互补
+</div>
+
+<h2>§1 与系统通知的边界</h2>
+<table>
+  <tr><th>能力</th><th>系统级 (ENH-P1-003 TrayIcon::showBalloon)</th><th>应用内 (ENH-P1-004 Toast)</th></tr>
+  <tr><td>位置</td><td>任务栏角落(Win32 Action Center)</td><td>应用窗口内浮动元素</td></tr>
+  <tr><td>跨平台</td><td>仅 Win32(macOS/Linux 待实现)</td><td>✅ 全部平台 — DOM 驱动</td></tr>
+  <tr><td>样式</td><td>系统决定,不可定制</td><td>✅ 完整 CSS 控制</td></tr>
+  <tr><td>关闭后保留</td><td>进 Action Center 历史</td><td>消失即不可恢复</td></tr>
+  <tr><td>窗口最小化时</td><td>✅ 仍可见</td><td>❌ 不可见(被窗口遮挡)</td></tr>
+  <tr><td>用例</td><td>后台事件/重要状态变更</td><td>UI 反馈/操作确认</td></tr>
+</table>
+
+<h2>§2 Lua API</h2>
+<pre><code>-- 快捷工厂(默认 duration:info/success=3000ms,warning=4000ms,error=5000ms)
+window.toast:info("Saved")
+window.toast:success("Operation completed")
+window.toast:warning("Low disk space")
+window.toast:error("Network failed")
+
+-- 完整自定义
+local id = window.toast:show{
+    message    = "File uploaded successfully",
+    title      = "Upload",
+    level      = "success",        -- info / success / warning / error
+    durationMs = 5000,             -- 0 = 持久(不自动关闭)
+    position   = "top-right",      -- 6 选项,见 §4
+    closable   = true,             -- 显示 × 关闭按钮
+    icon       = "✓"               -- 可选,自定义 icon
+}
+
+-- 提前关闭
+window.toast:dismiss(id)
+window.toast:dismissAll()
+
+-- 查询
+print(window.toast:count())  -- 当前活跃数量
+
+-- 配置(全局)
+window.toast:setLeaveDurationMs(500)    -- 离场动画时长
+window.toast:setInjectDefaultStyles(false)  -- 不注入 UA 默认 CSS</code></pre>
+
+<h2>§3 C++ API</h2>
+<pre><code>#include &lt;kui/dom/toast_manager.h&gt;
+
+auto&amp; tm = doc-&gt;toastManager();
+tm.info("Saved");
+tm.success("Operation done");
+tm.warning("Low memory", 4000);
+tm.error("Critical error", 5000);
+
+ToastConfig cfg;
+cfg.message    = "File uploaded";
+cfg.title      = "Upload";
+cfg.level      = ToastLevel::Success;
+cfg.durationMs = 5000;
+cfg.position   = "top-right";
+u32 id = tm.show(cfg);
+
+tm.dismiss(id);
+tm.dismissAll();</code></pre>
+
+<h2>§4 实时演示</h2>
+
+<div class="panel">
+  <h3 style="margin-top:0">基础 Level</h3>
+  <div class="btn-row">
+    <button class="btn"         id="btnInfo">Info</button>
+    <button class="btn success" id="btnSuccess">Success</button>
+    <button class="btn warning" id="btnWarning">Warning</button>
+    <button class="btn error"   id="btnError">Error</button>
+  </div>
+
+  <h3>Position 6 选项</h3>
+  <div class="btn-row">
+    <button class="btn outline" data-pos="top-left">top-left</button>
+    <button class="btn outline" data-pos="top-center">top-center</button>
+    <button class="btn outline" data-pos="top-right">top-right</button>
+    <button class="btn outline" data-pos="bottom-left">bottom-left</button>
+    <button class="btn outline" data-pos="bottom-center">bottom-center</button>
+    <button class="btn outline" data-pos="bottom-right">bottom-right</button>
+  </div>
+
+  <h3>Title + Body + Persistent</h3>
+  <div class="btn-row">
+    <button class="btn" id="btnWithTitle">含标题</button>
+    <button class="btn" id="btnPersistent">持久(durationMs = 0)</button>
+    <button class="btn outline" id="btnDismissAll">关闭全部</button>
+  </div>
+
+  <h3>批量堆叠</h3>
+  <div class="btn-row">
+    <button class="btn" id="btnBurst">连发 5 条</button>
+    <button class="btn" id="btnBurstSuccess">连发 5 条(success)</button>
+  </div>
+</div>
+
+<h2>§5 DOM 结构(自动生成)</h2>
+<pre><code>&lt;body&gt;
+    ...&lt;your content&gt;...
+    &lt;kui-toast-container data-position="bottom-right"&gt;
+        &lt;kui-toast data-level="info" role="alert" aria-live="polite"
+                   data-toast-id="1" class="kui-toast-entered"&gt;
+            &lt;div class="kui-toast-title"&gt;Title&lt;/div&gt;
+            &lt;div class="kui-toast-body"&gt;Message&lt;/div&gt;
+            &lt;button class="kui-toast-close" aria-label="Close"&gt;×&lt;/button&gt;
+        &lt;/kui-toast&gt;
+    &lt;/kui-toast-container&gt;
+&lt;/body&gt;</code></pre>
+
+<h2>§6 测试覆盖</h2>
+<table>
+  <tr><th>测试套件</th><th>测试数</th><th>覆盖</th></tr>
+  <tr><td><code>test_toast_manager</code> (C++)</td><td>24 PASSED</td><td>show/dismiss/dismissAll/count、6 position、UA stylesheet 注入幂等、tick 生命周期、closable、持久 toast、LeaveDuration</td></tr>
+  <tr><td><code>test_lua_api</code> (Lua/sol2)</td><td>5 PASSED</td><td>namespace/shortcuts/show-table-config/dismiss/empty-message-reject</td></tr>
+</table>
+
+<script>
+// 该 demo 在 KUI 内运行时,window.toast 是真实 ToastManager binding;
+// 在浏览器内直接打开,降级为 console.log。
+const isKUI = (typeof window.toast === 'object');
+
+function showInfo(msg)    { if (isKUI) window.toast.info(msg);    else console.log('[INFO]',    msg); }
+function showSuccess(msg) { if (isKUI) window.toast.success(msg); else console.log('[SUCCESS]', msg); }
+function showWarning(msg) { if (isKUI) window.toast.warning(msg); else console.log('[WARNING]', msg); }
+function showError(msg)   { if (isKUI) window.toast.error(msg);   else console.log('[ERROR]',   msg); }
+
+document.getElementById('btnInfo')   .addEventListener('click', () => showInfo('这是一条 info toast'));
+document.getElementById('btnSuccess').addEventListener('click', () => showSuccess('操作成功完成'));
+document.getElementById('btnWarning').addEventListener('click', () => showWarning('注意:磁盘空间不足'));
+document.getElementById('btnError')  .addEventListener('click', () => showError('网络请求失败'));
+
+// Position
+document.querySelectorAll('[data-pos]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const p = btn.getAttribute('data-pos');
+        if (isKUI) {
+            window.toast.show({
+                message: 'Toast at ' + p,
+                level:   'info',
+                position: p,
+                durationMs: 3000
+            });
+        } else {
+            console.log('Toast at', p);
+        }
+    });
+});
+
+document.getElementById('btnWithTitle').addEventListener('click', () => {
+    if (isKUI) {
+        window.toast.show({
+            message: 'KUI 是一个跨平台的 C++ UI 框架,完整支持 HTML+CSS。',
+            title:   '产品介绍',
+            level:   'info',
+            durationMs: 5000
+        });
+    }
+});
+
+document.getElementById('btnPersistent').addEventListener('click', () => {
+    if (isKUI) {
+        window.toast.show({
+            message: '此 toast 不会自动消失,点击 × 或调用 dismiss() 关闭',
+            title:   'Persistent',
+            level:   'warning',
+            durationMs: 0
+        });
+    }
+});
+
+document.getElementById('btnDismissAll').addEventListener('click', () => {
+    if (isKUI) window.toast.dismissAll();
+});
+
+document.getElementById('btnBurst').addEventListener('click', () => {
+    if (isKUI) {
+        for (let i = 1; i <= 5; ++i) window.toast.info('连发 #' + i);
+    }
+});
+
+document.getElementById('btnBurstSuccess').addEventListener('click', () => {
+    if (isKUI) {
+        for (let i = 1; i <= 5; ++i) window.toast.success('Step ' + i + ' done');
+    }
+});
+
+if (!isKUI) {
+    console.log('Note: 浏览器内直接打开,window.toast 不可用。请在 KUI 中加载本页面以体验真实 toast。');
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:32px;font-family:"Segoe UI","Microsoft YaHei",sans-serif;
+     background:linear-gradient(135deg,#0f172a 0%%,#1e293b 100%%);color:#f8fafc;min-height:100vh}
+.tag{display:inline-block;padding:4px 12px;border-radius:12px;background:#1e3a8a;
+     color:#bfdbfe;font-size:12px;font-weight:600;letter-spacing:.5px;margin-bottom:16px}
+h1{font-size:34px;margin-bottom:8px}
+.port{font-family:"Cascadia Code",Consolas,monospace;color:#38bdf8;font-weight:700}
+.card{background:#1e293b;border:1px solid #334155;border-radius:12px;
+      padding:20px 24px;margin-top:20px}
+.card h3{font-size:14px;color:#93c5fd;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.card p{color:#cbd5e1;font-size:15px;line-height:1.7}
+code{font-family:"Cascadia Code",Consolas,monospace;background:#0f172a;
+     padding:2px 8px;border-radius:6px;color:#fcd34d}
+.hl{color:#4ade80;font-weight:700}
+.steps{margin-top:8px}
+.steps li{list-style:none;padding:8px 0;color:#cbd5e1;font-size:14px;
+          border-bottom:1px solid #1e293b}
+.num{display:inline-block;width:24px;height:24px;border-radius:50%%;background:#3b82f6;
+     color:#fff;text-align:center;line-height:24px;font-size:12px;font-weight:700;margin-right:10px}
+</style></head><body>
+<span class="tag">KUI-039 · SDK 3.16.0 · DevTools 统一发现</span>
+<h1>我是 App %d / %d</h1>
+<p style="font-size:17px;color:#94a3b8;">本窗口 DevTools 监听端口 <span class="port">%u</span></p>
+<div class="card">
+  <h3>一个地址发现全部</h3>
+  <p>在浏览器或 MCP 连接 <code>localhost:%u/json</code>,即可<span class="hl">聚合发现</span>
+     本机全部 %d 个活跃 KUI target —— 连任意一个端口(%u..%u)都一样。</p>
+</div>
+<div class="card">
+  <h3>试一试</h3>
+  <ul class="steps">
+    <li><span class="num">1</span>浏览器打开 <code>http://localhost:%u/json</code></li>
+    <li><span class="num">2</span>看到 %d 个 target 的聚合 JSON,各 <code>webSocketDebuggerUrl</code> 指向真实端口</li>
+    <li><span class="num">3</span>Chrome <code>chrome://inspect</code> 配 <code>localhost:%u</code> 即可发现全部</li>
+    <li><span class="num">4</span>本窗口精确 id 是 <code>kui-%u</code>；使用 <code>kui_connect(target="kui-%u")</code></li>
+  </ul>
+</div>
+</body></html>

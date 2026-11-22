@@ -1,0 +1,75 @@
+<html><body>
+<div id="container"></div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test dynamically building complex DOM structures
+local container = document:getElementById("container")
+local ok = true
+local detail = ""
+
+-- Create 10 items with IDs
+for i = 1, 10 do
+    local item = document:createElement("div")
+    item:setAttribute("id", "item-" .. tostring(i))
+
+    local label = document:createElement("span")
+    label.textContent = "Item " .. tostring(i)
+    item:appendChild(label)
+
+    container:appendChild(item)
+end
+
+-- Verify via children()
+local ch = container:children()
+detail = detail .. "count=" .. tostring(#ch) .. "; "
+ok = ok and (#ch == 10)
+
+-- Verify IDs via getElementById
+local item5 = document:getElementById("item-5")
+ok = ok and (item5 ~= nil)
+if item5 then
+    detail = detail .. "item5.text=" .. item5.textContent .. "; "
+    ok = ok and (item5.textContent == "Item 5")
+end
+
+-- Build nested structure: grid
+local grid = document:createElement("div")
+grid:setAttribute("id", "grid")
+for row = 1, 3 do
+    local rowEl = document:createElement("div")
+    rowEl:setAttribute("id", "row-" .. tostring(row))
+    for col = 1, 4 do
+        local cell = document:createElement("div")
+        cell.textContent = tostring(row) .. "x" .. tostring(col)
+        rowEl:appendChild(cell)
+    end
+    grid:appendChild(rowEl)
+end
+container:appendChild(grid)
+
+-- Verify grid via children()
+local gridCh = grid:children()
+detail = detail .. "rows=" .. tostring(#gridCh) .. "; "
+ok = ok and (#gridCh == 3)
+
+-- Verify first row has 4 cells
+local row1 = document:getElementById("row-1")
+ok = ok and (row1 ~= nil)
+if row1 then
+    local cells = row1:children()
+    ok = ok and (#cells == 4)
+    detail = detail .. "cells=" .. tostring(#cells) .. "; "
+end
+
+-- Total children of container: 10 items + 1 grid
+ch = container:children()
+detail = detail .. "total=" .. tostring(#ch)
+ok = ok and (#ch == 11)
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

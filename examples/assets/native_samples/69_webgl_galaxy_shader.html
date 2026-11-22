@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    background: #050510;
+    color: #e0e0e0;
+    font-family: "Segoe UI", sans-serif;
+}
+h2 { color: #8888ff; margin-bottom: 10px; }
+.info { color: #888; font-size: 13px; margin-bottom: 8px; }
+.container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.panel {
+    background: #0a0a20;
+    border: 1px solid #1a1a4a;
+    border-radius: 8px;
+    padding: 16px;
+}
+canvas {
+    display: block;
+    border: 1px solid #1a1a4a;
+    border-radius: 4px;
+}
+.perf {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #aaa;
+    font-family: "Consolas", monospace;
+}
+</style>
+</head>
+<body>
+    <h2>WebGL Cosmic Nebula</h2>
+    <p class="info">Procedural volumetric nebula with star field, god rays and animated gas clouds</p>
+
+    <div class="container">
+        <div class="panel">
+            <canvas id="gl-canvas" width="512" height="512"></canvas>
+            <div id="perf-info" class="perf">Initializing...</div>
+        </div>
+        <div class="panel" style="max-width: 320px;">
+            <h3 style="color: #8888ff; margin-top: 0;">Techniques</h3>
+            <p class="info">&#8226; Volumetric ray marching</p>
+            <p class="info">&#8226; Multi-octave 3D noise</p>
+            <p class="info">&#8226; Procedural star field</p>
+            <p class="info">&#8226; Emission + absorption model</p>
+            <p class="info">&#8226; Animated camera fly-through</p>
+            <p class="info">&#8226; HDR tone mapping</p>
+            <div id="status" class="perf">Status: loading...</div>
+        </div>
+    </div>
+
+<script>
+-- WebGL Cosmic Nebula — Volumetric Ray Marching
+local canvas = document:getElementById("gl-canvas")
+local perfDiv = document:getElementById("perf-info")
+local statusDiv = document:getElementById("status")
+
+if not canvas then return end
+
+local gl = canvas:getContext("webgl")
+if not gl then
+    statusDiv.textContent = "Status: ERROR - WebGL not available"
+    return
+end
+
+statusDiv.textContent = "Status: WebGL context created"
+
+local vsSource = [[
+    attribute vec2 aPosition;
+    varying vec2 vUV;
+    void main() {
+        vUV = aPosition;
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+    }
+]]
+
+local fsSource = [[
+    precision highp float;
+    varying vec2 vUV;
+    uniform float uTime;
+    uniform vec2 uResolution;
+
+    // Hash functions
+    float hash(float n) { return fract(sin(n) * 43758.5453); }
+    float hash2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+    // 3D value noise
+    float noise3D(vec3 p) {
+        vec3 i = floor(p);
+        vec3 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+
+        float n = i.x + i.y * 57.0 + i.z * 113.0;
+        float a = hash(n);
+        float b = hash(n + 1.0);
+        float c = hash(n + 57.0);
+        float d = hash(n + 58.0);
+        float e = hash(n + 113.0);
+        float ff = hash(n + 114.0);
+        float g = hash(n + 170.0);
+        float h = hash(n + 171.0);
+
+        return mix(
+            mix(mix(a, b, f.x), mix(c, d, f.x), f.y),
+            mix(mix(e, ff, f.x), mix(g, h, f.x), f.y),
+            f.z
+        );
+    }
+
+    // FBM 3D (4 octaves)
+    float fbm3(vec3 p) {
+        float f = 0.0;
+        f += 0.5000 * noise3D(p); p *= 2.01;
+        f += 0.2500 * noise3D(p); p *= 2.02;
+        f += 0.1250 * noise3D(p); p *= 2.03;
+        f += 0.0625 * noise3D(p);
+        return f / 0.9375;
+    }
+
+    // Star field
+    float stars(vec2 uv) {
+        vec2 id = floor(uv * 200.0);
+        float h = hash2(id);
+        if (h > 0.98) {
+            vec2 center = (id + 0.5) / 200.0;
+            float d = length(uv - center) * 200.0;
+            float brightness = (h - 0.98) * 50.0;
+            float twinkle = 0.5 + 0.5 * sin(h * 100.0 + uTime * (2.0 + h * 3.0));
+            return brightness * twinkle * exp(-d * d * 8.0);
+        }
+        return 0.0;
+    }
+
+    // Nebula density function
+    float nebulaDensity(vec3 p, float t) {
+        // Domain warping
+        vec3 q = p + vec3(t * 0.02, t * 0.01, t * 0.015);
+        float n1 = fbm3(q * 0.5);
+        vec3 r = p + n1 * 1.5 + vec3(t * 0.01);
+        float n2 = fbm3(r * 0.3);
+
+        // Shape: concentrated around origin with falloff
+        float dist = length(p) * 0.15;
+        float falloff = exp(-dist * dist);
+
+        float density = n2 * falloff;
+        // Threshold for sharp edges
+        density = smoothstep(0.1, 0.5, density);
+        return density;
+    }
+
+    // Nebula color based on density and position
+    vec3 nebulaColor(vec3 p, float density, float t) {
+        float n = fbm3(p * 0.2 + t * 0.03);
+        // Purple-blue-pink palette
+        vec3 c1 = vec3(0.3, 0.1, 0.6); // deep purple
+        vec3 c2 = vec3(0.1, 0.2, 0.8); // blue
+        vec3 c3 = vec3(0.8, 0.2, 0.5); // pink
+        vec3 c4 = vec3(0.2, 0.8, 0.6); // teal
+
+        vec3 col = mix(c1, c2, n);
+        col = mix(col, c3, smoothstep(0.3, 0.7, fbm3(p * 0.15 + 100.0)));
+        col = mix(col, c4, smoothstep(0.5, 0.8, fbm3(p * 0.1 + 200.0)) * 0.3);
+
+        // Emission glow in dense regions
+        col *= (1.0 + density * 2.0);
+        return col;
+    }
+
+    void main() {
+        vec2 uv = vUV;
+        uv.x *= uResolution.x / uResolution.y;
+        float t = uTime;
+
+        // Camera
+        float camT = t * 0.5;
+        vec3 ro = vec3(sin(camT * 0.3) * 4.0, cos(camT * 0.2) * 2.0, camT * 2.0);
+        vec3 ta = ro + vec3(sin(camT * 0.1), cos(camT * 0.15) * 0.3, 3.0);
+
+        vec3 fwd = normalize(ta - ro);
+        vec3 right = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)));
+        vec3 up = cross(right, fwd);
+        vec3 rd = normalize(uv.x * right + uv.y * up + 2.0 * fwd);
+
+        // Background: star field
+        vec3 col = vec3(0.01, 0.005, 0.02);
+        float s = stars(uv * 0.5 + t * 0.01);
+        col += vec3(s * 0.8, s * 0.9, s);
+
+        // Volume ray march through nebula
+        float stepSize = 0.3;
+        float transmittance = 1.0;
+        vec3 scatteredLight = vec3(0.0);
+
+        for (int i = 0; i < 50; i++) {
+            float tt = float(i) * stepSize;
+            vec3 p = ro + rd * tt;
+
+            float density = nebulaDensity(p, t);
+            if (density > 0.01) {
+                vec3 emitColor = nebulaColor(p, density, t);
+
+                // Beer-Lambert absorption
+                float absorption = density * stepSize * 0.8;
+                scatteredLight += emitColor * density * transmittance * stepSize;
+                transmittance *= exp(-absorption);
+
+                if (transmittance < 0.01) break;
+            }
+        }
+
+        col = col * transmittance + scatteredLight;
+
+        // Add central bright star/core
+        vec3 coreDir = normalize(vec3(sin(t * 0.1), cos(t * 0.15) * 0.2, 1.0));
+        float coreDot = max(dot(rd, coreDir), 0.0);
+        col += vec3(1.0, 0.8, 0.6) * pow(coreDot, 200.0) * 3.0;
+        col += vec3(0.5, 0.3, 0.7) * pow(coreDot, 20.0) * 0.5;
+
+        // Tone mapping (Reinhard)
+        col = col / (col + vec3(1.0));
+        // Gamma
+        col = pow(col, vec3(0.85));
+
+        gl_FragColor = vec4(col, 1.0);
+    }
+]]
+
+local function compileShader(type, source)
+    local shader = gl:createShader(type)
+    gl:shaderSource(shader, source)
+    gl:compileShader(shader)
+    if gl:getShaderParameter(shader, gl.COMPILE_STATUS) == 0 then
+        print("Shader error: " .. gl:getShaderInfoLog(shader))
+        gl:deleteShader(shader)
+        return nil
+    end
+    return shader
+end
+
+local vs = compileShader(gl.VERTEX_SHADER, vsSource)
+local fs = compileShader(gl.FRAGMENT_SHADER, fsSource)
+if not vs or not fs then
+    statusDiv.textContent = "Status: ERROR - shader compile failed"
+    return
+end
+
+local program = gl:createProgram()
+gl:attachShader(program, vs)
+gl:attachShader(program, fs)
+gl:linkProgram(program)
+if gl:getProgramParameter(program, gl.LINK_STATUS) == 0 then
+    statusDiv.textContent = "Status: ERROR - link failed: " .. gl:getProgramInfoLog(program)
+    return
+end
+gl:useProgram(program)
+
+local quadVerts = { -1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1 }
+local vbo = gl:createBuffer()
+gl:bindBuffer(gl.ARRAY_BUFFER, vbo)
+gl:bufferDataFloat(gl.ARRAY_BUFFER, quadVerts, gl.STATIC_DRAW)
+
+local aPos = gl:getAttribLocation(program, "aPosition")
+local uTime = gl:getUniformLocation(program, "uTime")
+local uRes = gl:getUniformLocation(program, "uResolution")
+
+gl:enableVertexAttribArray(aPos)
+gl:vertexAttribPointer(aPos, 2, gl.FLOAT, false, 8, 0)
+
+statusDiv.textContent = "Status: Rendering nebula..."
+
+local startTimeMs = 0
+local frameCount = 0
+
+local function render(nowMs)
+    if startTimeMs == 0 then startTimeMs = nowMs end
+    local t = (nowMs - startTimeMs) / 1000.0
+
+    gl:beginFrame()
+    gl:uniform1f(uTime, t)
+    gl:uniform2f(uRes, 512.0, 512.0)
+    gl:drawArrays(gl.TRIANGLES, 0, 6)
+    gl:endFrame()
+
+    frameCount = frameCount + 1
+    if frameCount % 60 == 0 then
+        local perf = gl:perfCounters()
+        perfDiv.textContent = string.format(
+            "Time: %.1fs | Frame: %d | %.2fms/frame",
+            t, frameCount, perf.frameTimeMs
+        )
+    end
+
+    requestAnimationFrame(render)
+end
+
+requestAnimationFrame(render)
+</script>
+</body>
+</html>

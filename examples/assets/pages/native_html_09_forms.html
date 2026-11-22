@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { margin-bottom: 16px; color: #1e293b; }
+.form-card { background: white; padding: 24px; border-radius: 12px;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.1); max-width: 500px; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 13px; font-weight: 600;
+               color: #475569; margin-bottom: 4px; }
+.field input, .field textarea, .field select {
+    width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1;
+    border-radius: 6px; font-size: 14px; font-family: inherit; }
+.field input:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+textarea { resize: vertical; min-height: 80px; }
+.btn { padding: 10px 24px; background: #3b82f6; color: white; border: none;
+       border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 600; }
+.btn:hover { background: #2563eb; }
+.range-demo { display: flex; align-items: center; gap: 12px; }
+.range-demo input[type="range"] { flex: 1; }
+#rangeVal { font-size: 14px; color: #475569; min-width: 30px; }
+#output { margin-top: 16px; padding: 12px; background: #f1f5f9; border-radius: 6px;
+          font-size: 13px; color: #475569; min-height: 40px; }
+</style></head><body>
+<h2>Form Elements</h2>
+<div class="form-card">
+  <div class="field"><label>Text Input</label><input type="text" id="nameInput" placeholder="Enter your name"></div>
+  <div class="field"><label>Email</label><input type="email" placeholder="email@example.com"></div>
+  <div class="field"><label>Password</label><input type="password" placeholder="Enter password"></div>
+  <div class="field"><label>Range</label>
+    <div class="range-demo"><input type="range" id="rangeInput" min="0" max="100" value="50"><span id="rangeVal">50</span></div>
+  </div>
+  <div class="field"><label>Select</label>
+    <select id="colorSelect"><option>Blue</option><option>Red</option><option>Green</option></select>
+  </div>
+  <div class="field"><label>Textarea</label><textarea placeholder="Enter description..."></textarea></div>
+  <button class="btn" id="submitBtn">Submit</button>
+  <div id="output">Fill in the form and click Submit.</div>
+</div>
+</body></html>

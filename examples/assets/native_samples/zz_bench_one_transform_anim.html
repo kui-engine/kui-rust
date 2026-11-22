@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { margin: 0; padding: 32px; background: #1a1a2e; color: #eee; font-family: "Segoe UI", sans-serif; }
+@keyframes slide { from { transform: translateX(0); } to { transform: translateX(200px); } }
+.box {
+    width: 80px; height: 80px;
+    background: #06b6d4; border-radius: 8px;
+    animation: slide 2s ease-in-out infinite alternate;
+}
+</style>
+</head>
+<body>
+    <h1>One transform-only animation</h1>
+    <div class="box"></div>
+    <p>If KUI burns 100% CPU here while Edge stays low, the bottleneck is the immediate-mode paint loop reacting to every animation tick.</p>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    :root {
+        --primary: #3b82f6;
+        --secondary: #8b5cf6;
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --bg-dark: #0f172a;
+        --bg-card: #1e293b;
+        --bg-surface: #334155;
+        --text-main: #e2e8f0;
+        --text-muted: #94a3b8;
+        --text-dim: #64748b;
+        --border: #475569;
+        --radius: 8px;
+        --gap: 16px;
+        --font: "Segoe UI", sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg-dark); color: var(--text-main); font-family: var(--font); padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: var(--text-muted); margin: 16px 0 8px; }
+    .section { background: var(--bg-card); border-radius: var(--radius); padding: var(--gap); margin-bottom: var(--gap); }
+    .label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+    .row { display: flex; gap: var(--gap); margin-bottom: 12px; flex-wrap: wrap; }
+
+    /* Themed components using variables */
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .badge-primary   { background: var(--primary); color: white; }
+    .badge-secondary { background: var(--secondary); color: white; }
+    .badge-success   { background: var(--success); color: white; }
+    .badge-danger    { background: var(--danger); color: white; }
+    .badge-warning   { background: var(--warning); color: black; }
+
+    .card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: var(--gap);
+        flex: 1;
+        min-width: 200px;
+    }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .card-text  { font-size: 13px; color: var(--text-muted); }
+
+    .btn-var {
+        padding: 8px 20px;
+        border-radius: var(--radius);
+        font-size: 14px;
+        font-weight: 600;
+        border: 2px solid transparent;
+        cursor: pointer;
+    }
+
+    /* Local variable overrides */
+    .theme-blue   { --accent: var(--primary); }
+    .theme-purple { --accent: var(--secondary); }
+    .theme-green  { --accent: var(--success); }
+    .theme-red    { --accent: var(--danger); }
+
+    .themed-card {
+        background: var(--bg-card);
+        border: 2px solid var(--accent);
+        border-radius: var(--radius);
+        padding: var(--gap);
+        flex: 1;
+    }
+    .themed-card .card-title { color: var(--accent); }
+
+    /* Variable-driven spacing */
+    .spacing-demo {
+        --item-gap: 8px;
+        display: flex;
+        gap: var(--item-gap);
+    }
+    .spacing-sm { --item-gap: 4px; }
+    .spacing-md { --item-gap: 16px; }
+    .spacing-lg { --item-gap: 32px; }
+    .spacing-item { width: 40px; height: 40px; background: var(--primary); border-radius: 4px; }
+
+    .var-ref {
+        font-family: monospace;
+        font-size: 12px;
+        padding: 4px 8px;
+        background: var(--bg-dark);
+        border-radius: 4px;
+        color: var(--warning);
+        margin: 2px 0;
+    }
+</style>
+</head>
+<body>
+    <h2>CSS Custom Properties (Variables)</h2>
+
+    <h3>:root Variables</h3>
+    <div class="section">
+        <div class="label">Variables defined in :root scope</div>
+        <div style="display:flex; flex-direction:column; gap:4px; margin-top:8px;">
+            <div class="var-ref">--primary: #3b82f6</div>
+            <div class="var-ref">--secondary: #8b5cf6</div>
+            <div class="var-ref">--success: #22c55e</div>
+            <div class="var-ref">--danger: #ef4444</div>
+            <div class="var-ref">--warning: #f59e0b</div>
+            <div class="var-ref">--radius: 8px</div>
+            <div class="var-ref">--gap: 16px</div>
+        </div>
+    </div>
+
+    <h3>Components Using Variables</h3>
+    <div class="section">
+        <div class="label">Badges</div>
+        <div class="row">
+            <span class="badge badge-primary">Primary</span>
+            <span class="badge badge-secondary">Secondary</span>
+            <span class="badge badge-success">Success</span>
+            <span class="badge badge-danger">Danger</span>
+            <span class="badge badge-warning">Warning</span>
+        </div>
+    </div>
+
+    <h3>Cards Using Variables</h3>
+    <div class="row">
+        <div class="card">
+            <div class="card-title">Analytics</div>
+            <div class="card-text">Card styled with var(--bg-surface), var(--border), var(--radius)</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Reports</div>
+            <div class="card-text">Same variables ensure consistent theming across all cards</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Settings</div>
+            <div class="card-text">Change :root values to retheme everything at once</div>
+        </div>
+    </div>
+
+    <h3>Local Variable Overrides (--accent per element)</h3>
+    <div class="row">
+        <div class="themed-card theme-blue">
+            <div class="card-title">Blue Theme</div>
+            <div class="card-text">--accent = var(--primary)</div>
+        </div>
+        <div class="themed-card theme-purple">
+            <div class="card-title">Purple Theme</div>
+            <div class="card-text">--accent = var(--secondary)</div>
+        </div>
+        <div class="themed-card theme-green">
+            <div class="card-title">Green Theme</div>
+            <div class="card-text">--accent = var(--success)</div>
+        </div>
+        <div class="themed-card theme-red">
+            <div class="card-title">Red Theme</div>
+            <div class="card-text">--accent = var(--danger)</div>
+        </div>
+    </div>
+
+    <h3>Variable-Driven Spacing</h3>
+    <div class="section">
+        <div class="label">--item-gap: 4px</div>
+        <div class="spacing-demo spacing-sm" style="margin-bottom:12px;">
+            <div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div>
+        </div>
+        <div class="label">--item-gap: 16px</div>
+        <div class="spacing-demo spacing-md" style="margin-bottom:12px;">
+            <div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div>
+        </div>
+        <div class="label">--item-gap: 32px</div>
+        <div class="spacing-demo spacing-lg">
+            <div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div><div class="spacing-item"></div>
+        </div>
+    </div>
+</body>
+</html>

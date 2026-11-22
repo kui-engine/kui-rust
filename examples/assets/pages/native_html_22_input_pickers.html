@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    padding: 24px;
+    font-family: "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+h1 { font-size: 22px; color: #7dd3fc; margin-bottom: 20px; }
+h2 { font-size: 15px; color: #94a3b8; margin-bottom: 12px;
+     border-bottom: 1px solid #1e293b; padding-bottom: 6px; }
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 18px;
+}
+label {
+    display: block;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    margin-top: 10px;
+}
+label:first-child { margin-top: 0; }
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+    display: block;
+    width: 100%;
+    padding: 7px 10px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-size: 13px;
+    font-family: inherit;
+}
+input[type="color"] {
+    width: 56px;
+    height: 34px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+input[type="file"] {
+    display: block;
+    width: 100%;
+    height: 34px;
+    font-size: 13px;
+    cursor: pointer;
+}
+input:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.row { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+.output {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 6px;
+    min-height: 16px;
+    padding: 4px 8px;
+    background: #0f172a;
+    border-radius: 4px;
+}
+.swatch-preview {
+    width: 24px; height: 24px;
+    border-radius: 4px;
+    border: 1px solid #475569;
+    display: inline-block;
+}
+</style></head><body>
+
+<h1>Input Pickers Demo</h1>
+
+<div class="grid">
+  <!-- Date -->
+  <div class="card">
+    <h2>Date Picker</h2>
+    <label>Select a date:</label>
+    <input type="date" id="date1" value="2025-03-21">
+    <div class="output" id="date1-out">2025-03-21</div>
+
+    <label>Empty (click to pick):</label>
+    <input type="date" id="date2">
+    <div class="output" id="date2-out">—</div>
+
+    <label>Disabled:</label>
+    <input type="date" value="2024-01-01" disabled>
+  </div>
+
+  <!-- Time -->
+  <div class="card">
+    <h2>Time Picker</h2>
+    <label>Select a time:</label>
+    <input type="time" id="time1" value="14:30">
+    <div class="output" id="time1-out">14:30</div>
+
+    <label>Empty:</label>
+    <input type="time" id="time2">
+    <div class="output" id="time2-out">—</div>
+
+    <label>Disabled:</label>
+    <input type="time" value="09:00" disabled>
+  </div>
+
+  <!-- DateTime-Local -->
+  <div class="card">
+    <h2>DateTime-Local Picker</h2>
+    <label>Select date + time:</label>
+    <input type="datetime-local" id="dtl1" value="2025-03-21T14:30">
+    <div class="output" id="dtl1-out">2025-03-21T14:30</div>
+
+    <label>Empty:</label>
+    <input type="datetime-local" id="dtl2">
+    <div class="output" id="dtl2-out">—</div>
+  </div>
+
+  <!-- Color -->
+  <div class="card">
+    <h2>Color Picker</h2>
+    <label>Pick a color:</label>
+    <div class="row">
+      <input type="color" id="color1" value="#3b82f6">
+      <div class="swatch-preview" id="swatch1" style="background: #3b82f6;"></div>
+      <span class="output" id="color1-out">#3b82f6</span>
+    </div>
+
+    <label>Default (black):</label>
+    <div class="row">
+      <input type="color" id="color2">
+      <span class="output" id="color2-out">#000000</span>
+    </div>
+
+    <label>Disabled:</label>
+    <div class="row">
+      <input type="color" value="#ef4444" disabled>
+    </div>
+  </div>
+
+  <!-- File -->
+  <div class="card">
+    <h2>File Picker</h2>
+    <label>Choose a file:</label>
+    <input type="file" id="file1">
+    <div class="output" id="file1-out">No file selected</div>
+
+    <label>With accept filter:</label>
+    <input type="file" id="file2" accept=".png,.jpg,.jpeg">
+    <div class="output" id="file2-out">No file selected</div>
+
+    <label>Disabled:</label>
+    <input type="file" disabled>
+  </div>
+
+  <!-- Summary -->
+  <div class="card">
+    <h2>All Input Types</h2>
+    <label>Text:</label>
+    <input type="text" value="Regular text input">
+    <label>Range:</label>
+    <input type="range" min="0" max="100" value="50" style="width: 100%;">
+    <label>Checkbox:</label>
+    <div class="row">
+      <input type="checkbox" checked> Opt A
+      <input type="checkbox"> Opt B
+    </div>
+    <label>Radio:</label>
+    <div class="row">
+      <input type="radio" name="r" checked> Yes
+      <input type="radio" name="r"> No
+    </div>
+  </div>
+</div>
+
+</body></html>

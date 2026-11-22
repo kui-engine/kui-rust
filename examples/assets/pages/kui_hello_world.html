@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 48px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        min-width: 400px;
+    }
+
+    .title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 12px;
+    }
+
+    .subtitle {
+        font-size: 16px;
+        color: #6b7280;
+        margin-bottom: 32px;
+        line-height: 1.5;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 32px;
+        background: #3b82f6;
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn:hover {
+        background: #2563eb;
+    }
+
+    .btn:active {
+        transform: scale(0.97);
+    }
+
+    .counter {
+        margin-top: 24px;
+        font-size: 48px;
+        font-weight: 800;
+        color: #3b82f6;
+    }
+</style>
+</head>
+<body>
+    <div class="card">
+        <div class="title">Hello, KUI!</div>
+        <div class="subtitle">
+            A C++ GUI framework powered by HTML &amp; CSS.<br>
+            No JavaScript required.
+        </div>
+        <div class="btn" id="clickBtn">Click Me</div>
+        <div class="counter" id="counter">0</div>
+    </div>
+</body>
+</html>

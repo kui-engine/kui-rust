@@ -1,0 +1,18 @@
+<html><body>
+<div id="box" style="font-size:20px;margin:10px"></div>
+<div id="result"></div>
+<script>
+local el = document:getElementById("box")
+local ok = (el.style:getProperty("font-size") == "20px")
+
+el.style:removeProperty("font-size")
+local after = el.style:getProperty("font-size")
+ok = ok and (after == "" or after == nil)
+
+-- margin should still be there
+ok = ok and (el.style:getProperty("margin") == "10px")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

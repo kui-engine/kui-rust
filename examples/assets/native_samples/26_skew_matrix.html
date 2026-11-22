@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+    .box { width: 100px; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; }
+    .label { font-size: 11px; color: #64748b; margin-top: 8px; text-align: center; }
+</style>
+</head>
+<body>
+    <h2>Transform: skew &amp; matrix</h2>
+
+    <h3>skewX()</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="box" style="background: #3b82f6; transform: skewX(0deg);">0deg</div>
+                <div class="label">skewX(0deg)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #3b82f6; transform: skewX(15deg);">15deg</div>
+                <div class="label">skewX(15deg)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #3b82f6; transform: skewX(30deg);">30deg</div>
+                <div class="label">skewX(30deg)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #3b82f6; transform: skewX(-20deg);">-20deg</div>
+                <div class="label">skewX(-20deg)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>skewY()</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="box" style="background: #8b5cf6; transform: skewY(10deg);">10deg</div>
+                <div class="label">skewY(10deg)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #8b5cf6; transform: skewY(20deg);">20deg</div>
+                <div class="label">skewY(20deg)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #8b5cf6; transform: skewY(-15deg);">-15deg</div>
+                <div class="label">skewY(-15deg)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>matrix() Transform</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="box" style="background: #10b981; transform: matrix(1, 0, 0, 1, 0, 0);">identity</div>
+                <div class="label">matrix(1,0,0,1,0,0)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #10b981; transform: matrix(1.5, 0, 0, 1.5, 0, 0);">scale 1.5x</div>
+                <div class="label">matrix(1.5,0,0,1.5,0,0)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #10b981; transform: matrix(1, 0.3, 0, 1, 0, 0);">shear</div>
+                <div class="label">matrix(1,0.3,0,1,0,0)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #10b981; transform: matrix(0.87, 0.5, -0.5, 0.87, 0, 0);">rotate30</div>
+                <div class="label">≈rotate(30deg)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Combined Transforms</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="box" style="background: #f59e0b; transform: rotate(15deg) skewX(10deg);">rot+skew</div>
+                <div class="label">rotate + skewX</div>
+            </div>
+            <div>
+                <div class="box" style="background: #ef4444; transform: scale(1.2) skewY(10deg);">scale+skew</div>
+                <div class="label">scale + skewY</div>
+            </div>
+            <div>
+                <div class="box" style="background: #ec4899; transform: translateX(10px) rotate(10deg) skewX(5deg);">combo</div>
+                <div class="label">translate+rotate+skew</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

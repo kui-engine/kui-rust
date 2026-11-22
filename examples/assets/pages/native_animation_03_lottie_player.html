@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { display: flex; align-items: center; justify-content: center; height: 100vh;
+       background: #0f172a; font-family: "Segoe UI", sans-serif; }
+.card { background: #1e293b; padding: 32px; border-radius: 16px; text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.card h2 { color: #f8fafc; margin-bottom: 8px; }
+.card p { color: #94a3b8; font-size: 14px; margin-bottom: 16px; }
+lottie-player { display: block; width: 200px; height: 200px; margin: 0 auto; }
+</style></head><body>
+<div class="card">
+  <h2>Lottie Animation</h2>
+  <p>Renders Lottie JSON animations via KUI's built-in player.</p>
+  <lottie-player id="lottie" loop></lottie-player>
+  <p id="status">Loading bundled animation…</p>
+</div>
+</body></html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>自定义右键菜单 · &lt;kui-context-menu&gt;</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --fg: #1f2933;
+    --muted: #66788a;
+    --border: #d9dee5;
+    --accent: #2563eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px 24px;
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .lead { color: var(--muted); margin: 0 0 16px; }
+  /* minmax(0, 1fr)：代码块里的长行不把列撑宽（1fr 的最小宽度是内容宽度） */
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 6px; }
+  .card p { margin: 0 0 10px; color: var(--muted); }
+  .zone {
+    height: 92px;
+    border: 2px dashed #b8c2cf;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    cursor: context-menu;
+  }
+  code { font-family: Consolas, monospace; font-size: 12px; background: #eef1f5; padding: 1px 4px; border-radius: 4px; }
+  pre {
+    margin: 8px 0 0;
+    padding: 8px 10px;
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 6px;
+    font-family: Consolas, monospace;
+    font-size: 11.5px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow: hidden;
+  }
+  #log {
+    margin-top: 14px;
+    padding: 8px 12px;
+    background: #111827;
+    color: #a7f3d0;
+    border-radius: 6px;
+    font-family: Consolas, monospace;
+    font-size: 12px;
+  }
+
+  /* ---- 2. 完全自定义的暗色菜单：只是普通 CSS ---------------------------------- */
+  kui-context-menu.dark {
+    min-width: 220px;
+    padding: 6px;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    font-size: 13px;
+  }
+  /* 作者样式总是压过 UA 默认：给菜单项设 padding 时把分隔线排除掉，否则分隔线会被撑成粗条 */
+  kui-context-menu.dark kui-menu-item:not([separator]) {
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 7px;
+  }
+  /* 高亮跟随鼠标与键盘：样式写 [highlighted] 即可，不需要悬停伪类 */
+  kui-context-menu.dark kui-menu-item[highlighted] {
+    background: linear-gradient(90deg, #7c3aed, #2563eb);
+    color: #ffffff;
+  }
+  kui-context-menu.dark kui-menu-item[separator] { height: 1px; padding: 0; background: #45475a; margin: 5px 6px; }
+  kui-context-menu.dark kui-menu-item[disabled] { color: #6c7086; }
+  kui-context-menu.dark kui-menu-item.danger { color: #f38ba8; }
+  kui-context-menu.dark kui-menu-item.danger[highlighted] { background: #f38ba8; color: #1e1e2e; }
+  kui-context-menu.dark .group {
+    padding: 4px 10px 2px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #89b4fa;
+  }
+  kui-context-menu.dark .icon {
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+  kui-context-menu.dark .kbd {
+    margin-left: auto;
+    padding: 0 6px;
+    border: 1px solid #585b70;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #a6adc8;
+  }
+  kui-context-menu.dark kui-menu-item[highlighted] .kbd { color: #ffffff; border-color: #ffffff; }
+  /* 勾选项：checked 属性 + 自己画的勾 */
+  kui-context-menu.dark .check {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    border-radius: 4px;
+    border: 1px solid #585b70;
+  }
+  kui-context-menu.dark kui-menu-item[checked] .check {
+    background: #a6e3a1;
+    border-color: #a6e3a1;
+  }
+  /* 子菜单沿用同一套外观 */
+  kui-context-menu.dark kui-context-menu { background: #181825; }
+  /* 静态预览：同一个元素，不带 open、显示成普通块，方便截图里看到外观 */
+  kui-context-menu.preview {
+    display: block;
+    position: static;
+    width: 230px;
+    box-shadow: none;
+  }
+  .dark-wrap { display: flex; gap: 14px; align-items: flex-start; }
+  .dark-wrap .zone { flex: 1; height: 236px; background: #11111b; color: #a6adc8; border-color: #45475a; }
+
+  /* ---- 3. 动态菜单 ---------------------------------------------------------- */
+  .files { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .file {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-bottom: 1px solid #eef1f5;
+    cursor: context-menu;
+  }
+  .file:last-child { border-bottom: none; }
+  .file.pinned { background: #eff6ff; }
+  .file .tag { color: var(--muted); font-size: 12px; }
+  kui-context-menu#file-menu .title {
+    padding: 4px 12px 6px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  /* ---- 4. 代码打开 ---------------------------------------------------------- */
+  .btn {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #ffffff;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<h1>自定义右键菜单</h1>
+<p class="lead">
+  <code>&lt;kui-context-menu&gt;</code> 就是页面里的一段 HTML：内容随便写，外观全由 CSS 决定；引擎负责右键时打开并定位
+  （贴边自动翻转）、点外面 / Esc / 窗口失活时关闭、点菜单项后关闭、上下键与回车。引擎自带的「剪切 / 复制 / 粘贴」菜单默认不弹。
+</p>
+
+<div class="grid">
+
+  <!-- 1. 最简用法 -->
+  <div class="card">
+    <h2>1. 最简用法：默认外观</h2>
+    <p>写 <code>for="目标 id"</code>（或者直接放在目标元素里面），菜单项用 <code>text</code> / <code>shortcut</code> /
+      <code>separator</code> / <code>disabled</code>；菜单项里再放一个菜单就是子菜单。</p>
+    <div class="zone" id="basic-zone">在这里右键</div>
+    <kui-context-menu for="basic-zone">
+      <kui-menu-item text="复制" shortcut="Ctrl+C"></kui-menu-item>
+      <kui-menu-item text="粘贴" shortcut="Ctrl+V"></kui-menu-item>
+      <kui-menu-item text="粘贴为纯文本" disabled></kui-menu-item>
+      <kui-menu-item separator></kui-menu-item>
+      <kui-menu-item>更多 ›
+        <kui-context-menu>
+          <kui-menu-item text="重命名" shortcut="F2"></kui-menu-item>
+          <kui-menu-item text="属性"></kui-menu-item>
+        </kui-context-menu>
+      </kui-menu-item>
+    </kui-context-menu>
+<pre>&lt;div id="basic-zone"&gt;在这里右键&lt;/div&gt;
+&lt;kui-context-menu for="basic-zone"&gt;
+  &lt;kui-menu-item text="复制" shortcut="Ctrl+C"&gt;&lt;/kui-menu-item&gt;
+  &lt;kui-menu-item separator&gt;&lt;/kui-menu-item&gt;
+  &lt;kui-menu-item text="粘贴为纯文本" disabled&gt;&lt;/kui-menu-item&gt;
+&lt;/kui-context-menu&gt;</pre>
+  </div>
+
+  <!-- 4. 代码打开 -->
+  <div class="card">
+    <h2>4. 从按钮打开（脚本）</h2>
+    <p>设好 <code>left</code> / <code>top</code> 再加 <code>open</code> 属性，就和右键打开的一样会自动关闭、能用键盘。</p>
+    <span class="btn" id="more-btn">⋯ 更多操作</span>
+    <kui-context-menu id="button-menu" for="no-right-click">
+      <kui-menu-item text="导出为 PDF" shortcut="Ctrl+P"></kui-menu-item>
+      <kui-menu-item text="分享链接"></kui-menu-item>
+      <kui-menu-item separator></kui-menu-item>
+      <kui-menu-item text="归档"></kui-menu-item>
+    </kui-context-menu>
+<pre>local menu = document:getElementById("button-menu")
+local r = btn:getBoundingClientRect()
+menu:setAttribute("style", "left:" .. r.x .. "px;top:"
+    .. (r.y + r.height + 4) .. "px")
+menu:setAttribute("open", "")</pre>
+  </div>
+
+  <!-- 2. 完全自定义外观 -->
+  <div class="card" style="grid-column: span 2">
+    <h2>2. 完全自定义外观：只是 CSS</h2>
+    <p>配色、圆角、阴影、字体、悬停渐变、图标、分组标题、勾选项、危险项、子菜单——全部是作者样式表，引擎只加
+      <code>open</code> / <code>highlighted</code> 属性和位置。左边是同一个菜单的静态预览。</p>
+    <div class="dark-wrap">
+      <kui-context-menu class="dark preview" for="preview-only">
+        <div class="group">编辑</div>
+        <kui-menu-item>
+          <svg class="icon" viewBox="0 0 16 16"><rect x="4" y="4" width="9" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 11V3a1 1 0 0 1 1-1h6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          复制<span class="kbd">Ctrl C</span>
+        </kui-menu-item>
+        <kui-menu-item highlighted>
+          <svg class="icon" viewBox="0 0 16 16"><path d="M3 13l3-1 7-7-2-2-7 7z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          重命名<span class="kbd">F2</span>
+        </kui-menu-item>
+        <kui-menu-item separator></kui-menu-item>
+        <div class="group">视图</div>
+        <kui-menu-item checked><span class="check"></span>显示网格</kui-menu-item>
+        <kui-menu-item><span class="check"></span>吸附对齐</kui-menu-item>
+        <kui-menu-item separator></kui-menu-item>
+        <kui-menu-item class="danger">
+          <svg class="icon" viewBox="0 0 16 16"><path d="M3 4h10M6 4V2h4v2M4.5 4l1 10h5l1-10" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+          删除<span class="kbd">Del</span>
+        </kui-menu-item>
+      </kui-context-menu>
+      <div class="zone" id="dark-zone">在这里右键：暗色主题菜单（勾选项点了不关菜单）</div>
+    </div>
+    <kui-context-menu class="dark" id="dark-menu" for="dark-zone">
+      <div class="group">编辑</div>
+      <kui-menu-item id="dark-copy">
+        <svg class="icon" viewBox="0 0 16 16"><rect x="4" y="4" width="9" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 11V3a1 1 0 0 1 1-1h6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        复制<span class="kbd">Ctrl C</span>
+      </kui-menu-item>
+      <kui-menu-item>
+        <svg class="icon" viewBox="0 0 16 16"><path d="M3 13l3-1 7-7-2-2-7 7z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        重命名<span class="kbd">F2</span>
+      </kui-menu-item>
+      <kui-menu-item>导出为 ›
+        <kui-context-menu>
+          <kui-menu-item>PNG 图片</kui-menu-item>
+          <kui-menu-item>SVG 矢量</kui-menu-item>
+        </kui-context-menu>
+      </kui-menu-item>
+      <kui-menu-item separator></kui-menu-item>
+      <div class="group">视图</div>
+      <kui-menu-item class="toggle" keep-open checked><span class="check"></span>显示网格</kui-menu-item>
+      <kui-menu-item class="toggle" keep-open><span class="check"></span>吸附对齐</kui-menu-item>
+      <kui-menu-item separator></kui-menu-item>
+      <kui-menu-item class="danger">
+        <svg class="icon" viewBox="0 0 16 16"><path d="M3 4h10M6 4V2h4v2M4.5 4l1 10h5l1-10" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        删除<span class="kbd">Del</span>
+      </kui-menu-item>
+    </kui-context-menu>
+  </div>
+
+  <!-- 3. 动态菜单 -->
+  <div class="card">
+    <h2>3. 按右键的对象变化（脚本）</h2>
+    <p>一个菜单服务整张列表：<code>menu-open</code> 事件的 <code>relatedTarget</code> 是被右键的元素，在这里改标题、
+      禁用项；取消 <code>menu-open</code> 就不打开。</p>
+    <div class="files" id="file-list">
+      <div class="file" data-name="报告.docx"><span>报告.docx</span><span class="tag">可编辑</span></div>
+      <div class="file" data-name="预算.xlsx" data-locked="1"><span>预算.xlsx</span><span class="tag">已锁定</span></div>
+      <div class="file" data-name="封面.png"><span>封面.png</span><span class="tag">可编辑</span></div>
+    </div>
+    <kui-context-menu id="file-menu" for="file-list">
+      <div class="title" id="file-menu-title">文件</div>
+      <kui-menu-item id="file-open" text="打开"></kui-menu-item>
+      <kui-menu-item id="file-pin" text="置顶"></kui-menu-item>
+      <kui-menu-item separator></kui-menu-item>
+      <kui-menu-item id="file-delete" text="删除" shortcut="Del"></kui-menu-item>
+    </kui-context-menu>
+  </div>
+
+  <!-- 5. 引擎自带的默认菜单 -->
+  <div class="card">
+    <h2>5. 引擎自带的默认菜单</h2>
+    <p>输入框的「剪切 / 复制 / 粘贴 / 全选」菜单默认不弹（下面这个输入框右键没有菜单）。需要时任选一种开启：</p>
+    <input type="text" value="右键这里：默认不弹菜单" style="width:100%;padding:5px 8px">
+<pre>&lt;html context-menu&gt;                          // 页面
+document->eventDispatcher()
+    ->setDefaultContextMenuEnabled(true);     // C++
+kui_document_set_default_context_menu_enabled(doc, 1);  // C</pre>
+  </div>
+
+</div>
+
+<div id="log">右键上面的区域试试；菜单项的 click、menu-open / menu-close 事件会记在这里。</div>
+
+<script type="application/lua">
+local doc = document
+local log = doc:getElementById("log")
+local function say(text) log.textContent = text end
+
+-- 1 / 2：菜单项就是普通元素，click 照常冒泡到菜单上，在菜单上统一处理。
+for _, id in ipairs({"dark-menu", "button-menu"}) do
+  local menu = doc:getElementById(id)
+  menu:addEventListener("click", function(e)
+    local item = e.target:closest("kui-menu-item")
+    if item then say("点了：" .. item.textContent:gsub("%s+", " ")) end
+  end)
+end
+
+-- 2：勾选项带 keep-open，点了只切换 checked，菜单不关。
+doc:getElementById("dark-menu"):querySelectorAll(".toggle"):forEach(function(item)
+  item:addEventListener("click", function()
+    if item:hasAttribute("checked") then item:removeAttribute("checked") else item:setAttribute("checked", "") end
+  end)
+end)
+
+-- 3：menu-open 的 relatedTarget 是被右键的元素。
+local fileMenu = doc:getElementById("file-menu")
+local current = nil
+fileMenu:addEventListener("menu-open", function(e)
+  local row = e.relatedTarget and e.relatedTarget:closest(".file")
+  if not row then
+    e:preventDefault()          -- 右键在列表空白处：不打开
+    return
+  end
+  current = row
+  doc:getElementById("file-menu-title").textContent = row:getAttribute("data-name")
+  local del = doc:getElementById("file-delete")
+  if row:hasAttribute("data-locked") then del:setAttribute("disabled", "") else del:removeAttribute("disabled") end
+  doc:getElementById("file-pin"):setAttribute("text", row:matches(".pinned") and "取消置顶" or "置顶")
+  say("menu-open：" .. row:getAttribute("data-name"))
+end)
+fileMenu:addEventListener("menu-close", function() say("menu-close") end)
+doc:getElementById("file-open"):addEventListener("click", function()
+  if current then say("打开 " .. current:getAttribute("data-name")) end
+end)
+doc:getElementById("file-pin"):addEventListener("click", function()
+  if current then current:toggleClass("pinned") end
+end)
+doc:getElementById("file-delete"):addEventListener("click", function()
+  if current then say("删除 " .. current:getAttribute("data-name")) end
+end)
+
+-- 4：从按钮打开：设位置，再加 open。
+local btn = doc:getElementById("more-btn")
+local buttonMenu = doc:getElementById("button-menu")
+btn:addEventListener("click", function()
+  local r = btn:getBoundingClientRect()
+  buttonMenu:setAttribute("style", "left:" .. r.x .. "px;top:" .. (r.y + r.height + 4) .. "px")
+  buttonMenu:setAttribute("open", "")
+end)
+</script>
+</body>
+</html>

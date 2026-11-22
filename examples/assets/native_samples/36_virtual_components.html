@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 20px;
+    margin: 0;
+  }
+  h2 {
+    color: #38bdf8;
+    font-size: 18px;
+    margin: 0 0 8px 0;
+  }
+  h3 {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 16px 0 8px 0;
+  }
+  .desc {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 12px;
+  }
+  .section {
+    margin-bottom: 24px;
+  }
+  .row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .panel {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    overflow: hidden;
+    flex: 1;
+    min-width: 280px;
+  }
+  .panel-header {
+    background: #1e293b;
+    padding: 8px 12px;
+    border-bottom: 1px solid #334155;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-header span {
+    color: #475569;
+    font-weight: 400;
+    font-size: 11px;
+  }
+
+  /* Virtual List container — height is required for scrolling */
+  #vlist-container {
+    height: 300px;
+    background: #0f172a;
+  }
+  /* Scroll-unit toggle bar — controls minimum scroll quantum for all
+     four virtual lists (3 C++ + 1 Lua). The C++ side wires the buttons
+     in main.cpp setupVirtualComponents(); the Lua side wires the lua-vlist
+     inside the <script type="text/lua"> block at the bottom of this file. */
+  .vc-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .vc-toolbar-label { color: #64748b; font-weight: 600; }
+  .vc-toolbar button {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #94a3b8;
+    user-select: none;
+  }
+  .vc-toolbar button:hover { background: #334155; }
+  .vc-toolbar .vc-hint { color: #475569; margin-left: auto; font-size: 11px; }
+  /* ListView container */
+  #listview-container {
+    height: 300px;
+    background: #0f172a;
+  }
+  /* TreeView container */
+  #treeview-container {
+    height: 350px;
+    background: #0f172a;
+  }
+</style>
+</head>
+<body>
+
+<h2>Virtual Components</h2>
+<p class="desc">
+  High-performance virtualized components: VirtualList (100K items),
+  ListView (selection + events), TreeView (expand/collapse + virtual scroll).
+  Only visible items exist in the DOM — scroll to verify performance.
+</p>
+
+<!-- Scroll-unit toggle bar: changes the minimum scroll quantum applied
+     to ALL four virtual lists below.  Pixel = browser-default smooth
+     scroll.  Line = scrollTop snaps to row boundaries (whole rows). -->
+<div class="vc-toolbar" role="radiogroup" aria-label="Scroll unit">
+  <span class="vc-toolbar-label">Scroll unit:</span>
+  <button id="vc-scroll-px"   role="radio" aria-checked="true"  type="button">Pixel</button>
+  <button id="vc-scroll-line" role="radio" aria-checked="false" type="button">Line (snap to row)</button>
+  <span class="vc-hint">applies to all 4 lists below — wheel / drag / scrollbar</span>
+</div>
+
+<div class="row">
+  <!-- VirtualList (C++ driven) -->
+  <div class="panel">
+    <div class="panel-header">
+      VirtualList
+      <span>100,000 items @ 32px</span>
+    </div>
+    <div id="vlist-container"></div>
+  </div>
+
+  <!-- ListView (C++ driven) -->
+  <div class="panel">
+    <div class="panel-header">
+      ListView
+      <span>50,000 items · click to select</span>
+    </div>
+    <div id="listview-container"></div>
+  </div>
+</div>
+
+<div class="row" style="margin-top: 16px;">
+  <!-- TreeView (C++ driven) -->
+  <div class="panel" style="max-width: 500px;">
+    <div class="panel-header">
+      TreeView
+      <span>file system tree · click arrows to expand</span>
+    </div>
+    <div id="treeview-container"></div>
+  </div>
+
+  <!-- Lua VirtualList -->
+  <div class="panel" style="flex: 1;">
+    <div class="panel-header">
+      Lua VirtualList
+      <span id="lua-vlist-stats">100,000 items · Lua script</span>
+    </div>
+    <div id="lua-vlist-container" style="height: 350px; background: #0f172a;"></div>
+    <div style="padding: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+      <button id="lua-btn-insert-mid" style="background:#0ea5e9;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;">Insert 1000 (mid)</button>
+      <button id="lua-btn-insert-begin" style="background:#22c55e;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;">Insert 1000 (begin)</button>
+      <button id="lua-btn-remove-mid" style="background:#ef4444;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;">Remove 1000 (mid)</button>
+      <button id="lua-btn-scroll-random" style="background:#8b5cf6;color:white;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;">Scroll random</button>
+    </div>
+  </div>
+</div>
+
+<script type="text/lua">
+-- =====================================================================
+-- Lua VirtualList Demo — 100,000 items with dynamic insert/remove
+-- =====================================================================
+
+local container = document:getElementById("lua-vlist-container")
+local statsEl   = document:getElementById("lua-vlist-stats")
+
+if container then
+    -- Create VirtualList instance
+    local vlist = VirtualList.new()
+
+    -- Setup with 100K items
+    vlist:setup(container, {
+        totalItems = 100000,
+        itemHeight = 32,
+        overscan   = 5,
+        renderItem = function(doc, index)
+            local row = doc:createElement("div")
+            local s = row.style
+            s:setProperty("display", "flex")
+            s:setProperty("align-items", "center")
+            s:setProperty("padding", "0 12px")
+            s:setProperty("font-size", "13px")
+            s:setProperty("font-family", "'Consolas', monospace")
+
+            if index % 2 == 0 then
+                s:setProperty("color", "#cbd5e1")
+                s:setProperty("background", "rgba(255,255,255,0.02)")
+            else
+                s:setProperty("color", "#94a3b8")
+                s:setProperty("background", "transparent")
+            end
+
+            -- Index column
+            local idx = doc:createElement("span")
+            local is = idx.style
+            is:setProperty("color", "#475569")
+            is:setProperty("width", "70px")
+            is:setProperty("font-size", "11px")
+            is:setProperty("flex-shrink", "0")
+            idx.textContent = tostring(index)
+            row:appendChild(idx)
+
+            -- Text content
+            local text = doc:createElement("span")
+            text.style:setProperty("flex", "1")
+            local label = "Lua Item #" .. tostring(index)
+            if index % 1000 == 0 then
+                label = label .. "  ** milestone **"
+            end
+            if index % 10000 == 0 then
+                label = label .. "  >>> MAJOR <<<"
+            end
+            text.textContent = label
+            row:appendChild(text)
+
+            -- Badge
+            local badge = doc:createElement("span")
+            badge.style:setProperty("font-size", "10px")
+            badge.style:setProperty("color", "#475569")
+            badge.style:setProperty("flex-shrink", "0")
+            badge.textContent = index % 2 == 0 and "even" or "odd"
+            row:appendChild(badge)
+
+            return row
+        end
+    })
+
+    -- Update stats display
+    local function updateStats()
+        if statsEl then
+            statsEl.textContent = tostring(vlist.totalItems) ..
+                " items · rendered: " .. tostring(vlist.renderedCount) ..
+                " · pool: " .. tostring(vlist.recyclePoolSize)
+        end
+    end
+
+    updateStats()
+
+    -- Wire buttons
+    local btnInsertMid = document:getElementById("lua-btn-insert-mid")
+    if btnInsertMid then
+        btnInsertMid:on("click", function()
+            local mid = math.floor(vlist.totalItems / 2)
+            vlist:insertItems(mid, 1000)
+            updateStats()
+            print("[Lua VList] Inserted 1000 at " .. tostring(mid))
+        end)
+    end
+
+    local btnInsertBegin = document:getElementById("lua-btn-insert-begin")
+    if btnInsertBegin then
+        btnInsertBegin:on("click", function()
+            vlist:insertItems(0, 1000)
+            updateStats()
+            print("[Lua VList] Inserted 1000 at beginning")
+        end)
+    end
+
+    local btnRemoveMid = document:getElementById("lua-btn-remove-mid")
+    if btnRemoveMid then
+        btnRemoveMid:on("click", function()
+            if vlist.totalItems >= 1000 then
+                local mid = math.floor(vlist.totalItems / 2)
+                vlist:removeItems(mid, 1000)
+                updateStats()
+                print("[Lua VList] Removed 1000 at " .. tostring(mid))
+            end
+        end)
+    end
+
+    local btnScrollRandom = document:getElementById("lua-btn-scroll-random")
+    if btnScrollRandom then
+        btnScrollRandom:on("click", function()
+            local idx = math.random(0, vlist.totalItems - 1)
+            vlist:scrollToIndex(idx)
+            updateStats()
+            print("[Lua VList] Scrolled to " .. tostring(idx))
+        end)
+    end
+
+    -- ------------------------------------------------------------------
+    -- Scroll-unit toggle (shared with C++-driven VirtualList/ListView/
+    -- TreeView through main.cpp).  Each click on the toolbar button
+    -- forwards "pixel" or "line" to *this* Lua-created vlist; the C++
+    -- side simultaneously updates the other three components in
+    -- main.cpp setupVirtualComponents(), keeping all four in sync.
+    -- ------------------------------------------------------------------
+    local btnPx   = document:getElementById("vc-scroll-px")
+    local btnLine = document:getElementById("vc-scroll-line")
+    if btnPx then
+        btnPx:on("click", function()
+            vlist:setScrollUnit("pixel")
+            if btnPx   then btnPx:setAttribute("aria-checked",  "true")  end
+            if btnLine then btnLine:setAttribute("aria-checked", "false") end
+            print("[Lua VList] scrollUnit -> pixel")
+        end)
+    end
+    if btnLine then
+        btnLine:on("click", function()
+            vlist:setScrollUnit("line")
+            if btnPx   then btnPx:setAttribute("aria-checked",  "false") end
+            if btnLine then btnLine:setAttribute("aria-checked", "true")  end
+            print("[Lua VList] scrollUnit -> line")
+        end)
+    end
+end
+</script>
+
+</body>
+</html>

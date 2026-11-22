@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#0f172a;color:#f8fafc}
+h2{margin-bottom:16px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.item{text-align:center}.shape{width:120px;height:120px;margin:0 auto 8px}
+.name{font-size:12px;color:#94a3b8}
+.circle{clip-path:circle(50%);background:linear-gradient(135deg,#3b82f6,#8b5cf6)}
+.ellipse{clip-path:ellipse(50% 35%);background:linear-gradient(135deg,#10b981,#06b6d4)}
+.tri{clip-path:polygon(50% 0%,0% 100%,100% 100%);background:linear-gradient(135deg,#f59e0b,#ef4444)}
+.diamond{clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);background:linear-gradient(135deg,#ec4899,#8b5cf6)}
+.pent{clip-path:polygon(50% 0%,100% 38%,82% 100%,18% 100%,0% 38%);background:linear-gradient(135deg,#06b6d4,#3b82f6)}
+.hex{clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);background:linear-gradient(135deg,#f59e0b,#10b981)}
+.star{clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:linear-gradient(135deg,#ef4444,#f59e0b)}
+.arrow{clip-path:polygon(0% 20%,60% 20%,60% 0%,100% 50%,60% 100%,60% 80%,0% 80%);background:linear-gradient(135deg,#3b82f6,#10b981)}
+</style></head><body><h2>Clip Path</h2>
+<div class="grid">
+<div class="item"><div class="shape circle"></div><div class="name">circle</div></div>
+<div class="item"><div class="shape ellipse"></div><div class="name">ellipse</div></div>
+<div class="item"><div class="shape tri"></div><div class="name">triangle</div></div>
+<div class="item"><div class="shape diamond"></div><div class="name">diamond</div></div>
+<div class="item"><div class="shape pent"></div><div class="name">pentagon</div></div>
+<div class="item"><div class="shape hex"></div><div class="name">hexagon</div></div>
+<div class="item"><div class="shape star"></div><div class="name">star</div></div>
+<div class="item"><div class="shape arrow"></div><div class="name">arrow</div></div>
+</div></body></html>

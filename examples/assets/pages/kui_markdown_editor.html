@@ -1,0 +1,229 @@
+<!doctype html><html><head><style>
+:root {
+    --bg: #0f172a;
+    --bg-editor: #1e293b;
+    --bg-preview: #0f172a;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --border: #334155;
+    --code-bg: #1e293b;
+}
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 44px;
+    background: var(--bg-editor);
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+}
+
+.toolbar .title {
+    font-weight: bold;
+    font-size: 15px;
+    color: var(--accent);
+}
+
+.toolbar .sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+}
+
+.toolbar-btn {
+    padding: 4px 12px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.toolbar-btn:hover {
+    background: var(--border);
+    color: var(--text);
+}
+
+/* Editor area */
+.editor-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.editor-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+}
+
+.preview-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.pane-header {
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    background: var(--bg-editor);
+    border-bottom: 1px solid var(--border);
+}
+
+.editor-input {
+    flex: 1;
+    padding: 16px;
+    background: var(--bg-editor);
+    color: var(--text);
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    border: none;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.preview-content {
+    flex: 1;
+    padding: 16px 24px;
+    background: var(--bg-preview);
+    overflow: auto;
+    line-height: 1.7;
+}
+
+/* Preview markdown styles */
+.preview-content h1 {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+.preview-content h2 {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 24px 0 12px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+.preview-content h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 20px 0 8px 0;
+    color: var(--text);
+}
+
+.preview-content p {
+    margin: 0 0 12px 0;
+    color: var(--text);
+}
+
+.preview-content code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--accent);
+}
+
+.preview-content pre {
+    background: var(--code-bg);
+    padding: 12px 16px;
+    border-radius: 6px;
+    overflow: auto;
+    margin: 0 0 12px 0;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.preview-content strong { font-weight: bold; color: var(--text); }
+.preview-content em { font-style: italic; }
+
+.preview-content blockquote {
+    margin: 0 0 12px 0;
+    padding: 8px 16px;
+    border-left: 3px solid var(--accent);
+    color: var(--text-muted);
+    background: rgba(56, 189, 248, 0.05);
+}
+
+.preview-content ul {
+    margin: 0 0 12px 0;
+    padding-left: 24px;
+}
+
+.preview-content li {
+    margin-bottom: 4px;
+}
+
+.preview-content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 16px 0;
+}
+
+/* Status bar */
+.statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 24px;
+    background: var(--bg-editor);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+}
+</style></head><body>
+            <div class="app">
+                <div class="toolbar">
+                    <span class="title">Markdown Editor</span>
+                    <div class="sep"></div>
+                    <button class="toolbar-btn" id="btn-clear">Clear</button>
+                    <button class="toolbar-btn" id="btn-sample">Load Sample</button>
+                </div>
+                <div class="editor-area">
+                    <div class="editor-pane">
+                        <div class="pane-header">Editor</div>
+                        <textarea class="editor-input" id="editor"></textarea>
+                    </div>
+                    <div class="preview-pane">
+                        <div class="pane-header">Preview</div>
+                        <div class="preview-content" id="preview"></div>
+                    </div>
+                </div>
+                <div class="statusbar">
+                    <span id="stats">0 words, 0 characters</span>
+                    <span>KUI Markdown Editor</span>
+                </div>
+            </div>
+        </body></html>

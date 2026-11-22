@@ -1,0 +1,55 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="host"></div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local connectCount = 0
+local disconnectCount = 0
+
+-- Define custom element with connected + disconnected callbacks
+local defined = document:defineElement("test-widget", {
+    connected = function(el)
+        connectCount = connectCount + 1
+    end,
+    disconnected = function(el)
+        disconnectCount = disconnectCount + 1
+    end,
+    observedAttributes = {}
+})
+
+if not defined then ok = false; msg = msg .. "defineElement failed; " end
+
+-- Create and attach — should trigger connected
+local host = document:getElementById("host")
+local widget = document:createElement("test-widget")
+host:appendChild(widget)
+
+if connectCount < 1 then ok = false; msg = msg .. "connected=" .. connectCount .. "; " end
+
+-- Remove — should trigger disconnected at least once
+local dcBefore = disconnectCount
+widget:remove()
+
+if disconnectCount <= dcBefore then ok = false; msg = msg .. "disconnected not fired after remove; " end
+
+-- Re-attach — should trigger connected again
+local ccBefore = connectCount
+host:appendChild(widget)
+if connectCount <= ccBefore then ok = false; msg = msg .. "reconnected not fired; " end
+
+-- Re-remove via removeChild — should trigger disconnected again
+local dcBefore2 = disconnectCount
+host:removeChild(widget)
+if disconnectCount <= dcBefore2 then ok = false; msg = msg .. "redisconnected not fired; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

@@ -1,0 +1,60 @@
+<html><body>
+<div id="i1" style="color:black;">Item 1</div>
+<div id="i2" style="color:black;">Item 2</div>
+<div id="i3" style="color:black;">Item 3</div>
+<div id="i4" style="color:black;">Item 4</div>
+<div id="i5" style="color:black;">Item 5</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test batch style modifications on multiple elements via getElementById
+local ok = true
+local detail = ""
+local ids = {"i1", "i2", "i3", "i4", "i5"}
+local els = {}
+for idx, id in ipairs(ids) do
+    els[idx] = document:getElementById(id)
+end
+
+detail = detail .. "count=" .. tostring(#els) .. "; "
+ok = ok and (#els == 5)
+
+-- Batch modify all items
+for i, el in ipairs(els) do
+    el.style:setProperty("font-size", tostring(10 + i * 2) .. "px")
+    el.style:setProperty("margin-top", tostring(i * 4) .. "px")
+end
+
+-- Verify modifications
+local allMatch = true
+for i, el in ipairs(els) do
+    local fs = el.style:getPropertyValue("font-size")
+    local expected = tostring(10 + i * 2) .. "px"
+    if fs ~= expected then
+        allMatch = false
+        detail = detail .. "MISMATCH[" .. tostring(i) .. "]:" .. fs .. "!=" .. expected .. "; "
+    end
+end
+ok = ok and allMatch
+
+-- cssText should reflect changes
+local ct = els[1].style.cssText
+ok = ok and (ct ~= nil and ct ~= "")
+detail = detail .. "cssText.len=" .. tostring(#ct) .. "; "
+
+-- Clear all via cssText
+for _, el in ipairs(els) do
+    el.style.cssText = ""
+end
+
+-- After clear, length should be 0
+local cleared = els[1].style.length
+ok = ok and (cleared == 0)
+detail = detail .. "cleared=" .. tostring(cleared) .. "; "
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

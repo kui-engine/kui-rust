@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; }
+    .code { background: #0f172a; padding: 10px 14px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #10b981; margin-bottom: 12px; }
+
+    .multicol-2 {
+        column-count: 2;
+        column-gap: 24px;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+    .multicol-3 {
+        column-count: 3;
+        column-gap: 20px;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+    .multicol-width {
+        column-width: 200px;
+        column-gap: 20px;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+    .multicol-ruled {
+        column-count: 2;
+        column-gap: 24px;
+        column-rule-width: 1px;
+        column-rule-style: solid;
+        column-rule-color: #475569;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+</style>
+</head>
+<body>
+    <h2>Multi-Column Layout</h2>
+
+    <h3>column-count: 2</h3>
+    <div class="section">
+        <div class="code">column-count: 2; column-gap: 24px;</div>
+        <div class="multicol-2">
+            CSS multi-column layout allows content to flow into multiple columns, similar to newspaper layouts.
+            This is useful for presenting large blocks of text in a more readable format.
+            The browser automatically balances the content across the specified number of columns.
+            You can control the gap between columns and add decorative rules between them.
+        </div>
+    </div>
+
+    <h3>column-count: 3</h3>
+    <div class="section">
+        <div class="code">column-count: 3; column-gap: 20px;</div>
+        <div class="multicol-3">
+            Three-column layouts work well for wider containers. The content is automatically distributed across all three columns.
+            Each column gets roughly the same amount of content to maintain visual balance.
+            This technique has been used in print design for centuries and is now available in CSS.
+            Multi-column is great for articles, documentation, and any text-heavy content.
+            It helps reduce line length, which improves readability.
+            Users can scan content more naturally with shorter lines.
+        </div>
+    </div>
+
+    <h3>column-width: 200px</h3>
+    <div class="section">
+        <div class="code">column-width: 200px; column-gap: 20px;</div>
+        <div class="multicol-width">
+            When using column-width instead of column-count, the browser determines the number of columns based on the available width.
+            If the container is 600px wide with 200px column-width and 20px gaps, you might get 2-3 columns.
+            This approach is more responsive — the column count adapts to the container size automatically.
+        </div>
+    </div>
+
+    <h3>columns shorthand</h3>
+    <div class="section">
+        <div class="code">columns: 2 250px;</div>
+        <div style="columns: 2 250px; column-gap: 24px; font-size: 13px; line-height: 1.6;">
+            The columns shorthand property sets both column-count and column-width at once.
+            This combines the best of both approaches — you get a target column count and a minimum column width.
+            The browser will create up to the specified number of columns, but each will be at least the specified width.
+        </div>
+    </div>
+
+    <h3>column-rule (decorative divider)</h3>
+    <div class="section">
+        <div class="code">column-rule: 1px solid #475569;</div>
+        <div class="multicol-ruled">
+            Column rules add a visual separator between columns, similar to a border.
+            You can control the width, style, and color of the rule independently.
+            Supported styles include solid, dashed, dotted, and double.
+            The rule appears centered in the column gap and does not affect the column width or content flow.
+        </div>
+    </div>
+
+    <h3>Different Rule Styles</h3>
+    <div class="section">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <div class="label" style="margin-bottom: 4px;">solid</div>
+                <div style="column-count: 2; column-gap: 16px; column-rule-width: 2px; column-rule-style: solid; column-rule-color: #3b82f6; font-size: 12px; line-height: 1.5;">
+                    Solid rule style is the most common. It creates a simple continuous line between columns.
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <div class="label" style="margin-bottom: 4px;">dashed</div>
+                <div style="column-count: 2; column-gap: 16px; column-rule-width: 2px; column-rule-style: dashed; column-rule-color: #10b981; font-size: 12px; line-height: 1.5;">
+                    Dashed rule style creates a series of short dashes as the separator between columns.
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <div class="label" style="margin-bottom: 4px;">dotted</div>
+                <div style="column-count: 2; column-gap: 16px; column-rule-width: 2px; column-rule-style: dotted; column-rule-color: #f59e0b; font-size: 12px; line-height: 1.5;">
+                    Dotted rule style uses small dots as the column separator for a lighter visual effect.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

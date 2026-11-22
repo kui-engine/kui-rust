@@ -1,0 +1,42 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;background:#f8fafc;color:#1e293b;padding:24px}
+h2{font-size:17px;margin-bottom:4px}
+h3{font-size:13px;color:#64748b;margin:18px 0 10px}
+.hint{font-size:12px;color:#94a3b8;margin-bottom:6px}
+.card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.tbtn{padding:9px 16px;border:none;border-radius:8px;background:#3b82f6;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.tbtn.g{background:#10b981}.tbtn.a{background:#f59e0b;color:#1e293b}
+/* tabindex 焦点环演示:用 <div> 才能看到 outline(原生控件会被 UA 改成 border) */
+.card[tabindex],.fcard{outline:none;cursor:pointer}
+.fcard{padding:14px 18px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:13px;min-width:150px}
+.fcard:focus{outline:3px solid #3b82f6;outline-offset:2px;background:#eff6ff;border-color:#3b82f6}
+#log{margin-top:14px;background:#0f172a;color:#cbd5e1;border-radius:6px;padding:10px 12px;font:12px "Cascadia Code","Consolas",monospace;height:150px;overflow:auto;white-space:pre-wrap}
+.tag{color:#64748b}
+</style></head><body>
+<h2>桌面交互完整性 (KUI-027)</h2>
+
+<div class="card">
+  <h3>1. title 属性 Tooltip(纯 HTML,hover 约 600ms 自动弹出)</h3>
+  <p class="hint">把鼠标悬停在按钮上,稍候出现原生 tooltip。</p>
+  <div class="row">
+    <button class="tbtn"   title="新建文件 (Ctrl+N)">新建</button>
+    <button class="tbtn g" title="打开文件夹 (Ctrl+O)">打开</button>
+    <button class="tbtn a" title="保存当前更改 (Ctrl+S)">保存</button>
+    <span class="tag" title="这是一个图标的悬停说明,文案取自 title 属性的纯文本">[i] 图标(也有 title)</span>
+  </div>
+</div>
+
+<div class="card" style="margin-top:16px;">
+  <h3>2. tabindex 焦点环 + Tab 键遍历</h3>
+  <p class="hint">点击页面后按 Tab / Shift+Tab。遍历顺序:tabindex=1 → 2 → 3 → 0 组(文档序)。蓝色 outline 即焦点环。</p>
+  <div class="row">
+    <div class="fcard" tabindex="1" data-name="卡片 A (tabindex=1)">卡片 A · tabindex=1</div>
+    <div class="fcard" tabindex="3" data-name="卡片 C (tabindex=3)">卡片 C · tabindex=3</div>
+    <div class="fcard" tabindex="2" data-name="卡片 B (tabindex=2)">卡片 B · tabindex=2</div>
+    <div class="fcard" tabindex="0" data-name="卡片 D (tabindex=0)">卡片 D · tabindex=0</div>
+  </div>
+  <div id="log">点击窗口后按 Tab 试试…</div>
+</div>
+</body></html>

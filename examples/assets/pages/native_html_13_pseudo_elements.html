@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { margin-bottom: 16px; color: #1e293b; }
+.badge { display: inline-block; padding: 8px 16px; background: #3b82f6; color: white;
+         border-radius: 6px; margin: 8px 8px 8px 0; position: relative; }
+.badge::before { content: "★ "; }
+.quote { background: #f1f5f9; padding: 16px 24px; border-left: 4px solid #3b82f6;
+         margin: 16px 0; font-style: italic; color: #475569; position: relative; }
+.quote::before { content: open-quote; font-size: 48px; color: #cbd5e1;
+                 position: absolute; top: -8px; left: 8px; }
+.tooltip { display: inline-block; padding: 8px 16px; background: #1e293b; color: white;
+           border-radius: 6px; margin-top: 16px; position: relative; }
+.tooltip::after { content: ""; position: absolute; top: 100%; left: 50%;
+                  transform: translateX(-50%); border: 6px solid transparent;
+                  border-top-color: #1e293b; }
+.divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: #94a3b8; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #cbd5e1; }
+.step { counter-increment: step; padding: 8px 16px; margin: 4px 0;
+        background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.step::before { content: counter(step) ". "; font-weight: 700; color: #3b82f6; }
+ol.steps { counter-reset: step; list-style: none; }
+</style></head><body>
+<h2>Pseudo Elements</h2>
+<div><span class="badge">Featured</span><span class="badge">New</span><span class="badge">Hot</span></div>
+<div class="quote">The only way to do great work is to love what you do.</div>
+<div class="tooltip">Tooltip with arrow</div>
+<div class="divider">Section Break</div>
+<ol class="steps">
+  <li class="step">Initialize the platform</li>
+  <li class="step">Create a window</li>
+  <li class="step">Load HTML content</li>
+  <li class="step">Run the event loop</li>
+</ol>
+</body></html>

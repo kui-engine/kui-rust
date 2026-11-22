@@ -1,0 +1,14 @@
+<html><body>
+<div id="result"></div>
+<script>
+-- All console levels should work without crashing
+console.log("log message")
+console.info("info message")
+console.warn("warn message")
+console.error("error message")
+console.debug("debug message")
+
+local r = document:getElementById("result")
+r.textContent = "PASS"
+</script>
+</body></html>

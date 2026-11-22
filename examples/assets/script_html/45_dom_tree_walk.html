@@ -1,0 +1,66 @@
+<html><body>
+<div id="root">
+  <div id="a">
+    <div id="a1">A1</div>
+    <div id="a2">A2</div>
+  </div>
+  <div id="b">
+    <div id="b1">B1</div>
+  </div>
+</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test DOM tree traversal using Lua table children and element traversal
+local root = document:getElementById("root")
+local ok = true
+local detail = ""
+
+-- children count (Lua table, 1-indexed)
+local ch = root:children()
+detail = detail .. "children=" .. tostring(#ch) .. "; "
+ok = ok and (#ch == 2)
+
+-- Access children via table
+local a = ch[1]
+local b = ch[2]
+ok = ok and (a.id == "a")
+ok = ok and (b.id == "b")
+detail = detail .. "a.id=" .. a.id .. "; b.id=" .. b.id .. "; "
+
+-- Nested children
+local ach = a:children()
+ok = ok and (#ach == 2)
+ok = ok and (ach[1].id == "a1")
+ok = ok and (ach[2].id == "a2")
+
+-- Parent traversal via parentElement (method call)
+local a1 = document:getElementById("a1")
+local a1p = a1:parentElement()
+ok = ok and (a1p ~= nil)
+ok = ok and (a1p.id == "a")
+detail = detail .. "a1.parent=" .. (a1p and a1p.id or "nil") .. "; "
+
+-- Sibling traversal (property access)
+local a2 = a1.nextElementSibling
+ok = ok and (a2 ~= nil)
+ok = ok and (a2.id == "a2")
+
+-- firstElementChild / lastElementChild (property access)
+local first = root.firstElementChild
+local last = root.lastElementChild
+ok = ok and (first.id == "a")
+ok = ok and (last.id == "b")
+
+-- textContent of deep tree
+local rootText = root.textContent
+ok = ok and (rootText:find("A1") ~= nil)
+ok = ok and (rootText:find("B1") ~= nil)
+detail = detail .. "hasA1=" .. tostring(rootText:find("A1") ~= nil) .. "; "
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

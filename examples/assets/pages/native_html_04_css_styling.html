@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 20px; font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { margin-bottom: 16px; color: #1e293b; }
+.section { background: white; padding: 16px; border-radius: 8px;
+           box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; }
+.section h3 { color: #475569; margin-bottom: 8px; font-size: 14px; }
+/* Class selector */
+.highlight { background: #fef3c7; padding: 4px 8px; border-radius: 4px; }
+/* Descendant selector */
+.section p { color: #64748b; line-height: 1.6; margin-bottom: 4px; }
+/* Child selector */
+.section > .tag { display: inline-block; padding: 2px 8px; background: #dbeafe;
+                  color: #1e40af; border-radius: 12px; font-size: 12px; margin: 2px; }
+/* :nth-child */
+.list-demo div:nth-child(odd) { background: #f1f5f9; }
+.list-demo div:nth-child(even) { background: #e2e8f0; }
+.list-demo div { padding: 8px 12px; border-radius: 4px; margin: 2px 0; }
+/* :first-child / :last-child */
+.list-demo div:first-child { border-left: 4px solid #3b82f6; }
+.list-demo div:last-child { border-left: 4px solid #ef4444; }
+/* Attribute selector */
+[data-status="active"] { color: #10b981; font-weight: 600; }
+[data-status="inactive"] { color: #94a3b8; text-decoration: line-through; }
+</style></head><body>
+<h2>CSS Selectors &amp; Styling</h2>
+<div class="section">
+  <h3>Class &amp; Descendant Selectors</h3>
+  <p>Normal paragraph text.</p>
+  <p>Text with <span class="highlight">highlighted span</span> inside.</p>
+  <span class="tag">Tag A</span><span class="tag">Tag B</span><span class="tag">Tag C</span>
+</div>
+<div class="section">
+  <h3>:nth-child, :first-child, :last-child</h3>
+  <div class="list-demo">
+    <div>Item 1 (first)</div><div>Item 2</div><div>Item 3</div>
+    <div>Item 4</div><div>Item 5 (last)</div>
+  </div>
+</div>
+<div class="section">
+  <h3>Attribute Selectors</h3>
+  <p data-status="active">Active Item</p>
+  <p data-status="inactive">Inactive Item</p>
+  <p data-status="active">Another Active</p>
+</div>
+</body></html>

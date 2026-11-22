@@ -1,0 +1,23 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.sample{background:#f1f5f9;border-radius:8px;padding:16px;font-size:14px;color:#475569;line-height:1.6;min-height:180px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#dbeafe;color:#1e40af;margin-top:8px}
+</style></head><body>
+<h2>CSS writing-mode</h2>
+<div class="grid">
+<div class="card"><h3>horizontal-tb</h3>
+<div class="sample" style="writing-mode:horizontal-tb">Text flows left-to-right, top-to-bottom. Default for Latin scripts.</div>
+<div class="tag">horizontal-tb</div></div>
+<div class="card"><h3>vertical-rl</h3>
+<div class="sample" style="writing-mode:vertical-rl">Text flows top-to-bottom, columns right to left. Traditional CJK typography.</div>
+<div class="tag">vertical-rl</div></div>
+<div class="card"><h3>vertical-lr</h3>
+<div class="sample" style="writing-mode:vertical-lr">Text flows top-to-bottom, columns left to right. Used in some scripts.</div>
+<div class="tag">vertical-lr</div></div>
+</div>
+</body></html>

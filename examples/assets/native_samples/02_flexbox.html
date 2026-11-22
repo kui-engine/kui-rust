@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .item { padding: 10px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; text-align: center; }
+    .a { background: #3b82f6; } .b { background: #8b5cf6; } .c { background: #ec4899; }
+    .d { background: #f59e0b; } .e { background: #10b981; } .f { background: #ef4444; }
+
+    /* Flex Direction */
+    .flex-row    { display: flex; gap: 8px; }
+    .flex-col    { display: flex; flex-direction: column; gap: 8px; }
+    .flex-row-r  { display: flex; flex-direction: row-reverse; gap: 8px; }
+    .flex-col-r  { display: flex; flex-direction: column-reverse; gap: 8px; }
+
+    /* Justify Content */
+    .jc-start   { display: flex; justify-content: flex-start; gap: 8px; }
+    .jc-center  { display: flex; justify-content: center; gap: 8px; }
+    .jc-end     { display: flex; justify-content: flex-end; gap: 8px; }
+    .jc-between { display: flex; justify-content: space-between; }
+    .jc-around  { display: flex; justify-content: space-around; }
+    .jc-evenly  { display: flex; justify-content: space-evenly; }
+
+    /* Align Items */
+    .ai-stretch  { display: flex; align-items: stretch; gap: 8px; min-height: 80px; }
+    .ai-start    { display: flex; align-items: flex-start; gap: 8px; min-height: 80px; }
+    .ai-center   { display: flex; align-items: center; gap: 8px; min-height: 80px; }
+    .ai-end      { display: flex; align-items: flex-end; gap: 8px; min-height: 80px; }
+
+    /* Flex Grow / Shrink */
+    .grow-demo { display: flex; gap: 8px; }
+    .grow-0 { flex-grow: 0; } .grow-1 { flex-grow: 1; } .grow-2 { flex-grow: 2; }
+
+    /* Flex Wrap */
+    .wrap-demo { display: flex; flex-wrap: wrap; gap: 8px; width: 300px; }
+    .wrap-item { width: 100px; }
+
+    /* Gap */
+    .gap-sm { display: flex; gap: 4px; }
+    .gap-md { display: flex; gap: 16px; }
+    .gap-lg { display: flex; gap: 32px; }
+
+    /* Order */
+    .order-demo { display: flex; gap: 8px; }
+
+    .row { display: flex; gap: 16px; margin-bottom: 12px; }
+    .col { flex: 1; }
+</style>
+</head>
+<body>
+    <h2>Flexbox Layout</h2>
+
+    <h3>Flex Direction</h3>
+    <div class="row">
+        <div class="col section">
+            <div class="label">row (default)</div>
+            <div class="flex-row">
+                <div class="item a">1</div><div class="item b">2</div><div class="item c">3</div>
+            </div>
+        </div>
+        <div class="col section">
+            <div class="label">column</div>
+            <div class="flex-col">
+                <div class="item a">1</div><div class="item b">2</div><div class="item c">3</div>
+            </div>
+        </div>
+        <div class="col section">
+            <div class="label">row-reverse</div>
+            <div class="flex-row-r">
+                <div class="item a">1</div><div class="item b">2</div><div class="item c">3</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Justify Content</h3>
+    <div class="section">
+        <div class="label">flex-start</div>
+        <div class="jc-start" style="margin-bottom: 8px;">
+            <div class="item a">A</div><div class="item b">B</div><div class="item c">C</div>
+        </div>
+        <div class="label">center</div>
+        <div class="jc-center" style="margin-bottom: 8px;">
+            <div class="item a">A</div><div class="item b">B</div><div class="item c">C</div>
+        </div>
+        <div class="label">flex-end</div>
+        <div class="jc-end" style="margin-bottom: 8px;">
+            <div class="item a">A</div><div class="item b">B</div><div class="item c">C</div>
+        </div>
+        <div class="label">space-between</div>
+        <div class="jc-between" style="margin-bottom: 8px;">
+            <div class="item a">A</div><div class="item b">B</div><div class="item c">C</div>
+        </div>
+        <div class="label">space-around</div>
+        <div class="jc-around" style="margin-bottom: 8px;">
+            <div class="item a">A</div><div class="item b">B</div><div class="item c">C</div>
+        </div>
+        <div class="label">space-evenly</div>
+        <div class="jc-evenly">
+            <div class="item a">A</div><div class="item b">B</div><div class="item c">C</div>
+        </div>
+    </div>
+
+    <h3>Align Items (container height: 80px)</h3>
+    <div class="row">
+        <div class="col section">
+            <div class="label">stretch</div>
+            <div class="ai-stretch" style="background: #0f172a; border-radius: 4px;">
+                <div class="item a">A</div><div class="item b">B</div>
+            </div>
+        </div>
+        <div class="col section">
+            <div class="label">flex-start</div>
+            <div class="ai-start" style="background: #0f172a; border-radius: 4px;">
+                <div class="item a">A</div><div class="item b">B</div>
+            </div>
+        </div>
+        <div class="col section">
+            <div class="label">center</div>
+            <div class="ai-center" style="background: #0f172a; border-radius: 4px;">
+                <div class="item a">A</div><div class="item b">B</div>
+            </div>
+        </div>
+        <div class="col section">
+            <div class="label">flex-end</div>
+            <div class="ai-end" style="background: #0f172a; border-radius: 4px;">
+                <div class="item a">A</div><div class="item b">B</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Flex Grow</h3>
+    <div class="section">
+        <div class="label">grow: 0 | 1 | 2</div>
+        <div class="grow-demo">
+            <div class="item a grow-0">grow:0</div>
+            <div class="item b grow-1">grow:1</div>
+            <div class="item c grow-2">grow:2</div>
+        </div>
+    </div>
+
+    <h3>Flex Wrap (container: 300px)</h3>
+    <div class="section">
+        <div class="wrap-demo">
+            <div class="item a wrap-item">100px</div>
+            <div class="item b wrap-item">100px</div>
+            <div class="item c wrap-item">100px</div>
+            <div class="item d wrap-item">100px</div>
+        </div>
+    </div>
+
+    <h3>Gap: 4px / 16px / 32px</h3>
+    <div class="row">
+        <div class="col section">
+            <div class="gap-sm"><div class="item a">A</div><div class="item b">B</div><div class="item c">C</div></div>
+        </div>
+        <div class="col section">
+            <div class="gap-md"><div class="item a">A</div><div class="item b">B</div><div class="item c">C</div></div>
+        </div>
+        <div class="col section">
+            <div class="gap-lg"><div class="item a">A</div><div class="item b">B</div><div class="item c">C</div></div>
+        </div>
+    </div>
+
+    <h3>Order</h3>
+    <div class="section">
+        <div class="label">Visual: C B A (order: 3, 2, 1)</div>
+        <div class="order-demo">
+            <div class="item a" style="order: 3;">A (order:3)</div>
+            <div class="item b" style="order: 1;">B (order:1)</div>
+            <div class="item c" style="order: 2;">C (order:2)</div>
+        </div>
+    </div>
+</body>
+</html>

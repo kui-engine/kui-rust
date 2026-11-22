@@ -1,0 +1,41 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+-- window.performance.now() returns a number
+local t = window.performance.now()
+if type(t) ~= "number" then
+    ok = false; msg = msg .. "perf.now not number; "
+end
+
+-- window.scrollTo / scrollBy should not crash
+window.scrollTo(0, 0)
+window.scrollBy(0, 0)
+
+-- window.alert should not crash
+window.alert("test")
+
+-- window.getComputedStyle should return an object with getPropertyValue
+local el = document:getElementById("result")
+local cs = window.getComputedStyle(el)
+if cs == nil then
+    ok = false; msg = msg .. "getComputedStyle nil; "
+elseif type(cs:getPropertyValue("display")) ~= "string" then
+    ok = false; msg = msg .. "getPropertyValue not string; "
+end
+
+-- cancelAnimationFrame should not crash
+local id = requestAnimationFrame(function() end)
+cancelAnimationFrame(id)
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    padding: 16px;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #0f172a; color: #e2e8f0; min-height: 100vh;
+}
+header { display: flex; align-items: baseline; justify-content: space-between;
+         margin-bottom: 10px; }
+h1 { font-size: 18px; }
+.subtitle { color: #94a3b8; font-size: 12px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+           padding: 10px 12px; margin-bottom: 10px;
+           background: #1e293b; border: 1px solid #334155; border-radius: 6px; }
+.toolbar .label { color: #94a3b8; font-size: 12px; margin: 0 4px; }
+.toolbar button {
+    padding: 6px 12px; border-radius: 4px; border: 1px solid #334155;
+    background: #334155; color: #e2e8f0; font: 13px "Segoe UI"; cursor: pointer;
+}
+.toolbar button:hover { background: #475569; }
+.toolbar button.active { background: #3b82f6; color: #fff; border-color: #2563eb; }
+.toolbar input {
+    width: 70px; padding: 5px 8px; border-radius: 4px;
+    border: 1px solid #475569; background: #0f172a; color: #e2e8f0;
+    font: 13px "Consolas", monospace;
+}
+.toolbar .sep { width: 1px; height: 22px; background: #334155; margin: 0 6px; }
+.toolbar .stats { margin-left: auto; color: #94a3b8; font: 11px "Consolas", monospace; }
+.editor-wrap { display: flex; height: 540px; }
+kui-editor { flex: 1; height: 100%;
+             background: #1e293b; border: 1px solid #334155;
+             font-family: "Cascadia Code", "Consolas", monospace; }
+</style></head>
+<body>
+<header>
+  <h1>kui-editor — scrollbar styles + scrollToLine</h1>
+  <span class="subtitle">SDK 3.13.0 • KUI-033/034 • setScrollbarStyle / scrollToLine / getFirstVisibleLine</span>
+</header>
+
+<div class="toolbar">
+  <span class="label">Scrollbar:</span>
+  <button id="sb-minimap" class="active">minimap</button>
+  <button id="sb-classic">classic</button>
+  <button id="sb-both">both</button>
+  <button id="sb-none">none</button>
+  <span class="sep"></span>
+  <span class="label">Go to line:</span>
+  <input id="goto-line" type="text" value="60">
+  <button id="goto-btn">Jump</button>
+  <button id="goto-top">Top</button>
+  <button id="goto-bottom">Bottom</button>
+  <span class="stats" id="stats">…</span>
+</div>
+
+<div class="editor-wrap">
+  <kui-editor id="ed" line-numbers="true"></kui-editor>
+</div>
+
+<script>
+local ed    = document:getElementById("ed")
+local stats = document:getElementById("stats")
+
+-- Generate a long, scrollable sample file (~120 lines).
+local parts = { "// KUI-033/034 demo — a long file so scrolling + the minimap matter." }
+for i = 1, 24 do
+    parts[#parts + 1] = ""
+    parts[#parts + 1] = string.format("function task%02d(input) {", i)
+    parts[#parts + 1] = string.format("    // section %02d of the generated sample", i)
+    parts[#parts + 1] = "    const acc = [];"
+    parts[#parts + 1] = string.format("    for (let i = 0; i < input.length; i++) {")
+    parts[#parts + 1] = string.format("        acc.push(input[i] * %d);", i)
+    parts[#parts + 1] = "    }"
+    parts[#parts + 1] = "    return acc;"
+    parts[#parts + 1] = "}"
+end
+ed:setValue(table.concat(parts, "\n"))
+ed:setLanguage("javascript")
+ed:setTheme("mocha")
+ed:setMinimapVisible(true)          -- ensure the minimap is on for "minimap"/"both"
+ed:focus()
+
+local STYLE_BTNS = { "sb-minimap", "sb-classic", "sb-both", "sb-none" }
+local function setActiveStyle(style)
+    for _, id in ipairs(STYLE_BTNS) do
+        local b = document:getElementById(id)
+        if b then
+            if id == ("sb-" .. style) then b:addClass("active")
+            else                           b:removeClass("active") end
+        end
+    end
+end
+
+local function applyStyle(style)
+    -- setScrollbarStyle echoes back the resulting form (unknown keeps current).
+    local result = ed:setScrollbarStyle(style)   -- editor_lua_api.cpp:2843
+    setActiveStyle(result)
+    ed:focus()
+end
+
+document:getElementById("sb-minimap"):addEventListener("click", function() applyStyle("minimap") end)
+document:getElementById("sb-classic"):addEventListener("click", function() applyStyle("classic") end)
+document:getElementById("sb-both")   :addEventListener("click", function() applyStyle("both")    end)
+document:getElementById("sb-none")   :addEventListener("click", function() applyStyle("none")    end)
+
+local function jumpTo(line)
+    if line < 0 then line = 0 end
+    local last = ed:getLineCount() - 1
+    if line > last then line = last end
+    ed:scrollToLine(line)               -- KUI-033: editor_lua_api.cpp:2838
+    ed:setCaret(line, 0)
+    ed:focus()
+end
+
+document:getElementById("goto-btn"):addEventListener("click", function()
+    local v = tonumber(document:getElementById("goto-line").value)
+    if v then jumpTo(math.floor(v)) end
+end)
+document:getElementById("goto-top")   :addEventListener("click", function() jumpTo(0) end)
+document:getElementById("goto-bottom"):addEventListener("click", function() jumpTo(ed:getLineCount() - 1) end)
+
+-- Stats poll (10 Hz) — show current scrollbar form + first visible line.
+setInterval(function()
+    stats.textContent = string.format(
+        "  style=%s  lines=%d  firstVisible=%d  scrollTop=%s",
+        ed:getScrollbarStyle(),         -- :2844
+        ed:getLineCount(),
+        ed:getFirstVisibleLine(),       -- :2839
+        tostring(ed:getScrollTop()))    -- :2840
+end, 100)
+
+print("[minimap-scroll demo] ready — switch scrollbar styles + jump to a line")
+</script>
+</body></html>

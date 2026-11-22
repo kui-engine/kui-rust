@@ -1,0 +1,71 @@
+<html>
+<head>
+<style>
+.existing { color: red; }
+</style>
+</head>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+-- Get first stylesheet
+local sheets = document.styleSheets
+if #sheets < 1 then ok = false; msg = msg .. "no stylesheets; "
+else
+    local sheet = sheets[1]
+
+    -- ruleCount
+    local rc = sheet.ruleCount
+    if type(rc) ~= "number" then ok = false; msg = msg .. "ruleCount not number; "
+    elseif rc < 1 then ok = false; msg = msg .. "ruleCount=" .. rc .. "; "
+    end
+
+    -- cssRules
+    local rules = sheet:cssRules()
+    if #rules < 1 then ok = false; msg = msg .. "cssRules empty; "
+    else
+        local rule = rules[1]
+        -- rule.type (0 = CSSRuleType::Style in KUI)
+        if rule.type ~= 0 then ok = false; msg = msg .. "rule.type=" .. tostring(rule.type) .. "; " end
+        -- rule.selectorText
+        if type(rule.selectorText) ~= "string" then ok = false; msg = msg .. "selectorText not string; " end
+        -- rule.cssText
+        if type(rule.cssText) ~= "string" then ok = false; msg = msg .. "rule.cssText not string; " end
+        -- rule.style (CSSStyleDeclaration)
+        if rule.style == nil then ok = false; msg = msg .. "rule.style nil; "
+        else
+            local cv = rule.style:getPropertyValue("color")
+            if type(cv) ~= "string" then ok = false; msg = msg .. "rule.style.color not string; " end
+        end
+    end
+
+    -- insertRule
+    local rcBefore = sheet.ruleCount
+    sheet:insertRule(".inserted { font-size: 20px; }")
+    local rcAfter = sheet.ruleCount
+    if rcAfter ~= rcBefore + 1 then ok = false; msg = msg .. "insertRule count=" .. rcAfter .. "; " end
+
+    -- deleteRule
+    sheet:deleteRule(rcAfter - 1)
+    local rcFinal = sheet.ruleCount
+    if rcFinal ~= rcBefore then ok = false; msg = msg .. "deleteRule count=" .. rcFinal .. "; " end
+
+    -- disabled (read/write)
+    if type(sheet.disabled) ~= "boolean" then ok = false; msg = msg .. "disabled not bool; " end
+    local wasDis = sheet.disabled
+    sheet.disabled = true
+    if sheet.disabled ~= true then ok = false; msg = msg .. "disabled set true failed; " end
+    sheet.disabled = wasDis
+end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

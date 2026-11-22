@@ -1,0 +1,33 @@
+<html><body>
+<div id="count">0</div>
+<button id="inc">+</button>
+<button id="dec">-</button>
+<div id="result"></div>
+<script>
+local count = 0
+local countEl = document:getElementById("count")
+
+document:getElementById("inc"):addEventListener("click", function()
+    count = count + 1
+    countEl.textContent = tostring(count)
+end)
+
+document:getElementById("dec"):addEventListener("click", function()
+    count = count - 1
+    countEl.textContent = tostring(count)
+end)
+
+-- Simulate: +1, +1, +1, -1 => count = 2
+document:getElementById("inc"):dispatchEvent("click")
+document:getElementById("inc"):dispatchEvent("click")
+document:getElementById("inc"):dispatchEvent("click")
+document:getElementById("dec"):dispatchEvent("click")
+
+local r = document:getElementById("result")
+if count == 2 and countEl.textContent == "2" then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL: count=" .. tostring(count) .. " text=" .. countEl.textContent
+end
+</script>
+</body></html>

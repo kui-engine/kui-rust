@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#0f172a;color:#f8fafc}
+h2{margin-bottom:16px}
+.card{background:#1e293b;border-radius:12px;padding:24px;margin-bottom:16px}
+.card h3{font-size:14px;margin-bottom:12px}
+.scale-demo{display:flex;gap:16px;flex-wrap:wrap}
+.scale-box{background:#0f172a;padding:16px;border-radius:8px;text-align:center}
+.scale-box .preview{width:64px;height:64px;margin:0 auto 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+.scale-box .label{font-size:12px;color:#64748b}
+.s100 .preview{background:#3b82f6;font-size:16px}.s125 .preview{background:#10b981;font-size:20px}
+.s150 .preview{background:#f59e0b;font-size:24px}.s200 .preview{background:#ef4444;font-size:32px}
+.info{font-size:13px;color:#94a3b8;margin-top:12px}
+.metric{display:flex;gap:12px;margin-top:12px}
+.m-item{background:#0f172a;padding:12px 16px;border-radius:8px;font-size:13px}
+.m-item .val{color:#3b82f6;font-weight:700;font-size:18px}.m-item .lbl{color:#64748b;font-size:11px;margin-top:2px}
+</style></head><body>
+<h2>DPI Scaling</h2>
+<div class="card"><h3>Scale Factor Preview</h3>
+<div class="scale-demo">
+<div class="scale-box s100"><div class="preview">Aa</div><div class="label">100% (1x)</div></div>
+<div class="scale-box s125"><div class="preview">Aa</div><div class="label">125% (1.25x)</div></div>
+<div class="scale-box s150"><div class="preview">Aa</div><div class="label">150% (1.5x)</div></div>
+<div class="scale-box s200"><div class="preview">Aa</div><div class="label">200% (2x)</div></div>
+</div>
+<div class="info">KUI automatically handles DPI scaling. All CSS pixels are resolution-independent.</div>
+<div class="metric">
+<div class="m-item"><div class="val" id="dpr">1.0</div><div class="lbl">Device Pixel Ratio</div></div>
+<div class="m-item"><div class="val" id="scale">100%</div><div class="lbl">System Scale</div></div>
+</div></div>
+</body></html>

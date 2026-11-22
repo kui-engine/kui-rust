@@ -1,0 +1,40 @@
+<div id="result"></div>
+<div id="detail"></div>
+<div id="original" class="foo bar">
+    <span>child1</span>
+    <span>child2</span>
+</div>
+<div id="target"></div>
+<script type="text/lua">
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+
+local ok, err = pcall(function()
+    local orig = document:getElementById("original")
+
+    -- shallow clone: no children
+    local shallow = orig:cloneNode(false)
+    assert(shallow, "cloneNode returned nil")
+    assert(shallow.tagName == "div", "clone tagName: " .. tostring(shallow.tagName))
+    assert(shallow:hasClass("foo"), "clone has class foo")
+
+    -- deep clone: with children
+    local deep = orig:cloneNode(true)
+    assert(deep, "deep cloneNode returned nil")
+    assert(deep.tagName == "div", "deep clone tagName")
+
+    -- insertAdjacentHTML
+    local target = document:getElementById("target")
+    target:insertAdjacentHTML("beforeend", "<p>hello</p>")
+    local p = target:querySelector("p")
+    assert(p, "insertAdjacentHTML did not create p element")
+    assert(p.textContent == "hello", "p text: " .. tostring(p.textContent))
+end)
+
+if ok then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL"
+    d.textContent = tostring(err)
+end
+</script>

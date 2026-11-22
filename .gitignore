@@ -1,0 +1,4 @@
+# Cargo 输出、build.ps1 / build.sh 的默认输出与本地构建目录（runtime/ 是随仓库提交的运行库，不要忽略）
+/target/
+/bin/
+/build*/

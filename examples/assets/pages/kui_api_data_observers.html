@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — data binding, observers, themes &amp; router</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 12px 18px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 6px; }
+#tour-result { padding: 5px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 8px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.panel { background: white; border-radius: 10px; padding: 8px 12px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 1px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 2px; }
+.note { color: #64748b; margin-bottom: 5px; font-size: 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
+button { padding: 3px 8px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 11px; background: #f1f5f9; padding: 4px 7px;
+       border-radius: 5px; color: #334155; min-height: 22px; }
+
+/* Observable: a counter bound to text, a badge bound to an attribute and its style, an input
+   bound both ways. */
+.ob-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.lbl { color: #64748b; font-size: 12px; width: 52px; }
+#ob-text { font-size: 18px; font-weight: 700; color: #1d4ed8; min-width: 30px; }
+#ob-badge { padding: 2px 10px; border-radius: 10px; border: 2px solid #cbd5e1; font-size: 12px; }
+#ob-badge[data-level="hot"] { border-color: #dc2626; }
+#ob-input { width: 110px; padding: 2px 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; }
+#ob-echo { font-size: 12px; color: #334155; }
+
+/* MutationObserver: the box is observed with its subtree. */
+#mut-box { border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px 8px; }
+#mut-list { list-style: none; display: flex; flex-wrap: wrap; gap: 4px; min-height: 20px; }
+#mut-list li { background: #e0e7ff; color: #3730a3; border-radius: 4px; padding: 0 6px; font-size: 12px; }
+#mut-item { padding: 0 6px; border-radius: 4px; background: #f1f5f9; font-size: 12px; }
+#mut-item[data-state="on"] { background: #bbf7d0; }
+
+/* ResizeObserver: a content-box with known padding / border, and a 50%-wide box in a stage. */
+#rs-stage { width: 100%; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px; }
+#rs-stage.narrow { width: 60%; }
+#rs-box { box-sizing: content-box; width: 160px; height: 40px; padding: 8px; border: 2px solid #93c5fd;
+          background: #eff6ff; font-size: 12px; }
+#rs-fluid { width: 50%; height: 16px; margin-top: 4px; background: #fde68a; font-size: 11px; }
+
+/* IntersectionObserver: two targets in a scroll box (the root). */
+#io-scroller { height: 90px; overflow: auto; border: 1px solid #cbd5e1; border-radius: 4px; }
+.io-target { height: 40px; line-height: 40px; padding-left: 10px; font-size: 12px; }
+#io-a { background: #dbeafe; }
+#io-b { background: #fce7f3; }
+#io-spacer { height: 220px; color: #94a3b8; font-size: 11px; padding: 4px 10px; }
+
+/* Theme: the card only uses the custom properties a theme sets on <html>. */
+#theme-card { height: 56px; padding: 8px 12px; border-radius: 8px; border-left: 8px solid var(--tour-accent, #94a3b8);
+              background-color: var(--tour-bg, #e2e8f0); color: var(--tour-fg, #1e293b); font-weight: 600; }
+
+/* Router: the registered view container. */
+#route-view { min-height: 40px; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px 8px; }
+#route-view .view { font-weight: 600; padding: 4px 0; }
+#view-home { color: #15803d; }
+#view-user { color: #1d4ed8; }
+#view-about { color: #7c3aed; }
+#view-admin { color: #b91c1c; }
+#route-nav { margin-top: 3px; }
+
+.log-title { margin: 8px 0 3px; font-size: 14px; }
+#log-box { height: 130px; overflow: auto; background: white; border-radius: 6px; }
+#tour-log { border-collapse: collapse; width: 100%; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 1px 8px; font-family: Consolas, monospace;
+               font-size: 11px; }
+#tour-log tr.bad td { color: #b91c1c; }
+
+/* Sandbox for the self-check (laid out, zero height). */
+#scratch { height: 0; overflow: hidden; }
+#s-style { background-color: #ffffff; }
+</style></head><body>
+<h1>KUI API — data binding, observers, themes &amp; router</h1>
+<p class="lead">Observable values bound to elements, Mutation / Resize / Intersection observers, the
+theme manager and the document router, driven through the C ABI (and the Go / Rust wrappers). On start
+the host runs every call once and checks the results; the buttons repeat the calls by hand.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-ob">
+    <h2>Observable &amp; bindings</h2>
+    <div class="api">observable_create · get · set · subscribe · bind · unbind · flush_bindings</div>
+    <p class="note">The counter is bound to text, the badge to an attribute and its style, the input
+      both ways (typing updates the value; a subscriber echoes it).</p>
+    <div class="ob-row"><span class="lbl">text</span><span id="ob-text">—</span>
+      <span id="ob-badge">badge</span></div>
+    <div class="ob-row"><span class="lbl">two-way</span><input id="ob-input" value="">
+      <span id="ob-echo">—</span></div>
+    <div class="toolbar">
+      <button id="btn-ob-inc">Count +1</button>
+      <button id="btn-ob-color">Toggle badge</button>
+      <button id="btn-ob-unbind">Unbind text</button>
+      <button id="btn-ob-rebind">Rebind text</button>
+    </div>
+    <div class="out" id="ob-out">—</div>
+  </section>
+
+  <section class="panel" id="p-mut">
+    <h2>MutationObserver</h2>
+    <div class="api">mutation_observer_create · mutation_observer_observe · observer_disconnect</div>
+    <p class="note">The dashed box is observed with its subtree (child list, attributes, text, old
+      values); every record batch is written below.</p>
+    <div id="mut-box">
+      <ul id="mut-list"><li id="mut-li-0">item 0</li></ul>
+      <span id="mut-text">hello</span> <span id="mut-item" data-state="off">state</span>
+    </div>
+    <div class="toolbar">
+      <button id="btn-mut-add">Add item</button>
+      <button id="btn-mut-remove">Remove item</button>
+      <button id="btn-mut-attr">Toggle attr</button>
+      <button id="btn-mut-text">Change text</button>
+      <button id="btn-mut-stop">Disconnect</button>
+      <button id="btn-mut-start">Observe</button>
+    </div>
+    <div class="out" id="mut-out">—</div>
+  </section>
+
+  <section class="panel" id="p-rs">
+    <h2>ResizeObserver</h2>
+    <div class="api">resize_observer_create · observer_observe · observer_unobserve</div>
+    <p class="note">Blue: content-box 160×40, padding 8, border 2. Yellow: 50% of the stage. Entries
+      arrive after a rendered frame.</p>
+    <div id="rs-stage">
+      <div id="rs-box">resize me</div>
+      <div id="rs-fluid">50%</div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-rs-grow">Wider +40</button>
+      <button id="btn-rs-reset">Reset</button>
+      <button id="btn-rs-stage">Toggle stage width</button>
+    </div>
+    <div class="out" id="rs-out">—</div>
+  </section>
+
+  <section class="panel" id="p-io">
+    <h2>IntersectionObserver</h2>
+    <div class="api">intersection_observer_create (root, thresholds) · observer_observe</div>
+    <p class="note">The scroll box is the root; A is at the top, B below the fold (thresholds 0, 0.5, 1).</p>
+    <div id="io-scroller">
+      <div class="io-target" id="io-a">target A</div>
+      <div id="io-spacer">… scroll …</div>
+      <div class="io-target" id="io-b">target B</div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-io-bottom">Scroll to B</button>
+      <button id="btn-io-top">Scroll to A</button>
+    </div>
+    <div class="out" id="io-out">—</div>
+  </section>
+
+  <section class="panel" id="p-th">
+    <h2>Theme manager</h2>
+    <div class="api">theme_manager_create · register · apply · get_active · get_variable</div>
+    <p class="note">Two registered themes set --tour-bg / --tour-fg / --tour-accent on &lt;html&gt;;
+      the card only uses those variables.</p>
+    <div id="theme-card">Themed card</div>
+    <div class="toolbar">
+      <button id="btn-th-light">Light</button>
+      <button id="btn-th-dark">Dark</button>
+      <button id="btn-th-list">List themes</button>
+    </div>
+    <div class="out" id="theme-out">—</div>
+  </section>
+
+  <section class="panel" id="p-rt">
+    <h2>Router</h2>
+    <div class="api">router_add_route · register_view · push · replace · go · add_guard</div>
+    <p class="note">Routes /, /user/:id, /about, /admin (a guard blocks /admin while locked).</p>
+    <div id="route-view"></div>
+    <div class="toolbar">
+      <button id="btn-rt-home">/</button>
+      <button id="btn-rt-user">/user/7</button>
+      <button id="btn-rt-about">replace /about</button>
+      <button id="btn-rt-admin">/admin</button>
+      <button id="btn-rt-lock">Toggle lock</button>
+      <button id="btn-rt-back">Back</button>
+      <button id="btn-rt-fwd">Forward</button>
+    </div>
+    <div class="out" id="route-out">—</div>
+    <div class="out" id="route-nav">—</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<div id="log-box"><table id="tour-log"></table></div>
+<div id="scratch">
+  <span id="s-text">x</span><span id="s-attr">a</span><span id="s-style">s</span>
+  <input id="s-input" value="">
+  <div id="s-mut"><ul id="s-list"></ul><span id="s-mtext">hello</span><span id="s-mitem" data-state="off">i</span></div>
+</div>
+</body></html>

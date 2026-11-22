@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!--
+  KUI scrollbar & scrolling feature showcase.
+
+  Demonstrates, in one page:
+    1. -kui-scrollbar-overlay: overlay vs auto (reserve gutter) + runtime toggle
+    2. flex overflow:auto reservation + scrollbar-gutter: stable
+    3. programmatic scrollTo / smooth scroll / momentum (fling)
+       plus keyboard scrolling, track-click paging and thumb hover highlight
+       (all driven from the mouse / arrow keys, no code needed).
+-->
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0f172a; color: #e2e8f0;
+         font-family: "Segoe UI", sans-serif; padding: 20px; }
+  h2 { font-size: 19px; color: #38bdf8; margin-bottom: 6px; }
+  .sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; line-height: 1.6; }
+  code { color: #fbbf24; }
+  h3 { font-size: 13px; color: #94a3b8; margin: 16px 0 6px; }
+  .section { background: #1e293b; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .col { width: 230px; }
+  .label { font-size: 11px; color: #cbd5e1; margin-bottom: 5px; font-family: monospace; }
+
+  .box { height: 120px; overflow-y: auto;
+         background: #0f172a; border: 1px solid #334155; border-radius: 6px; }
+  /* Each row's rightmost 10px is amber — the content boundary marker. */
+  .line { height: 28px; display: flex; align-items: center; padding-left: 8px; font-size: 12px;
+          background: linear-gradient(to right, #334155 0, #334155 calc(100% - 10px),
+                      #f59e0b calc(100% - 10px), #f59e0b 100%); }
+  .line:nth-child(odd) {
+          background: linear-gradient(to right, #283548 0, #283548 calc(100% - 10px),
+                      #f59e0b calc(100% - 10px), #f59e0b 100%); }
+
+  .overlay { -kui-scrollbar-overlay: overlay; }
+  .reserve { -kui-scrollbar-overlay: auto; }
+  .flexcol { display: flex; flex-direction: column; }
+  .gutter  { scrollbar-gutter: stable; }
+
+  button { margin: 4px 4px 0 0; padding: 7px 12px; font-size: 12px; cursor: pointer;
+           background: #2563eb; color: #fff; border: none; border-radius: 5px; }
+  button:hover { background: #1d4ed8; }
+  #status { margin-top: 6px; font-size: 11px; color: #fbbf24; font-family: monospace; }
+
+  .scrollzone { height: 160px; overflow-y: auto; scroll-behavior: smooth;
+                background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px; }
+  .zline { height: 26px; display: flex; align-items: center; padding-left: 8px;
+           font-size: 12px; color: #cbd5e1; border-bottom: 1px solid #1e293b; }
+  .tip { font-size: 11px; color: #64748b; margin-top: 8px; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h2>KUI Scrollbar &amp; Scrolling Features</h2>
+  <div class="sub">
+    Overlay vs reserve gutter (<code>-kui-scrollbar-overlay</code>), flex
+    <code>overflow:auto</code> reservation, <code>scrollbar-gutter</code>,
+    programmatic <code>scrollTo</code> / smooth / momentum, plus keyboard,
+    track-paging and thumb-hover — try them with the mouse and arrow keys.
+  </div>
+
+  <h3>1 &mdash; -kui-scrollbar-overlay: overlay vs auto</h3>
+  <div class="section"><div class="row">
+    <div class="col">
+      <div class="label">overlay (covers content)</div>
+      <div class="box overlay">
+        <div class="line">1</div><div class="line">2</div><div class="line">3</div>
+        <div class="line">4</div><div class="line">5</div><div class="line">6</div>
+        <div class="line">7</div><div class="line">8</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="label">auto — reserves 8px (default)</div>
+      <div class="box reserve">
+        <div class="line">1</div><div class="line">2</div><div class="line">3</div>
+        <div class="line">4</div><div class="line">5</div><div class="line">6</div>
+        <div class="line">7</div><div class="line">8</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="label">runtime toggle (C++ setProperty)</div>
+      <div class="box" id="toggle-target">
+        <div class="line">1</div><div class="line">2</div><div class="line">3</div>
+        <div class="line">4</div><div class="line">5</div><div class="line">6</div>
+        <div class="line">7</div><div class="line">8</div>
+      </div>
+      <button id="toggle-btn">Toggle overlay / auto</button>
+      <div id="toggle-status">current: -kui-scrollbar-overlay: overlay  (scrollbar overlays content)</div>
+    </div>
+  </div></div>
+
+  <h3>2 &mdash; flex overflow:auto reservation + scrollbar-gutter</h3>
+  <div class="section"><div class="row">
+    <div class="col">
+      <div class="label">flex column overflow:auto (now reserves)</div>
+      <div class="box flexcol">
+        <div class="line">1</div><div class="line">2</div><div class="line">3</div>
+        <div class="line">4</div><div class="line">5</div><div class="line">6</div>
+        <div class="line">7</div><div class="line">8</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="label">scrollbar-gutter: stable (reserves w/o bar)</div>
+      <div class="box gutter">
+        <div class="line">1</div><div class="line">2</div>
+      </div>
+    </div>
+  </div></div>
+
+  <h3>3 &mdash; programmatic: scrollTo / smooth / momentum</h3>
+  <div class="section">
+    <div class="scrollzone" id="scrollzone">
+      <div class="zline">Row 1</div><div class="zline">Row 2</div>
+      <div class="zline">Row 3</div><div class="zline">Row 4</div>
+      <div class="zline">Row 5</div><div class="zline">Row 6</div>
+      <div class="zline">Row 7</div><div class="zline">Row 8</div>
+      <div class="zline">Row 9</div><div class="zline">Row 10</div>
+      <div class="zline">Row 11</div><div class="zline">Row 12</div>
+      <div class="zline">Row 13</div><div class="zline">Row 14</div>
+      <div class="zline">Row 15</div><div class="zline">Row 16</div>
+      <div class="zline">Row 17</div><div class="zline">Row 18</div>
+      <div class="zline">Row 19</div><div class="zline">Row 20</div>
+      <div class="zline">Row 21</div><div class="zline">Row 22</div>
+      <div class="zline">Row 23</div><div class="zline">Row 24</div>
+      <div class="zline">Row 25</div><div class="zline">Row 26</div>
+      <div class="zline">Row 27</div><div class="zline">Row 28</div>
+      <div class="zline">Row 29</div><div class="zline">Row 30</div>
+    </div>
+    <button id="btn-top">scrollTo top (smooth)</button>
+    <button id="btn-bottom">scrollTo bottom (smooth)</button>
+    <button id="btn-fling">fling (momentum)</button>
+    <div class="tip">
+      The box above has <code>scroll-behavior: smooth</code>, so scrollTo animates.<br>
+      Also try: <b>hover the scrollbar thumb</b> (it brightens) ·
+      <b>click the track</b> above/below the thumb to page ·
+      focus the page and use <b>↑ ↓ PageUp PageDown Home End</b>.
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<html><body>
+<div id="target"></div>
+<div id="result"></div>
+<script>
+local count = 0
+local el = document:getElementById("target")
+
+el:addEventListener("test", function(e)
+    count = count + 1
+end)
+
+el:dispatchEvent("test")
+-- count should be 1
+
+el:removeEventListeners("test")
+el:dispatchEvent("test")
+-- count should still be 1 (listener removed)
+
+local r = document:getElementById("result")
+if count == 1 then r.textContent = "PASS"
+else r.textContent = "FAIL: count=" .. tostring(count)
+end
+</script>
+</body></html>

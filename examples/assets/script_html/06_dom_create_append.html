@@ -1,0 +1,24 @@
+<html><body>
+<div id="container"></div>
+<div id="result"></div>
+<script>
+local c = document:getElementById("container")
+local span = document:createElement("span")
+span:setAttribute("id", "created")
+span.textContent = "Dynamic"
+c:appendChild(span)
+
+local found = document:getElementById("created")
+local ok = (found ~= nil) and (found.textContent == "Dynamic") and (found.tagName == "span")
+
+-- Also test createTextNode indirectly via textContent
+local div2 = document:createElement("div")
+div2:setAttribute("id", "d2")
+div2.textContent = "Text node"
+c:appendChild(div2)
+ok = ok and (document:getElementById("d2").textContent == "Text node")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

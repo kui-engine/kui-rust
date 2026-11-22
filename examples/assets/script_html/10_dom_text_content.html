@@ -1,0 +1,20 @@
+<html><body>
+<div id="target">Original</div>
+<div id="result"></div>
+<script>
+local el = document:getElementById("target")
+local ok = (el.textContent == "Original")
+
+el.textContent = "Modified"
+ok = ok and (el.textContent == "Modified")
+
+el.textContent = ""
+ok = ok and (el.textContent == "")
+
+el.textContent = "Final"
+ok = ok and (el.textContent == "Final")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

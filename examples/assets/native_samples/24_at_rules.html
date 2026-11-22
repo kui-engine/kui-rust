@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; }
+    .code { background: #0f172a; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #10b981; margin-bottom: 8px; white-space: pre; }
+
+    @supports (display: flex) {
+        .supports-flex { display: flex; gap: 12px; }
+        .supports-badge { background: #10b981; color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; }
+    }
+
+    @supports (display: grid) {
+        .supports-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .grid-item { background: #334155; padding: 12px; border-radius: 4px; text-align: center; font-size: 13px; }
+    }
+
+    @media (min-width: 600px) {
+        .media-wide { background: #3b82f6; color: white; padding: 12px; border-radius: 4px; }
+    }
+
+    @media (max-width: 599px) {
+        .media-narrow { background: #f59e0b; color: black; padding: 12px; border-radius: 4px; }
+    }
+</style>
+</head>
+<body>
+    <h2>CSS At-Rules</h2>
+
+    <h3>@supports (display: flex)</h3>
+    <div class="section">
+        <div class="code">@supports (display: flex) { ... }</div>
+        <div class="supports-flex">
+            <div class="supports-badge">Flex Supported</div>
+            <div class="supports-badge">Item 2</div>
+            <div class="supports-badge">Item 3</div>
+        </div>
+    </div>
+
+    <h3>@supports (display: grid)</h3>
+    <div class="section">
+        <div class="code">@supports (display: grid) { ... }</div>
+        <div class="supports-grid">
+            <div class="grid-item">A</div>
+            <div class="grid-item">B</div>
+            <div class="grid-item">C</div>
+            <div class="grid-item">D</div>
+            <div class="grid-item">E</div>
+            <div class="grid-item">F</div>
+        </div>
+    </div>
+
+    <h3>@media queries</h3>
+    <div class="section">
+        <div class="code">@media (min-width: 600px) { .media-wide { ... } }</div>
+        <div class="media-wide" style="margin-bottom: 8px;">Visible when width >= 600px</div>
+        <div class="media-narrow">Visible when width < 600px</div>
+    </div>
+
+    <h3>@font-face</h3>
+    <div class="section">
+        <div class="code">@font-face {
+  font-family: "MyCustomFont";
+  src: url("path/to/font.ttf");
+}</div>
+        <div class="label">@font-face rules are parsed; fonts are loaded from local file paths via SkiaBackend::addFontFromFile() before style resolution.</div>
+        <div style="margin-top: 12px; padding: 12px; background: #334155; border-radius: 6px; font-size: 13px; color: #94a3b8;">
+            When a valid local font file path is specified in src: url(), the engine will load it into the Skia font manager
+            and make it available for use with font-family references throughout the document.
+        </div>
+    </div>
+
+    <h3>@import（本地样式表）</h3>
+    <div class="section">
+        <div class="code">@import "reset.css";
+@import url("normalize.css");</div>
+        <div class="label">@import 会按源顺序加载本地样式表，支持相对路径、嵌套、supports/media 条件与循环防护；远程 URL 不加载，layer()/layer 语义尚未实现。</div>
+    </div>
+</body>
+</html>

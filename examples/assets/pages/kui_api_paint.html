@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — custom paint</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 16px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 8px; }
+#tour-result { padding: 7px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 10px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.panel { background: white; border-radius: 10px; padding: 10px 12px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 6px; min-height: 32px; }
+.frame { border: 1px dashed #cbd5e1; border-radius: 6px; padding: 4px; margin-bottom: 6px;
+         width: 310px; }
+/* The painted elements: no padding or border, so the content box the host paints into is the
+   element's whole box (the pixel checks sample fixed fractions of it). */
+paint-shapes, paint-text, paint-image, paint-clip, paint-xform, paint-alpha {
+  display: block; width: 300px; height: 120px; background: #ffffff; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+button { padding: 5px 10px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 5px 8px;
+       border-radius: 5px; color: #334155; min-height: 24px; }
+.log-title { margin: 14px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+</style></head><body>
+<h1>KUI API — custom paint</h1>
+<p class="lead">Six custom elements defined by the host with a paint callback
+(define_custom_element_ex). Each callback draws into its content box with the kui_paint_* calls;
+the buttons change what is drawn and ask for a repaint (request_repaint / invalidate_rect).</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-shapes">
+    <h2>Shapes</h2>
+    <div class="api">fill_rect · fill_rounded_rect · stroke_rect · stroke_rounded_rect · get_info</div>
+    <p class="note">Filled and stroked rectangles, square and rounded.</p>
+    <div class="frame"><paint-shapes id="pv-shapes"></paint-shapes></div>
+    <div class="toolbar">
+      <button id="btn-shapes-color">Next fill colour</button>
+      <button id="btn-paint-info">Paint counts</button>
+    </div>
+    <div class="out" id="shapes-out">fill=#ef4444</div>
+  </section>
+
+  <section class="panel" id="p-text">
+    <h2>Text &amp; decoration lines</h2>
+    <div class="api">draw_text · draw_decoration_line · invalidate_rect</div>
+    <p class="note">Text hanging from y (the top of its line box), a decoration line under it (style and colour change only
+      the line's band) and a wavy line.</p>
+    <div class="frame"><paint-text id="pv-text"></paint-text></div>
+    <div class="toolbar">
+      <button id="btn-text-style">Next line style</button>
+      <button id="btn-text-color">Toggle line colour</button>
+    </div>
+    <div class="out" id="text-out">style=solid</div>
+  </section>
+
+  <section class="panel" id="p-image">
+    <h2>Pixels &amp; images</h2>
+    <div class="api">draw_pixels · draw_image</div>
+    <p class="note">A 2×2 pixel buffer scaled up (left) and an image file the host wrote (right).</p>
+    <div class="frame"><paint-image id="pv-image"></paint-image></div>
+    <div class="toolbar">
+      <button id="btn-image-rotate">Rotate pixels</button>
+    </div>
+    <div class="out" id="image-out">top-left=#ff0000</div>
+  </section>
+
+  <section class="panel" id="p-clip">
+    <h2>Clipping</h2>
+    <div class="api">clip_rect · clip_rounded_rect · save · restore</div>
+    <p class="note">The top band is clipped to the left half, the bottom band to a rounded
+      rectangle.</p>
+    <div class="frame"><paint-clip id="pv-clip"></paint-clip></div>
+    <div class="toolbar">
+      <button id="btn-clip-toggle">Toggle clipping</button>
+    </div>
+    <div class="out" id="clip-out">clip=on</div>
+  </section>
+
+  <section class="panel" id="p-xform">
+    <h2>Transforms</h2>
+    <div class="api">save · translate · rotate · scale · restore</div>
+    <p class="note">A square rotated about its centre, a 10×10 square scaled ×4, and a corner
+      marker drawn after restore.</p>
+    <div class="frame"><paint-xform id="pv-xform"></paint-xform></div>
+    <div class="toolbar">
+      <button id="btn-xform-rotate">Toggle rotation</button>
+    </div>
+    <div class="out" id="xform-out">angle=45</div>
+  </section>
+
+  <section class="panel" id="p-alpha">
+    <h2>Opacity</h2>
+    <div class="api">set_opacity (nested save / restore)</div>
+    <p class="note">Blue at the left square's opacity; the right square nests 0.5 × 0.5.</p>
+    <div class="frame"><paint-alpha id="pv-alpha"></paint-alpha></div>
+    <div class="toolbar">
+      <button id="btn-alpha-cycle">Next opacity</button>
+    </div>
+    <div class="out" id="alpha-out">opacity=0.5</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+</body></html>

@@ -1,0 +1,51 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="box" style="width:100px;height:50px;margin:10px;padding:5px;border:2px solid black">content</div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local box = document:getElementById("box")
+
+-- clientWidth / clientHeight — should be numbers (may be 0 in headless without layout)
+if type(box.clientWidth) ~= "number" then ok = false; msg = msg .. "clientWidth not number; " end
+if type(box.clientHeight) ~= "number" then ok = false; msg = msg .. "clientHeight not number; " end
+
+-- offsetWidth / offsetHeight — should be numbers
+if type(box.offsetWidth) ~= "number" then ok = false; msg = msg .. "offsetWidth not number; " end
+if type(box.offsetHeight) ~= "number" then ok = false; msg = msg .. "offsetHeight not number; " end
+
+-- offsetTop / offsetLeft — should be numbers
+if type(box.offsetTop) ~= "number" then ok = false; msg = msg .. "offsetTop not number; " end
+if type(box.offsetLeft) ~= "number" then ok = false; msg = msg .. "offsetLeft not number; " end
+
+-- getBoundingClientRect — returns table with x,y,width,height,top,left,right,bottom
+local rect = box:getBoundingClientRect()
+if type(rect) ~= "table" then ok = false; msg = msg .. "rect not table; "
+else
+    if type(rect.x) ~= "number" then ok = false; msg = msg .. "rect.x not number; " end
+    if type(rect.y) ~= "number" then ok = false; msg = msg .. "rect.y not number; " end
+    if type(rect.width) ~= "number" then ok = false; msg = msg .. "rect.width not number; " end
+    if type(rect.height) ~= "number" then ok = false; msg = msg .. "rect.height not number; " end
+    if type(rect.top) ~= "number" then ok = false; msg = msg .. "rect.top not number; " end
+    if type(rect.left) ~= "number" then ok = false; msg = msg .. "rect.left not number; " end
+    if type(rect.right) ~= "number" then ok = false; msg = msg .. "rect.right not number; " end
+    if type(rect.bottom) ~= "number" then ok = false; msg = msg .. "rect.bottom not number; " end
+end
+
+-- scrollIntoView — should not crash
+box:scrollIntoView()
+box:scrollIntoView(false)
+
+-- childElementCount (box has no element children)
+if box.childElementCount ~= 0 then ok = false; msg = msg .. "childElementCount=" .. box.childElementCount .. "; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

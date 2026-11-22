@@ -1,0 +1,132 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="200" height="200"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: lineWidth property round-trip
+ctx.lineWidth = 5
+if ctx.lineWidth ~= 5 then fail("T1: lineWidth="..tostring(ctx.lineWidth)) end
+
+-- T2: lineWidth affects stroke thickness
+ctx:clearRect(0, 0, 200, 200)
+ctx.strokeStyle = "#ff0000"
+ctx.lineWidth = 10
+ctx:beginPath()
+ctx:moveTo(10, 50)
+ctx:lineTo(100, 50)
+ctx:stroke()
+-- At y=50 (center), should be red
+local px2c = ctx:getImageData(50, 50, 1, 1)
+if px2c == nil then fail("T2: nil")
+else
+    local r = px2c:get(1)
+    if r < 200 then fail("T2: center red="..tostring(r)) end
+end
+-- At y=47 (3px from center, well within 5px half-width), should also be red
+local px2e = ctx:getImageData(50, 47, 1, 1)
+if px2e ~= nil then
+    local r = px2e:get(1)
+    if r < 100 then fail("T2: edge red="..tostring(r)) end
+end
+
+-- T3: lineCap property round-trip
+ctx.lineCap = "round"
+if ctx.lineCap ~= "round" then fail("T3: lineCap="..tostring(ctx.lineCap)) end
+ctx.lineCap = "square"
+if ctx.lineCap ~= "square" then fail("T3: lineCap square="..tostring(ctx.lineCap)) end
+ctx.lineCap = "butt"
+if ctx.lineCap ~= "butt" then fail("T3: lineCap butt="..tostring(ctx.lineCap)) end
+
+-- T4: lineJoin property round-trip
+ctx.lineJoin = "round"
+if ctx.lineJoin ~= "round" then fail("T4: lineJoin="..tostring(ctx.lineJoin)) end
+ctx.lineJoin = "bevel"
+if ctx.lineJoin ~= "bevel" then fail("T4: lineJoin bevel="..tostring(ctx.lineJoin)) end
+ctx.lineJoin = "miter"
+if ctx.lineJoin ~= "miter" then fail("T4: lineJoin miter="..tostring(ctx.lineJoin)) end
+
+-- T5: miterLimit property round-trip
+ctx.miterLimit = 8
+if ctx.miterLimit ~= 8 then fail("T5: miterLimit="..tostring(ctx.miterLimit)) end
+
+-- T6: setLineDash / getLineDash
+ctx:setLineDash({10, 5})
+local dash = ctx:getLineDash()
+if dash == nil then fail("T6: getLineDash nil")
+elseif type(dash) ~= "table" then fail("T6: getLineDash type="..type(dash))
+else
+    if #dash < 2 then fail("T6: dash len="..tostring(#dash))
+    else
+        if dash[1] ~= 10 then fail("T6: dash[1]="..tostring(dash[1])) end
+        if dash[2] ~= 5 then fail("T6: dash[2]="..tostring(dash[2])) end
+    end
+end
+
+-- T7: lineDashOffset property
+ctx.lineDashOffset = 3
+if ctx.lineDashOffset ~= 3 then fail("T7: lineDashOffset="..tostring(ctx.lineDashOffset)) end
+
+-- T8: dashed line draws with gaps
+ctx:clearRect(0, 0, 200, 200)
+ctx.strokeStyle = "#00ff00"
+ctx.lineWidth = 4
+ctx:setLineDash({20, 20})
+ctx.lineDashOffset = 0
+ctx:beginPath()
+ctx:moveTo(10, 100)
+ctx:lineTo(190, 100)
+ctx:stroke()
+-- At x=15 (within first dash), should have color
+local px8a = ctx:getImageData(15, 100, 1, 1)
+-- At x=35 (within gap), should be transparent
+local px8b = ctx:getImageData(35, 100, 1, 1)
+if px8a == nil then fail("T8: nil")
+else
+    local ga = px8a:get(2); local aa = px8a:get(4)
+    if ga < 150 or aa < 150 then fail("T8: dash present g="..tostring(ga).." a="..tostring(aa)) end
+end
+if px8b ~= nil then
+    local ab = px8b:get(4)
+    if ab > 100 then fail("T8: dash gap alpha="..tostring(ab)) end
+end
+
+-- Reset dash for subsequent tests
+ctx:setLineDash({})
+
+-- T9: round lineCap extends past endpoint
+ctx:clearRect(0, 0, 200, 200)
+ctx.strokeStyle = "#0000ff"
+ctx.lineWidth = 20
+ctx.lineCap = "round"
+ctx:beginPath()
+ctx:moveTo(50, 150)
+ctx:lineTo(150, 150)
+ctx:stroke()
+-- Round cap extends ~10px (half lineWidth) past endpoint
+local px9 = ctx:getImageData(155, 150, 1, 1)
+if px9 ~= nil then
+    local b = px9:get(3)
+    if b < 100 then fail("T9: round cap blue="..tostring(b)) end
+end
+ctx.lineCap = "butt"
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "line props ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

@@ -1,0 +1,39 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="outer" class="container">
+    <div id="inner" class="box item">
+        <span id="deep" class="label">text</span>
+    </div>
+</div>
+<script type="text/lua">
+local ok = true
+
+local deep = document:getElementById("deep")
+local inner = document:getElementById("inner")
+local outer = document:getElementById("outer")
+
+-- matches
+ok = ok and (deep:matches(".label") == true)
+ok = ok and (deep:matches("span") == true)
+ok = ok and (deep:matches("#deep") == true)
+ok = ok and (deep:matches(".nonexistent") == false)
+
+-- closest
+local c1 = deep:closest(".container")
+ok = ok and (c1 ~= nil)
+ok = ok and (c1.id == "outer")
+
+local c2 = deep:closest(".box")
+ok = ok and (c2 ~= nil)
+ok = ok and (c2.id == "inner")
+
+local c3 = deep:closest("#deep")
+ok = ok and (c3 ~= nil)
+ok = ok and (c3.id == "deep")
+
+local c4 = deep:closest(".nonexistent")
+ok = ok and (c4 == nil)
+
+document:getElementById("result").textContent = ok and "PASS" or "FAIL"
+</script>
+</body></html>

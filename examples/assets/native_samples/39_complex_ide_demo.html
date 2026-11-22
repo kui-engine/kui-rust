@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* ============================================================
+   39_complex_ide_demo.html — KUI IDE Stress Test (interactive)
+
+   Data-driven, fully functional IDE mock:
+     - file tree (click to open / folder collapse)
+     - tab system (4 sample files, switch / close / dirty)
+     - editor area (gutter line numbers + tokenized code)
+     - breadcrumb + statusbar (file / language / cursor)
+     - toolbar: Run / Stop / Build trigger toast notifications
+     - toolbar search: live-filter file tree
+     - right panel:
+         * Find: live count matches in current file
+         * Editor settings: theme select / font slider / tab size radio
+         * Color palette: change accent color live
+         * Tags: toggle active state
+     - Ctrl+P -> command palette modal
+     - right-click code area -> context menu (close on outside click)
+     - auto-dismissing toasts (setTimeout)
+   ============================================================ */
+/* Catppuccin 4-flavor palette: defaults to Mocha (dark).  Theme switch is
+   driven by `<html data-theme="...">` attribute (see Lua wire-up below). */
+:root,
+html[data-theme="mocha"] {
+    --bg-dark:    #1e1e2e;
+    --bg-surface: #252536;
+    --bg-surface2:#2a2a3c;
+    --bg-surface3:#313147;
+    --bg-hover:   #3a3a52;
+    --bg-active:  #45456a;
+    --border:     #3b3b5c;
+    --border-light:#4a4a6a;
+    --text:       #cdd6f4;
+    --text-muted: #7f849c;
+    --text-dim:   #585b70;
+    --accent:     #89b4fa;
+    --accent2:    #cba6f7;
+    --green:      #a6e3a1;
+    --yellow:     #f9e2af;
+    --red:        #f38ba8;
+    --orange:     #fab387;
+    --teal:       #94e2d5;
+    --pink:       #f5c2e7;
+    --blue:       #74c7ec;
+}
+html[data-theme="macchiato"] {
+    --bg-dark:    #24273a;  --bg-surface: #2a2d44;  --bg-surface2:#30334a;
+    --bg-surface3:#363a4f;  --bg-hover:   #3f425a;  --bg-active:  #494d64;
+    --border:     #404363;  --border-light:#5b6078; --text:       #cad3f5;
+    --text-muted: #a5adcb;  --text-dim:   #6e738d;  --accent:     #8aadf4;
+    --accent2:    #c6a0f6;  --green:      #a6da95;  --yellow:     #eed49f;
+    --red:        #ed8796;  --orange:     #f5a97f;  --teal:       #8bd5ca;
+    --pink:       #f5bde6;  --blue:       #7dc4e4;
+}
+html[data-theme="frappe"] {
+    --bg-dark:    #303446;  --bg-surface: #363a4f;  --bg-surface2:#3c4156;
+    --bg-surface3:#41475e;  --bg-hover:   #51576d;  --bg-active:  #626880;
+    --border:     #4a5068;  --border-light:#65697c; --text:       #c6d0f5;
+    --text-muted: #a5adce;  --text-dim:   #737994;  --accent:     #8caaee;
+    --accent2:    #ca9ee6;  --green:      #a6d189;  --yellow:     #e5c890;
+    --red:        #e78284;  --orange:     #ef9f76;  --teal:       #81c8be;
+    --pink:       #f4b8e4;  --blue:       #85c1dc;
+}
+html[data-theme="latte"] {
+    --bg-dark:    #eff1f5;  --bg-surface: #e6e9ef;  --bg-surface2:#dce0e8;
+    --bg-surface3:#ccd0da;  --bg-hover:   #bcc0cc;  --bg-active:  #acb0be;
+    --border:     #ccd0da;  --border-light:#bcc0cc; --text:       #4c4f69;
+    --text-muted: #6c6f85;  --text-dim:   #8c8fa1;  --accent:     #1e66f5;
+    --accent2:    #8839ef;  --green:      #40a02b;  --yellow:     #df8e1d;
+    --red:        #d20f39;  --orange:     #fe640b;  --teal:       #179299;
+    --pink:       #ea76cb;  --blue:       #04a5e5;
+}
+:root {
+    --radius:     6px;
+    --radius-sm:  3px;
+    --shadow:     0 4px 12px rgba(0,0,0,0.4);
+    --font-mono:  'Consolas','Courier New',monospace;
+    --font-ui:    'Segoe UI','Microsoft YaHei','Helvetica',sans-serif;
+    --editor-font-size: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    line-height: 1.5;
+    /* column flex — toolbar (loader-injected) sits on top, .app fills the rest. */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+}
+.app {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ===== Toolbar ===== */
+.toolbar {
+    height: 36px;
+    background: linear-gradient(180deg,#2d2d44 0%,#252536 100%);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 2px;
+    padding: 0 8px; flex-shrink: 0;
+}
+.toolbar-title { font-size: 12px; font-weight: 700; color: var(--accent); margin-right: 12px; letter-spacing: 0.5px; }
+.toolbar-group { display: flex; align-items: center; gap: 1px; }
+.toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 6px; }
+.toolbar-btn {
+    padding: 4px 10px; background: transparent; border: 1px solid transparent;
+    border-radius: var(--radius-sm); color: var(--text-muted);
+    font-size: 11px; cursor: pointer; white-space: nowrap; font-family: var(--font-ui);
+}
+.toolbar-btn:hover { background: var(--bg-hover); color: var(--text); border-color: var(--border); }
+.toolbar-btn.run    { color: var(--green); }
+.toolbar-btn.stop   { color: var(--red); }
+.toolbar-btn.build  { color: var(--orange); }
+.toolbar-spacer { flex: 1; }
+.toolbar-search {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg-dark); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 2px 8px;
+}
+.toolbar-search-icon {
+    width: 11px; height: 11px; border: 1.5px solid var(--text-muted); border-radius: 50%;
+    position: relative;
+}
+.toolbar-search-icon::after {
+    content: ''; position: absolute; right: -4px; bottom: -3px;
+    width: 5px; height: 1.5px; background: var(--text-muted); transform: rotate(45deg);
+}
+.toolbar-search input {
+    background: transparent; border: none; color: var(--text);
+    font-size: 11px; width: 160px; outline: none; font-family: var(--font-ui);
+}
+.toolbar-search input::placeholder { color: var(--text-dim); }
+.gradient-bar {
+    height: 3px; flex-shrink: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--pink), var(--orange));
+}
+
+/* ===== Main layout ===== */
+.main-layout { flex: 1; display: flex; min-height: 0; overflow: hidden; position: relative; }
+
+/* --- Sidebar (file tree) --- */
+.sidebar {
+    width: 220px; flex-shrink: 0;
+    background: var(--bg-surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+}
+.sidebar-header {
+    padding: 12px 14px 8px; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);
+}
+.file-tree { padding: 0 4px; overflow-y: auto; flex: 1; min-height: 0; }
+.file-item {
+    display: flex; align-items: center; padding: 4px 10px;
+    border-radius: var(--radius-sm); cursor: pointer; font-size: 12px;
+    color: var(--text-muted); gap: 6px;
+}
+.file-item:hover { background: var(--bg-hover); color: var(--text); }
+.file-item.active { background: var(--bg-active); color: var(--accent); }
+.file-item.folder { font-weight: 600; color: var(--text); }
+.file-item.hidden { display: none; }
+.file-icon {
+    width: 14px; height: 14px; border-radius: 2px;
+    display: inline-block; flex-shrink: 0;
+}
+.file-icon.folder-icon { background: var(--yellow); opacity: 0.7; }
+.file-icon.js-icon     { background: var(--yellow); }
+.file-icon.css-icon    { background: var(--accent); }
+.file-icon.html-icon   { background: var(--orange); }
+.file-icon.json-icon   { background: var(--green); }
+.file-icon.md-icon     { background: var(--text-muted); }
+.file-arrow {
+    width: 8px; height: 8px; flex-shrink: 0;
+    border-right: 1.5px solid var(--text-muted);
+    border-bottom: 1.5px solid var(--text-muted);
+    transform: rotate(-45deg);
+    transition: transform 0.15s;
+}
+.file-item.folder.expanded .file-arrow { transform: rotate(45deg); }
+.file-indent { padding-left: 22px; }
+
+/* --- Editor area --- */
+.editor-area {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; overflow: hidden;
+}
+.tab-bar {
+    height: 32px; background: var(--bg-surface2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: stretch; overflow-x: auto; flex-shrink: 0;
+}
+.tab {
+    display: flex; align-items: center; padding: 0 14px;
+    font-size: 11px; color: var(--text-muted);
+    border-right: 1px solid var(--border); cursor: pointer; gap: 6px;
+    white-space: nowrap; min-width: 0;
+}
+.tab:hover { background: var(--bg-hover); color: var(--text); }
+.tab.active {
+    background: var(--bg-dark); color: var(--text);
+    border-bottom: 2px solid var(--accent);
+}
+.tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.tab.dirty .tab-dot { box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+.tab-close {
+    font-size: 12px; color: var(--text-dim); cursor: pointer; margin-left: 4px;
+    width: 14px; height: 14px; line-height: 14px; text-align: center; border-radius: 3px;
+}
+.tab-close:hover { color: var(--red); background: var(--bg-hover); }
+
+.breadcrumb {
+    padding: 4px 12px; font-size: 11px; color: var(--text-dim);
+    background: var(--bg-surface2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.breadcrumb span { cursor: pointer; }
+.breadcrumb span:hover { color: var(--text); }
+.breadcrumb .sep { color: var(--text-dim); }
+.breadcrumb .crumb-active { color: var(--text); }
+
+.editor-content { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+.gutter {
+    width: 44px; background: var(--bg-surface); border-right: 1px solid var(--border);
+    padding: 8px 0; text-align: right; font-family: var(--font-mono);
+    font-size: var(--editor-font-size); color: var(--text-dim);
+    line-height: 1.65; flex-shrink: 0; overflow: hidden;
+}
+.gutter .ln { padding-right: 8px; }
+.gutter .ln.active { color: var(--text); }
+.gutter .ln.breakpoint { color: var(--red); font-weight: 700; position: relative; }
+.gutter .ln.breakpoint::before {
+    content: ''; position: absolute; left: 4px; top: 50%;
+    width: 8px; height: 8px; background: var(--red); border-radius: 50%;
+    transform: translateY(-50%);
+}
+/* Editable code area = real textarea (KUI text-input core: cursor, IME,
+   selection, clipboard, drag-select, scroll all native). */
+textarea.code-area {
+    flex: 1; padding: 8px 12px; font-family: var(--font-mono);
+    font-size: var(--editor-font-size); line-height: 1.65;
+    overflow: auto; background: var(--bg-dark); color: var(--text);
+    tab-size: 4; min-width: 0; border: none; outline: none;
+    resize: none; caret-color: var(--accent); white-space: pre;
+}
+textarea.code-area:focus { outline: none; }
+/* Syntax highlighting tokens */
+.kw   { color: var(--accent2); font-weight: 600; }
+.fn   { color: var(--accent); }
+.str  { color: var(--green); }
+.num  { color: var(--orange); }
+.cm   { color: var(--text-dim); font-style: italic; }
+.op   { color: var(--red); }
+.ty   { color: var(--yellow); }
+.prop { color: var(--teal); }
+.tag  { color: var(--red); }
+.attr { color: var(--orange); }
+.val  { color: var(--green); }
+.punct{ color: var(--text-dim); }
+.cur-line { background: rgba(255,255,255,0.03); display: block; }
+.match-hl { background: rgba(249,226,175,0.25); border-radius: 2px; }
+
+.minimap {
+    width: 48px; background: var(--bg-surface); border-left: 1px solid var(--border);
+    flex-shrink: 0; padding-top: 4px; overflow: hidden;
+    position: relative; cursor: pointer;
+}
+/* Viewport indicator: highlights which slice of the file is visible.
+   Position synced from textarea.scrollTop in Lua. */
+.minimap-viewport {
+    position: absolute; left: 0; right: 0;
+    background: rgba(137,180,250,0.10);
+    border: 1px solid rgba(137,180,250,0.4);
+    pointer-events: none;
+}
+.minimap-line {
+    height: 2px; margin: 1px 4px; border-radius: 1px;
+    background: var(--text-dim); opacity: 0.3;
+}
+.minimap-line.short  { width: 40%; }
+.minimap-line.medium { width: 65%; }
+.minimap-line.long   { width: 90%; }
+.minimap-line.indent { margin-left: 10px; width: 60%; }
+.minimap-line.blank  { background: transparent; }
+
+/* --- Right panel --- */
+.right-panel {
+    width: 260px; flex-shrink: 0;
+    background: var(--bg-surface); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow-y: auto;
+}
+.panel-header {
+    padding: 10px 14px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent2);
+    border-bottom: 1px solid var(--border); background: var(--bg-surface2);
+}
+.panel-section { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.panel-section-title {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px;
+}
+.form-group { margin-bottom: 10px; }
+.form-label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+.form-input, .form-select, .form-textarea {
+    width: 100%; padding: 5px 8px; background: var(--bg-dark);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    color: var(--text); font-size: 12px; font-family: var(--font-mono);
+    outline: none; resize: none;
+}
+.form-input:focus, .form-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(137,180,250,0.2); }
+.form-select { font-family: var(--font-ui); cursor: pointer; }
+.form-textarea { min-height: 60px; line-height: 1.4; }
+.form-checkbox-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; cursor: pointer; }
+.form-checkbox {
+    width: 14px; height: 14px; border: 1px solid var(--border);
+    border-radius: 3px; background: var(--bg-dark); flex-shrink: 0;
+    position: relative;
+}
+.form-checkbox.checked { background: var(--accent); border-color: var(--accent); }
+.form-checkbox.checked::after {
+    content: ''; position: absolute; left: 3px; top: 0;
+    width: 5px; height: 9px; border: solid var(--bg-dark);
+    border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.form-radio {
+    width: 14px; height: 14px; border: 2px solid var(--border);
+    border-radius: 50%; background: var(--bg-dark); flex-shrink: 0;
+    cursor: pointer;
+}
+.form-radio.selected {
+    border-color: var(--accent);
+    background: radial-gradient(circle, var(--accent) 40%, transparent 41%);
+}
+.form-btn {
+    padding: 6px 14px; border-radius: var(--radius); font-size: 11px;
+    font-weight: 600; cursor: pointer; border: 1px solid transparent; font-family: var(--font-ui);
+}
+.form-btn.primary  { background: var(--accent); color: var(--bg-dark); }
+.form-btn.primary:hover  { opacity: 0.9; }
+.form-btn.secondary{ background: var(--bg-surface3); color: var(--text); border-color: var(--border); }
+.form-btn.secondary:hover{ background: var(--bg-hover); }
+.form-btn-row { display: flex; gap: 6px; margin-top: 8px; }
+.color-row { display: flex; gap: 4px; margin-top: 4px; }
+.color-swatch {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 1px solid var(--border); cursor: pointer;
+}
+.color-swatch.active { box-shadow: 0 0 0 2px var(--text); }
+.color-swatch:hover { transform: scale(1.15); }
+
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-track {
+    flex: 1; height: 4px; background: var(--bg-dark);
+    border-radius: 2px; position: relative; cursor: pointer;
+}
+.slider-fill {
+    height: 100%; background: var(--accent); border-radius: 2px; width: 50%;
+}
+.slider-thumb {
+    position: absolute; top: -4px; left: 50%; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%; border: 2px solid var(--bg-dark);
+    transform: translateX(-50%); cursor: pointer;
+}
+.slider-val { font-size: 10px; color: var(--text-muted); min-width: 36px; text-align: right; font-family: var(--font-mono); }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+.stat-card {
+    background: var(--bg-dark); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 8px; text-align: center;
+}
+.stat-value { font-size: 18px; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.tag-cloud { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.chip {
+    padding: 2px 8px; border-radius: 10px; font-size: 10px;
+    border: 1px solid var(--border); color: var(--text-muted); cursor: pointer;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.active { background: var(--accent); color: var(--bg-dark); border-color: var(--accent); }
+
+/* --- Status bar --- */
+.statusbar {
+    height: 24px; background: var(--accent); color: var(--bg-dark);
+    display: flex; align-items: center; padding: 0 12px;
+    font-size: 11px; font-weight: 500; gap: 16px; flex-shrink: 0;
+}
+.statusbar-right { margin-left: auto; display: flex; gap: 14px; align-items: center; }
+.statusbar-item { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bg-dark); display: inline-block; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* --- Popup menus (context menu + toolbar dropdowns share visuals) --- */
+.context-menu, .menu-dropdown {
+    position: absolute; background: var(--bg-surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 4px 0; box-shadow: var(--shadow);
+    z-index: 200; font-size: 12px; display: none;
+    /* width: max-content keeps the popup wrapped tightly around its
+       longest item (label + gap + kbd) rather than stretching to fill
+       the containing block — which is what absolute-positioned elements
+       in KUI default to without explicit sizing constraints. */
+    width: max-content; min-width: 200px; max-width: 340px;
+}
+.context-menu.open, .menu-dropdown.open { display: block; }
+.ctx-item, .menu-item {
+    padding: 5px 12px; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px;
+    cursor: pointer; color: var(--text); min-width: 220px;
+}
+.ctx-item:hover, .menu-item:hover { background: var(--bg-hover); }
+.ctx-item.danger { color: var(--red); }
+.ctx-item.danger:hover { background: rgba(243,139,168,0.1); }
+/* `justify-content: space-between` lays out label (1st) and kbd (2nd)
+   on opposite sides.  Items without a kbd just sit on the left,
+   which matches VS Code / Sublime menu rendering. */
+.ctx-shortcut, .menu-kbd { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
+.ctx-sep, .menu-sep { height: 1px; background: var(--border); margin: 3px 0; }
+.toolbar-btn.menu-active {
+    background: var(--bg-hover); color: var(--text); border-color: var(--border);
+}
+.hidden-pane { display: none !important; }
+
+/* --- Modal (command palette) --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none; align-items: flex-start; justify-content: center;
+    padding-top: 80px; z-index: 1000;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+    background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: 10px; width: 480px; max-width: 90vw;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6); overflow: hidden;
+}
+.modal-input {
+    width: 100%; padding: 12px 14px; background: transparent; border: none;
+    border-bottom: 1px solid var(--border); color: var(--text);
+    font-size: 14px; outline: none; font-family: var(--font-ui);
+}
+.modal-results { max-height: 280px; overflow-y: auto; }
+.modal-result {
+    padding: 8px 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text);
+}
+.modal-result:hover, .modal-result.highlight { background: var(--bg-hover); }
+.modal-result-kbd { margin-left: auto; font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); }
+.modal-hint { padding: 8px 14px; font-size: 10px; color: var(--text-dim); background: var(--bg-surface2); border-top: 1px solid var(--border); }
+
+/* --- Toast --- */
+.toast-stack {
+    position: fixed; top: 56px; right: 16px;
+    display: flex; flex-direction: column; gap: 6px; z-index: 500;
+    pointer-events: none;
+}
+.toast {
+    padding: 8px 14px; border-radius: var(--radius); font-size: 11px;
+    display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow);
+    min-width: 240px; pointer-events: auto; cursor: pointer;
+    animation: slideIn 0.25s ease-out;
+}
+.toast.success { background: #1a3a2a; border-left: 3px solid var(--green); color: var(--green); }
+.toast.error   { background: #3a1a2a; border-left: 3px solid var(--red);   color: var(--red); }
+.toast.info    { background: #1a2a3a; border-left: 3px solid var(--accent); color: var(--accent); }
+.toast.warning { background: #3a3a1a; border-left: 3px solid var(--yellow); color: var(--yellow); }
+.toast-icon {
+    width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
+    background: currentColor; opacity: 0.25;
+}
+.toast-close { margin-left: 8px; color: currentColor; opacity: 0.6; cursor: pointer; }
+.toast-close:hover { opacity: 1; }
+@keyframes slideIn {
+    from { transform: translateX(20px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOOLBAR ===== -->
+<div class="toolbar">
+    <span class="toolbar-title">KUI IDE</span>
+    <div class="toolbar-group">
+        <div class="toolbar-btn" id="menu-file">File</div>
+        <div class="toolbar-btn" id="menu-edit">Edit</div>
+        <div class="toolbar-btn" id="menu-view">View</div>
+        <div class="toolbar-btn" id="menu-go">Go</div>
+        <div class="toolbar-btn" id="menu-help">Help</div>
+    </div>
+    <div class="toolbar-sep"></div>
+    <div class="toolbar-group">
+        <div class="toolbar-btn run"   id="btn-run">&#9655; Run</div>
+        <div class="toolbar-btn stop"  id="btn-stop">&#9632; Stop</div>
+        <div class="toolbar-btn build" id="btn-build">&#9874; Build</div>
+    </div>
+    <div class="toolbar-spacer"></div>
+    <div class="toolbar-search">
+        <span class="toolbar-search-icon"></span>
+        <input type="text" id="file-search" placeholder="Filter files...">
+    </div>
+</div>
+<div class="gradient-bar"></div>
+
+<!-- ===== APP ===== -->
+<div class="app">
+<div class="main-layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">Explorer</div>
+        <div class="file-tree" id="file-tree"></div>
+    </div>
+
+    <!-- Editor area -->
+    <div class="editor-area">
+        <div class="tab-bar" id="tab-bar"></div>
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <div class="editor-content">
+            <div class="gutter" id="gutter"></div>
+            <textarea class="code-area" id="code-area" spellcheck="false"></textarea>
+            <div class="minimap" id="minimap"></div>
+        </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="right-panel">
+        <div class="panel-header">Properties</div>
+
+        <div class="panel-section">
+            <div class="panel-section-title">Find in File</div>
+            <div class="form-group">
+                <input class="form-input" id="find-input" placeholder="Find text...">
+            </div>
+            <div class="form-checkbox-row" id="opt-case">
+                <div class="form-checkbox checked"></div> Match case
+            </div>
+            <div class="form-checkbox-row" id="opt-word">
+                <div class="form-checkbox"></div> Whole word
+            </div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:4px" id="find-result">0 results</div>
+        </div>
+
+        <div class="panel-section">
+            <div class="panel-section-title">Editor Settings</div>
+            <div class="form-group">
+                <label class="form-label">Theme</label>
+                <select class="form-select" id="theme-select">
+                    <option value="mocha">Catppuccin Mocha</option>
+                    <option value="macchiato">Catppuccin Macchiato</option>
+                    <option value="frappe">Catppuccin Frappe</option>
+                    <option value="latte">Catppuccin Latte</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Font Size</label>
+                <div class="slider-row">
+                    <div class="slider-track" id="font-track">
+                        <div class="slider-fill" id="font-fill"></div>
+                        <div class="slider-thumb" id="font-thumb"></div>
+                    </div>
+                    <span class="slider-val" id="font-val">12px</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Tab Size</label>
+                <div style="display:flex;gap:14px">
+                    <div class="form-checkbox-row" data-tabsize="2">
+                        <div class="form-radio selected"></div> 2
+                    </div>
+                    <div class="form-checkbox-row" data-tabsize="4">
+                        <div class="form-radio"></div> 4
+                    </div>
+                    <div class="form-checkbox-row" data-tabsize="8">
+                        <div class="form-radio"></div> 8
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Accent Color</label>
+                <div class="color-row" id="color-row">
+                    <div class="color-swatch active" data-color="#89b4fa" style="background:#89b4fa"></div>
+                    <div class="color-swatch" data-color="#cba6f7" style="background:#cba6f7"></div>
+                    <div class="color-swatch" data-color="#a6e3a1" style="background:#a6e3a1"></div>
+                    <div class="color-swatch" data-color="#f9e2af" style="background:#f9e2af"></div>
+                    <div class="color-swatch" data-color="#f38ba8" style="background:#f38ba8"></div>
+                    <div class="color-swatch" data-color="#fab387" style="background:#fab387"></div>
+                    <div class="color-swatch" data-color="#94e2d5" style="background:#94e2d5"></div>
+                    <div class="color-swatch" data-color="#f5c2e7" style="background:#f5c2e7"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="panel-section-title">Project Stats</div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value" id="stat-files">0</div><div class="stat-label">Files</div></div>
+                <div class="stat-card"><div class="stat-value" style="color:var(--green)" id="stat-lines">0</div><div class="stat-label">Lines</div></div>
+                <div class="stat-card"><div class="stat-value" style="color:var(--yellow)">98%</div><div class="stat-label">Coverage</div></div>
+                <div class="stat-card"><div class="stat-value" style="color:var(--accent2)" id="stat-tabs">0</div><div class="stat-label">Open Tabs</div></div>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <div class="panel-section-title">Tags</div>
+            <div class="tag-cloud" id="tag-cloud">
+                <span class="chip active">React</span>
+                <span class="chip">TypeScript</span>
+                <span class="chip">CSS</span>
+                <span class="chip active">Hooks</span>
+                <span class="chip">Router</span>
+                <span class="chip">API</span>
+                <span class="chip">Testing</span>
+                <span class="chip">Webpack</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status bar -->
+<div class="statusbar">
+    <span class="statusbar-item">&#x2387; main</span>
+    <span class="statusbar-item">&#10003; 0 errors</span>
+    <span class="statusbar-item">&#9888; 1 warning</span>
+    <div class="statusbar-right">
+        <span class="statusbar-item" id="sb-cursor">Ln 1, Col 1</span>
+        <span class="statusbar-item" id="sb-tabsize">Spaces: 2</span>
+        <span class="statusbar-item">UTF-8</span>
+        <span class="statusbar-item" id="sb-lang">JavaScript</span>
+        <span class="statusbar-item"><span class="live-dot"></span> Live</span>
+    </div>
+</div>
+</div><!-- /.app -->
+
+<!-- ===== Toolbar menu dropdown (Lua-driven; populated on open) ===== -->
+<div class="menu-dropdown" id="menu-dropdown"></div>
+
+<!-- ===== Context menu (hidden until right-click) ===== -->
+<div class="context-menu" id="ctx-menu">
+    <div class="ctx-item" data-action="cut">Cut <span class="ctx-shortcut">Ctrl+X</span></div>
+    <div class="ctx-item" data-action="copy">Copy <span class="ctx-shortcut">Ctrl+C</span></div>
+    <div class="ctx-item" data-action="paste">Paste <span class="ctx-shortcut">Ctrl+V</span></div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" data-action="findref">Find References <span class="ctx-shortcut">Shift+F12</span></div>
+    <div class="ctx-item" data-action="gotodef">Go to Definition <span class="ctx-shortcut">F12</span></div>
+    <div class="ctx-item" data-action="rename">Rename Symbol <span class="ctx-shortcut">F2</span></div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" data-action="format">Format Document <span class="ctx-shortcut">Shift+Alt+F</span></div>
+    <div class="ctx-item danger" data-action="delete">Delete Line <span class="ctx-shortcut">Ctrl+Shift+K</span></div>
+</div>
+
+<!-- ===== Command palette modal ===== -->
+<div class="modal-overlay" id="palette-overlay">
+    <div class="modal">
+        <input type="text" class="modal-input" id="palette-input" placeholder="Type a command or '?' for help...">
+        <div class="modal-results" id="palette-results"></div>
+        <div class="modal-hint">Up/Down to navigate. Enter to select. Esc to close.</div>
+    </div>
+</div>
+
+<!-- ===== Toast container ===== -->
+<div class="toast-stack" id="toast-stack"></div>
+
+<script type="application/lua">
+--------------------------------------------------------------------
+-- 39_complex_ide_demo.html — model + view + controller
+--------------------------------------------------------------------
+local doc = document
+
+-- File system model: each file owns a mutable `content` string buffer.
+-- On tab switch the textarea's value is persisted back to file.content.
+--
+-- IMPORTANT: KUI's HTML parser scans raw bytes and does NOT exempt
+-- script-tag bodies the way browsers exempt regular script elements.
+-- A literal close-script-tag or textarea-tag byte sequence anywhere
+-- inside this Lua source would terminate the script element early
+-- and break the entire page.  Where the sample code needs those
+-- tokens, we assemble them at runtime via string concatenation so
+-- the trigger sequence never appears verbatim in source bytes.
+local _T  = "<" .. "textarea"          -- opening textarea token
+local _TC = "<" .. "/textarea>"        -- closing textarea token
+local _S  = "<" .. "script"            -- opening script token
+local _SC = "<" .. "/script>"          -- closing script token
+
+local files = {
+    {id="app",      name="app.js",        type="js",   parent="src",       content=
+[[// app.js — Main application entry point
+import React, { useState, useEffect } from 'react';
+import { Router, Route, Switch } from 'react-router-dom';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+
+const API_URL = 'https://api.example.com/v2';
+const MAX_RETRIES = 3;
+
+/**
+ * Main App component
+ * @param {Object} props - component properties
+ * @returns {JSX.Element}
+ */
+function App({ theme, locale }) {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const res = await fetch(`${API_URL}/items`);
+                if (!res.ok) throw new Error(res.statusText);
+                setData(await res.json());
+            } catch (err) {
+                setError(err.message);
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error}</div>;
+    return (
+        <Router>
+            <Header theme={theme} />
+            <Sidebar />
+            <Switch>
+                <Route path="/" exact>{data}</Route>
+            </Switch>
+        </Router>
+    );
+}
+
+export default App;
+]]},
+    {id="styles",   name="styles.css",    type="css",  parent="src",       content=
+[[/* styles.css — base styles for the app */
+
+:root {
+    --primary: #89b4fa;
+    --bg:      #1e1e2e;
+    --text:    #cdd6f4;
+    --radius:  6px;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.button {
+    background: var(--primary);
+    color: var(--bg);
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s ease;
+}
+
+.button:hover { opacity: 0.85; }
+.button:active { transform: translateY(1px); }
+]]},
+    -- index.html and Editor.jsx contain script / textarea tags in their
+    -- natural source.  We build those strings using concatenation with
+    -- the _S / _SC / _T / _TC sentinels so the trigger byte sequences
+    -- never appear contiguous in *this* file's source bytes.
+    {id="index",    name="index.html",    type="html", parent="public",    content=
+[[<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KUI IDE Demo</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div id="root"></div>
+    ]] .. _S .. [[ type="module" src="./app.js">]] .. _SC .. [[
+</body>
+</html>
+]]},
+    {id="package",  name="package.json",  type="json", parent="",          content=
+[[{
+    "name": "kui-ide-demo",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "start": "vite",
+        "build": "vite build",
+        "test":  "vitest"
+    },
+    "dependencies": {
+        "react":            "^18.2.0",
+        "react-dom":        "^18.2.0",
+        "react-router-dom": "^6.20.0"
+    },
+    "devDependencies": {
+        "vite":   "^5.0.0",
+        "vitest": "^1.0.0"
+    }
+}
+]]},
+    {id="utils",    name="utils.js",      type="js",   parent="src",       content=
+[[// utils.js — helper functions
+
+export function debounce(fn, ms = 250) {
+    let timer = null;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), ms);
+    };
+}
+
+export function throttle(fn, ms = 100) {
+    let last = 0;
+    return (...args) => {
+        const now = Date.now();
+        if (now - last >= ms) {
+            last = now;
+            fn(...args);
+        }
+    };
+}
+
+export const noop = () => {};
+]]},
+    {id="api",      name="api.js",        type="js",   parent="src",       content=
+[[// api.js — REST client wrapper
+
+const BASE = 'https://api.example.com/v2';
+
+export async function fetchJson(path, options = {}) {
+    const res = await fetch(`${BASE}${path}`, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+    });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    return res.json();
+}
+
+export const get  = (path)        => fetchJson(path);
+export const post = (path, body)  => fetchJson(path, { method: 'POST', body: JSON.stringify(body) });
+export const put  = (path, body)  => fetchJson(path, { method: 'PUT',  body: JSON.stringify(body) });
+export const del  = (path)        => fetchJson(path, { method: 'DELETE' });
+]]},
+    {id="header",   name="Header.jsx",    type="js",   parent="components",content=
+[[// Header.jsx
+import React from 'react';
+
+export default function Header({ theme = 'dark', onToggleTheme }) {
+    return (
+        <header className={`app-header app-header--${theme}`}>
+            <h1 className="app-title">KUI IDE</h1>
+            <button onClick={onToggleTheme}>Toggle theme</button>
+        </header>
+    );
+}
+]]},
+    {id="sidebar",  name="Sidebar.jsx",   type="js",   parent="components",content=
+[[// Sidebar.jsx
+import React from 'react';
+
+export default function Sidebar({ items = [] }) {
+    return (
+        <aside className="sidebar">
+            <ul>
+                {items.map(it => (
+                    <li key={it.id}>{it.label}</li>
+                ))}
+            </ul>
+        </aside>
+    );
+}
+]]},
+    {id="editor",   name="Editor.jsx",    type="js",   parent="components",content=
+[[// Editor.jsx
+import React, { useState } from 'react';
+
+export default function Editor({ initialValue = '', onChange }) {
+    const [value, setValue] = useState(initialValue);
+    return (
+        ]] .. _T .. [[
+            className="editor"
+            value={value}
+            onChange={(e) => { setValue(e.target.value); onChange?.(e.target.value); }}
+        />
+    );
+}
+]]},
+    {id="manifest", name="manifest.json", type="json", parent="public",    content=
+[[{
+    "name": "KUI Demo",
+    "short_name": "KUIDemo",
+    "icons": [],
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1e1e2e",
+    "theme_color":      "#89b4fa"
+}
+]]},
+    {id="readme",   name="README.md",     type="md",   parent="",          content=
+[[# KUI IDE Demo
+
+A stress-test of the KUI rendering engine: file tree, tabs, editor,
+syntax highlighting, command palette, themed UI, and toast notifications.
+
+## Build
+
+```bash
+npm install
+npm run build
+```
+
+## Editor
+
+The code area is a real ]] .. _T .. [[> powered by KUI's text-input
+infrastructure: cursor positioning, IME composition, clipboard
+copy/cut/paste, drag-selection, and word-wrapping all work.
+]]},
+    {id="tsconfig", name="tsconfig.json", type="json", parent="",          content=
+[[{
+    "compilerOptions": {
+        "target":            "es2022",
+        "module":            "esnext",
+        "moduleResolution":  "bundler",
+        "jsx":               "react-jsx",
+        "strict":            true,
+        "esModuleInterop":   true,
+        "skipLibCheck":      true,
+        "outDir":            "./dist"
+    },
+    "include": ["src/**/*"]
+}
+]]},
+}
+
+local folders = { {name="src", expanded=true}, {name="components", expanded=true}, {name="public", expanded=true} }
+
+local langName = { js="JavaScript", css="CSS", html="HTML", json="JSON", md="Markdown" }
+
+local function fileById(id)
+    for _, f in ipairs(files) do if f.id == id then return f end end
+    return nil
+end
+
+-- Count lines in a file's text content.  N newlines == N lines
+-- (terminal newline counts as a separator, not an extra empty line).
+local function fileLineCount(f)
+    if not f or not f.content then return 1 end
+    local _, c = f.content:gsub("\n", "\n")
+    if f.content:sub(-1) == "\n" then return math.max(1, c)
+    else return c + 1 end
+end
+
+-- UI state --------------------------------------------------------
+local state = {
+    openTabs   = {"app", "styles", "index", "package"},  -- ordered tab ids
+    activeTab  = "app",
+    folderState= {src=true, components=true, public=true},
+    findText   = "",
+    matchCase  = true,
+    wholeWord  = false,
+    tabSize    = 2,
+    fontSize   = 12,
+    accent     = "#89b4fa",
+    fileFilter = "",
+}
+
+-- Helpers ---------------------------------------------------------
+local function setText(id, txt)
+    local el = doc:getElementById(id)
+    if el then el.textContent = tostring(txt) end
+end
+
+local function clearChildren(el)
+    if not el then return end
+    while el.firstChild do el:removeChild(el.firstChild) end
+end
+
+local function el(tag, attrs)
+    local e = doc:createElement(tag)
+    if attrs then
+        for k, v in pairs(attrs) do
+            if k == "text" then e.textContent = tostring(v)
+            elseif k == "class" then e.className = v
+            elseif k == "html" then e.innerHTML = v
+            else e:setAttribute(k, tostring(v)) end
+        end
+    end
+    return e
+end
+
+-- ===== Render: file tree =========================================
+local function renderFileTree()
+    local tree = doc:getElementById("file-tree")
+    clearChildren(tree)
+    local filter = state.fileFilter:lower()
+
+    local function addFolder(name)
+        local f = el("div", {class = "file-item folder" .. (state.folderState[name] and " expanded" or "")})
+        local arrow = el("span", {class = "file-arrow"})
+        local icon  = el("span", {class = "file-icon folder-icon"})
+        local label = el("span", {text = name})
+        f:appendChild(arrow); f:appendChild(icon); f:appendChild(label)
+        f:setAttribute("data-folder", name)
+        f:addEventListener("click", function(e)
+            state.folderState[name] = not state.folderState[name]
+            renderFileTree()
+        end)
+        tree:appendChild(f)
+    end
+
+    local function addFile(file, indent)
+        if filter ~= "" and not file.name:lower():find(filter, 1, true) then return end
+        local item = el("div", {class = "file-item" .. (indent and " file-indent" or "") .. (state.activeTab == file.id and " active" or "")})
+        local icon = el("span", {class = "file-icon " .. file.type .. "-icon"})
+        local label = el("span", {text = file.name})
+        item:appendChild(icon); item:appendChild(label)
+        item:setAttribute("data-fileid", file.id)
+        item:addEventListener("click", function() openFile(file.id) end)
+        tree:appendChild(item)
+    end
+
+    -- Render by folder grouping
+    for _, fld in ipairs(folders) do
+        addFolder(fld.name)
+        if state.folderState[fld.name] then
+            for _, f in ipairs(files) do
+                if f.parent == fld.name then addFile(f, true) end
+            end
+        end
+    end
+    -- Root-level files
+    for _, f in ipairs(files) do
+        if f.parent == "" then addFile(f, false) end
+    end
+end
+
+-- ===== Buffer persistence ========================================
+-- Persist the textarea's current value into the active file's content.
+-- Called BEFORE switching tabs so user edits survive the round-trip.
+local function saveCurrentBuffer()
+    local f = fileById(state.activeTab)
+    local ta = doc:getElementById("code-area")
+    if f and ta then f.content = ta.value or "" end
+end
+
+-- ===== Render: tabs ==============================================
+function openFile(id)
+    saveCurrentBuffer()
+    local found = false
+    for _, t in ipairs(state.openTabs) do if t == id then found = true break end end
+    if not found then table.insert(state.openTabs, id) end
+    state.activeTab = id
+    renderAll()
+end
+
+function closeTab(id)
+    if state.activeTab == id then saveCurrentBuffer() end
+    for i, t in ipairs(state.openTabs) do
+        if t == id then table.remove(state.openTabs, i); break end
+    end
+    if state.activeTab == id then
+        state.activeTab = state.openTabs[1]
+    end
+    renderAll()
+end
+
+local function renderTabs()
+    local bar = doc:getElementById("tab-bar")
+    clearChildren(bar)
+    local dotColor = { js="var(--yellow)", css="var(--accent)", html="var(--orange)", json="var(--green)", md="var(--text-muted)" }
+    for _, id in ipairs(state.openTabs) do
+        local f = fileById(id)
+        if f then
+            local tab = el("div", {class = "tab" .. (state.activeTab == id and " active" or "")})
+            local dot = el("span", {class = "tab-dot"})
+            dot:setAttribute("style", "background:" .. (dotColor[f.type] or "var(--text-muted)"))
+            local name = el("span", {text = f.name})
+            local close = el("span", {class = "tab-close", text = "x"})
+            tab:appendChild(dot); tab:appendChild(name); tab:appendChild(close)
+            tab:addEventListener("click", function(e)
+                saveCurrentBuffer()
+                state.activeTab = id
+                renderAll()
+            end)
+            close:addEventListener("click", function(e)
+                e:stopPropagation()
+                closeTab(id)
+            end)
+            bar:appendChild(tab)
+        end
+    end
+end
+
+-- ===== Render: breadcrumb ========================================
+local function renderBreadcrumb()
+    local bc = doc:getElementById("breadcrumb")
+    clearChildren(bc)
+    local f = fileById(state.activeTab)
+    if not f then return end
+    if f.parent ~= "" then
+        bc:appendChild(el("span", {text = f.parent}))
+        bc:appendChild(el("span", {class = "sep", text = "/"}))
+    end
+    bc:appendChild(el("span", {class = "crumb-active", text = f.name}))
+end
+
+-- ===== Editor sync helpers =======================================
+-- Iterate line-by-line over `s`, invoking fn(lineNum, lineText).
+-- Empty body yields one empty line (fn(1, "")).
+local function eachLine(s, fn)
+    local i, n = 1, #s
+    local lineNum = 0
+    while i <= n do
+        local nl = s:find("\n", i, true)
+        lineNum = lineNum + 1
+        if nl then
+            fn(lineNum, s:sub(i, nl - 1))
+            i = nl + 1
+        else
+            fn(lineNum, s:sub(i))
+            i = n + 1
+        end
+    end
+    if lineNum == 0 then fn(1, "") end
+end
+
+-- Render gutter line numbers based on current buffer.
+local function renderGutter(content)
+    local gutter = doc:getElementById("gutter")
+    clearChildren(gutter)
+    local total = 1
+    if content and #content > 0 then
+        local _, c = content:gsub("\n", "\n")
+        total = c + (content:sub(-1) == "\n" and 0 or 1)
+        if total < 1 then total = 1 end
+    end
+    for i = 1, total do
+        gutter:appendChild(el("div", {class = "ln", text = tostring(i)}))
+    end
+end
+
+-- Render minimap bars from actual line widths.  Capped at 200 lines
+-- to keep DOM size sane (longer files just show first 200 in minimap).
+local function renderMinimap(content)
+    local mini = doc:getElementById("minimap")
+    clearChildren(mini)
+    if not content or #content == 0 then return end
+    local count = 0
+    eachLine(content, function(_, line)
+        count = count + 1
+        if count > 200 then return end
+        local len = #line
+        local cls = "minimap-line"
+        if len == 0 then cls = cls .. " blank"
+        elseif len < 12 then cls = cls .. " short"
+        elseif len < 36 then cls = cls .. " medium"
+        else                 cls = cls .. " long" end
+        if len > 0 and line:sub(1, 1) == " " then
+            cls = cls .. " indent"
+        end
+        mini:appendChild(el("div", {class = cls}))
+    end)
+    -- Viewport indicator (positioned later by syncMinimapViewport)
+    local vp = el("div", {class = "minimap-viewport"})
+    vp:setAttribute("id", "mm-viewport")
+    mini:appendChild(vp)
+end
+
+-- ===== Render code area: load content into textarea + sync deps ===
+local function renderCode()
+    local f = fileById(state.activeTab)
+    local ta = doc:getElementById("code-area")
+    local content = (f and f.content) or ""
+    -- textarea.value = the canonical buffer.  Set on every tab switch.
+    -- Live edits flow back via the input listener (saveCurrentBuffer).
+    ta.value = content
+    renderGutter(content)
+    renderMinimap(content)
+    if f then setText("sb-lang", langName[f.type] or f.type) end
+    setText("sb-cursor", "Ln 1, Col 1")
+end
+
+-- ===== Render: stats =============================================
+local function renderStats()
+    setText("stat-files", #files)
+    local total = 0
+    for _, f in ipairs(files) do total = total + fileLineCount(f) end
+    setText("stat-lines", total)
+    setText("stat-tabs", #state.openTabs)
+end
+
+-- ===== Find in file ==============================================
+local function runFind()
+    local input = doc:getElementById("find-input")
+    local q = input and input.value or ""
+    state.findText = q
+    if q == "" then setText("find-result", "0 results"); return end
+    local f = fileById(state.activeTab)
+    if not f then return end
+    local hay = f.content or ""
+    if not state.matchCase then hay = hay:lower(); q = q:lower() end
+    local count, pos = 0, 1
+    while true do
+        local s = hay:find(q, pos, true)
+        if not s then break end
+        count = count + 1
+        pos = s + #q
+    end
+    setText("find-result", count .. " result" .. (count == 1 and "" or "s"))
+end
+
+-- ===== Toasts ====================================================
+local function showToast(level, msg, durationMs)
+    local stack = doc:getElementById("toast-stack")
+    local t = el("div", {class = "toast " .. level})
+    local icon = el("span", {class = "toast-icon"})
+    local body = el("span", {text = msg})
+    local x = el("span", {class = "toast-close", text = "x"})
+    t:appendChild(icon); t:appendChild(body); t:appendChild(x)
+    local function remove()
+        if t.parentNode then t.parentNode:removeChild(t) end
+    end
+    x:addEventListener("click", remove)
+    t:addEventListener("click", remove)
+    stack:appendChild(t)
+    setTimeout(remove, durationMs or 3500)
+end
+
+-- ===== Render all ================================================
+function renderAll()
+    renderFileTree()
+    renderTabs()
+    renderBreadcrumb()
+    renderCode()
+    renderStats()
+    runFind()
+end
+
+-- ===== Context menu ==============================================
+local function hideCtxMenu()
+    local m = doc:getElementById("ctx-menu")
+    m:removeClass("open")
+end
+local function showCtxMenu(x, y)
+    local m = doc:getElementById("ctx-menu")
+    m:setAttribute("style", "left:" .. x .. "px;top:" .. y .. "px")
+    m:addClass("open")
+end
+
+-- ===== Command palette ===========================================
+local commands = {
+    {name="Run Application",    kbd="F5",       fn=function() showToast("info", "Running application...", 2500) end},
+    {name="Build Project",      kbd="Ctrl+B",   fn=function() showToast("success", "Build succeeded (2.4s)", 3000) end},
+    {name="Format Document",    kbd="Shift+Alt+F", fn=function() showToast("success", "Document formatted", 2000) end},
+    {name="Toggle Comment",     kbd="Ctrl+/",   fn=function() showToast("info", "Toggled comments", 1800) end},
+    {name="Go to Line...",      kbd="Ctrl+G",   fn=function() showToast("info", "Jump to line — not implemented", 2000) end},
+    {name="Open File...",       kbd="Ctrl+O",   fn=function() showToast("info", "Open file dialog (mock)", 2000) end},
+    {name="Save File",          kbd="Ctrl+S",   fn=function() showToast("success", "File saved", 1500) end},
+    {name="Close Tab",          kbd="Ctrl+W",   fn=function() closeTab(state.activeTab) end},
+    {name="Toggle Sidebar",     kbd="Ctrl+B",   fn=function() showToast("info", "Sidebar toggle (mock)", 1500) end},
+    {name="Switch Theme",       kbd="Ctrl+K T", fn=function() showToast("info", "Theme switcher (use right panel)", 2000) end},
+}
+
+local paletteHighlight = 1
+local function renderPalette(filter)
+    local list = doc:getElementById("palette-results")
+    clearChildren(list)
+    local filtered = {}
+    local f = (filter or ""):lower()
+    for _, c in ipairs(commands) do
+        if f == "" or c.name:lower():find(f, 1, true) then
+            table.insert(filtered, c)
+        end
+    end
+    if #filtered == 0 then
+        list:appendChild(el("div", {class = "modal-result", text = "No commands found"}))
+        return
+    end
+    if paletteHighlight > #filtered then paletteHighlight = 1 end
+    for i, c in ipairs(filtered) do
+        local row = el("div", {class = "modal-result" .. (i == paletteHighlight and " highlight" or "")})
+        row:appendChild(el("span", {text = c.name}))
+        row:appendChild(el("span", {class = "modal-result-kbd", text = c.kbd}))
+        row:addEventListener("click", function()
+            closePalette(); c.fn()
+        end)
+        list:appendChild(row)
+    end
+    -- store current filtered for Enter handler
+    state._paletteFiltered = filtered
+end
+
+function closePalette()
+    doc:getElementById("palette-overlay"):removeClass("open")
+end
+
+function openPalette()
+    doc:getElementById("palette-overlay"):addClass("open")
+    local input = doc:getElementById("palette-input")
+    input.value = ""
+    paletteHighlight = 1
+    renderPalette("")
+    setTimeout(function() input:focus() end, 50)
+end
+
+-- ===== Wire-up: file search ======================================
+local fsInput = doc:getElementById("file-search")
+fsInput:addEventListener("input", function()
+    state.fileFilter = fsInput.value or ""
+    renderFileTree()
+end)
+
+-- ===== Wire-up: toolbar buttons ==================================
+doc:getElementById("btn-run"):addEventListener("click", function()
+    showToast("info", "Running application (mock)...", 2500)
+    setTimeout(function() showToast("success", "Application started on port 5173", 3000) end, 800)
+end)
+doc:getElementById("btn-stop"):addEventListener("click", function()
+    showToast("warning", "Application stopped", 2000)
+end)
+doc:getElementById("btn-build"):addEventListener("click", function()
+    showToast("info", "Building...", 1500)
+    setTimeout(function() showToast("success", "Build succeeded (2.4s)", 3000) end, 1200)
+end)
+-- ===== Toggle helpers (used by View menu) ========================
+function toggleSidebar()
+    local sb = doc:querySelector(".sidebar")
+    if not sb then return end
+    if sb:hasClass("hidden-pane") then sb:removeClass("hidden-pane") else sb:addClass("hidden-pane") end
+end
+function toggleMinimap()
+    local mm = doc:getElementById("minimap")
+    if not mm then return end
+    if mm:hasClass("hidden-pane") then mm:removeClass("hidden-pane") else mm:addClass("hidden-pane") end
+end
+function toggleRightPanel()
+    local rp = doc:querySelector(".right-panel")
+    if not rp then return end
+    if rp:hasClass("hidden-pane") then rp:removeClass("hidden-pane") else rp:addClass("hidden-pane") end
+end
+function cycleTab(delta)
+    local idx = 1
+    for i, t in ipairs(state.openTabs) do
+        if t == state.activeTab then idx = i; break end
+    end
+    local n = #state.openTabs
+    if n <= 1 then return end
+    saveCurrentBuffer()
+    local newIdx = ((idx - 1 + delta) % n + n) % n + 1
+    state.activeTab = state.openTabs[newIdx]
+    renderAll()
+end
+
+-- Forward declare so menu actions defined below can reference these
+-- without forcing me to repeat the global-vs-local dance.  These names
+-- become local upvalues, captured by the menu-item closures.
+local openMenu, closeMenu, activeMenuId
+
+local menus = {
+    ["menu-file"] = {
+        title = "File",
+        items = {
+            {label="New File",        kbd="Ctrl+N",         action=function() showToast("info", "New file (mock)", 1500) end},
+            {label="Open File...",    kbd="Ctrl+O",         action=function() showToast("info", "Open file dialog (mock)", 1500) end},
+            {label="Open Folder..."},
+            {sep=true},
+            {label="Save",            kbd="Ctrl+S",         action=function()
+                saveCurrentBuffer()
+                local f = fileById(state.activeTab)
+                showToast("success", "Saved " .. (f and f.name or ""), 1500)
+            end},
+            {label="Save As...",      kbd="Ctrl+Shift+S"},
+            {label="Save All",        kbd="Ctrl+K S"},
+            {sep=true},
+            {label="Close Tab",       kbd="Ctrl+W",         action=function() closeTab(state.activeTab) end},
+            {label="Exit"},
+        },
+    },
+    ["menu-edit"] = {
+        title = "Edit",
+        items = {
+            {label="Undo",            kbd="Ctrl+Z"},
+            {label="Redo",            kbd="Ctrl+Y"},
+            {sep=true},
+            {label="Cut",             kbd="Ctrl+X"},
+            {label="Copy",            kbd="Ctrl+C"},
+            {label="Paste",           kbd="Ctrl+V"},
+            {sep=true},
+            {label="Find...",         kbd="Ctrl+F",         action=function() doc:getElementById("find-input"):focus() end},
+            {label="Replace...",      kbd="Ctrl+H"},
+            {label="Format Document", kbd="Shift+Alt+F"},
+        },
+    },
+    ["menu-view"] = {
+        title = "View",
+        items = {
+            {label="Command Palette", kbd="Ctrl+P",         action=function() openPalette() end},
+            {sep=true},
+            {label="Toggle Sidebar",  kbd="Ctrl+B",         action=function() toggleSidebar() end},
+            {label="Toggle Minimap",                         action=function() toggleMinimap() end},
+            {label="Toggle Right Panel",                     action=function() toggleRightPanel() end},
+            {sep=true},
+            {label="Zoom In",         kbd="Ctrl+=",         action=function() setFontSize(math.min(30, state.fontSize + 1)) end},
+            {label="Zoom Out",        kbd="Ctrl+-",         action=function() setFontSize(math.max(10, state.fontSize - 1)) end},
+            {label="Reset Zoom",      kbd="Ctrl+0",         action=function() setFontSize(12) end},
+        },
+    },
+    ["menu-go"] = {
+        title = "Go",
+        items = {
+            {label="Go to File...",   kbd="Ctrl+P",         action=function() openPalette() end},
+            {label="Go to Line..."},
+            {label="Go to Symbol..."},
+            {sep=true},
+            {label="Next Tab",        kbd="Ctrl+Tab",       action=function() cycleTab(1) end},
+            {label="Previous Tab",    kbd="Ctrl+Shift+Tab", action=function() cycleTab(-1) end},
+        },
+    },
+    ["menu-help"] = {
+        title = "Help",
+        items = {
+            {label="Documentation",                          action=function() showToast("info", "Docs would open in browser", 2000) end},
+            {label="Keyboard Shortcuts"},
+            {label="Release Notes"},
+            {sep=true},
+            {label="About KUI IDE",                          action=function() showToast("info", "KUI IDE 0.1 - built on KUI rendering engine", 3000) end},
+        },
+    },
+}
+
+closeMenu = function()
+    if activeMenuId then
+        local b = doc:getElementById(activeMenuId)
+        if b then b:removeClass("menu-active") end
+        activeMenuId = nil
+    end
+    doc:getElementById("menu-dropdown"):removeClass("open")
+end
+
+openMenu = function(mid)
+    local def = menus[mid]
+    if not def then return end
+    closeMenu()
+    local btn = doc:getElementById(mid)
+    if not btn then return end
+    local rect = btn:getBoundingClientRect()
+    local dd = doc:getElementById("menu-dropdown")
+    clearChildren(dd)
+    for _, item in ipairs(def.items) do
+        if item.sep then
+            dd:appendChild(el("div", {class = "menu-sep"}))
+        else
+            local row = el("div", {class = "menu-item"})
+            row:appendChild(el("span", {text = item.label}))
+            if item.kbd then row:appendChild(el("span", {class = "menu-kbd", text = item.kbd})) end
+            local act = item.action
+            row:addEventListener("click", function()
+                closeMenu()
+                if act then act() else showToast("info", item.label .. " (mock)", 1200) end
+            end)
+            dd:appendChild(row)
+        end
+    end
+    local left = rect.left
+    local viewport = doc:documentElement().clientWidth or 1500
+    if left + 220 > viewport - 8 then left = viewport - 220 - 8 end
+    dd:setAttribute("style", "left:" .. math.floor(left) .. "px;top:" .. math.floor(rect.bottom + 2) .. "px")
+    dd:addClass("open")
+    btn:addClass("menu-active")
+    activeMenuId = mid
+end
+
+for mid, _ in pairs(menus) do
+    doc:getElementById(mid):addEventListener("click", function(e)
+        e:stopPropagation()
+        if activeMenuId == mid then closeMenu() else openMenu(mid) end
+    end)
+    -- VS Code-style: any menu open + hover another -> auto-switch
+    doc:getElementById(mid):addEventListener("mouseenter", function()
+        if activeMenuId and activeMenuId ~= mid then openMenu(mid) end
+    end)
+end
+
+-- ===== Wire-up: find panel =======================================
+doc:getElementById("find-input"):addEventListener("input", runFind)
+doc:getElementById("opt-case"):addEventListener("click", function(e)
+    state.matchCase = not state.matchCase
+    local cb = doc:getElementById("opt-case"):querySelector(".form-checkbox")
+    if state.matchCase then cb:addClass("checked") else cb:removeClass("checked") end
+    runFind()
+end)
+doc:getElementById("opt-word"):addEventListener("click", function(e)
+    state.wholeWord = not state.wholeWord
+    local cb = doc:getElementById("opt-word"):querySelector(".form-checkbox")
+    if state.wholeWord then cb:addClass("checked") else cb:removeClass("checked") end
+    runFind()
+end)
+
+-- ===== Wire-up: editor settings ==================================
+doc:getElementById("theme-select"):addEventListener("change", function(e)
+    local v = doc:getElementById("theme-select").value
+    -- Toggle <html data-theme="..."> -> 4 CSS palette slices in :root.
+    doc:documentElement():setAttribute("data-theme", v)
+    state.theme = v
+    local prettyName = ({mocha="Catppuccin Mocha", macchiato="Catppuccin Macchiato",
+                        frappe="Catppuccin Frappe", latte="Catppuccin Latte"})[v] or v
+    showToast("info", "Theme: " .. prettyName, 1500)
+end)
+
+-- font slider.  Declared as a global (no `local`) so menu-item closures
+-- defined earlier can resolve the upvalue via _ENV lookup at call time.
+function setFontSize(px)
+    state.fontSize = px
+    local pct = math.max(0, math.min(100, (px - 10) * 5))
+    doc:getElementById("font-fill").style:setProperty("width", pct .. "%")
+    doc:getElementById("font-thumb").style:setProperty("left", pct .. "%")
+    doc:getElementById("font-val").textContent = px .. "px"
+    doc:documentElement().style:setProperty("--editor-font-size", px .. "px")
+end
+doc:getElementById("font-track"):addEventListener("click", function(e)
+    local track = doc:getElementById("font-track")
+    local rect = track:getBoundingClientRect()
+    local ratio = (e.clientX - rect.left) / rect.width
+    if ratio < 0 then ratio = 0 end
+    if ratio > 1 then ratio = 1 end
+    local px = math.floor(10 + ratio * 20 + 0.5)  -- 10..30
+    setFontSize(px)
+end)
+setFontSize(12)
+
+-- tab size radios
+for _, sz in ipairs({2, 4, 8}) do
+    local row = doc:querySelector("[data-tabsize='" .. sz .. "']")
+    if row then
+        row:addEventListener("click", function()
+            state.tabSize = sz
+            -- update radios
+            for _, s2 in ipairs({2, 4, 8}) do
+                local r = doc:querySelector("[data-tabsize='" .. s2 .. "']"):querySelector(".form-radio")
+                if r then
+                    if s2 == sz then r:addClass("selected") else r:removeClass("selected") end
+                end
+            end
+            setText("sb-tabsize", "Spaces: " .. sz)
+            doc:getElementById("code-area").style:setProperty("tab-size", tostring(sz))
+        end)
+    end
+end
+
+-- accent color swatches
+local swatches = doc:getElementById("color-row"):querySelectorAll(".color-swatch")
+swatches:forEach(function(sw, idx)
+    sw:addEventListener("click", function()
+        local color = sw:getAttribute("data-color")
+        state.accent = color
+        doc:documentElement().style:setProperty("--accent", color)
+        swatches:forEach(function(s2) s2:removeClass("active") end)
+        sw:addClass("active")
+    end)
+end)
+
+-- tag chips toggle
+local chips = doc:getElementById("tag-cloud"):querySelectorAll(".chip")
+chips:forEach(function(chip)
+    chip:addEventListener("click", function()
+        chip:toggleClass("active")
+    end)
+end)
+
+-- ===== Wire-up: context menu =====================================
+doc:getElementById("code-area"):addEventListener("contextmenu", function(e)
+    e:preventDefault()
+    showCtxMenu(e.clientX, e.clientY)
+end)
+doc:addEventListener("mousedown", function(e)
+    local ctx = doc:getElementById("ctx-menu")
+    local md  = doc:getElementById("menu-dropdown")
+    local ctxOpen = ctx:hasClass("open")
+    local menuOpen = md:hasClass("open")
+    if not ctxOpen and not menuOpen then return end
+    -- Click is on the menu/ctx itself or on a toolbar menu-btn?  Skip;
+    -- toolbar btn click handler owns the toggle.
+    local t = e.target
+    while t do
+        if t == ctx or t == md then return end
+        if t.id and (t.id == "menu-file" or t.id == "menu-edit" or t.id == "menu-view"
+                  or t.id == "menu-go"   or t.id == "menu-help") then return end
+        t = t.parentNode
+    end
+    if ctxOpen then hideCtxMenu() end
+    if menuOpen then closeMenu() end
+end)
+local ctxItems = doc:getElementById("ctx-menu"):querySelectorAll(".ctx-item")
+ctxItems:forEach(function(it)
+    it:addEventListener("click", function()
+        local action = it:getAttribute("data-action")
+        hideCtxMenu()
+        showToast("info", "Action: " .. action, 1500)
+    end)
+end)
+
+-- ===== Wire-up: palette modal ====================================
+doc:getElementById("palette-input"):addEventListener("input", function()
+    paletteHighlight = 1
+    renderPalette(doc:getElementById("palette-input").value)
+end)
+doc:getElementById("palette-overlay"):addEventListener("click", function(e)
+    if e.target == doc:getElementById("palette-overlay") then closePalette() end
+end)
+
+-- ===== Keyboard shortcuts ========================================
+doc:addEventListener("keydown", function(e)
+    local key = e.key
+    local ctrl = e.ctrlKey or e.metaKey
+    if ctrl and (key == "p" or key == "P") then
+        e:preventDefault(); openPalette(); return
+    end
+    if key == "Escape" then
+        closePalette(); hideCtxMenu(); closeMenu(); return
+    end
+    -- palette navigation
+    if doc:getElementById("palette-overlay"):hasClass("open") then
+        local list = state._paletteFiltered or {}
+        if key == "ArrowDown" then
+            paletteHighlight = math.min(#list, paletteHighlight + 1)
+            renderPalette(doc:getElementById("palette-input").value)
+            e:preventDefault()
+        elseif key == "ArrowUp" then
+            paletteHighlight = math.max(1, paletteHighlight - 1)
+            renderPalette(doc:getElementById("palette-input").value)
+            e:preventDefault()
+        elseif key == "Enter" then
+            local cmd = list[paletteHighlight]
+            if cmd then closePalette(); cmd.fn() end
+            e:preventDefault()
+        end
+    end
+end)
+
+-- ===== Expose state for DevTools / scripted testing ==============
+_G.state = state
+_G.fileById = fileById
+_G.showToast = showToast
+
+-- ===== Wire-up: editor textarea ==================================
+-- Live cursor Ln/Col is computed from textarea.selectionStart against
+-- the current buffer.  We also schedule a throttled rebuild of gutter
+-- + minimap + stats on every input event (~150ms coalescing window).
+local function computeLnCol(text, pos)
+    if not text or pos <= 0 then return 1, 1 end
+    local ln, lastNl = 1, 0
+    for i = 1, math.min(pos, #text) do
+        if text:sub(i, i) == "\n" then ln = ln + 1; lastNl = i end
+    end
+    return ln, pos - lastNl + 1
+end
+
+local function syncStatusFromCursor()
+    local ta = doc:getElementById("code-area")
+    if not ta then return end
+    local pos = ta.selectionStart or 0
+    local ln, col = computeLnCol(ta.value or "", pos)
+    setText("sb-cursor", "Ln " .. ln .. ", Col " .. col)
+end
+
+local rebuildPending = false
+local function scheduleRebuild()
+    if rebuildPending then return end
+    rebuildPending = true
+    setTimeout(function()
+        rebuildPending = false
+        local ta = doc:getElementById("code-area")
+        if not ta then return end
+        local content = ta.value or ""
+        renderGutter(content)
+        renderMinimap(content)
+        local f = fileById(state.activeTab)
+        if f then f.content = content end
+        renderStats()
+        if state.findText ~= "" then runFind() end
+    end, 150)
+end
+
+local codeArea = doc:getElementById("code-area")
+codeArea:addEventListener("input", function()
+    syncStatusFromCursor()
+    scheduleRebuild()
+end)
+codeArea:addEventListener("keyup",   syncStatusFromCursor)
+codeArea:addEventListener("mouseup", syncStatusFromCursor)
+codeArea:addEventListener("click",   syncStatusFromCursor)
+codeArea:addEventListener("focus",   syncStatusFromCursor)
+
+-- ===== Minimap viewport sync + click-to-jump =====================
+local function syncMinimapViewport()
+    local ta = doc:getElementById("code-area")
+    local mini = doc:getElementById("minimap")
+    if not ta or not mini then return end
+    local vp = doc:getElementById("mm-viewport")
+    if not vp then return end
+    local sh = ta.scrollHeight or 1
+    local ch = ta.clientHeight or 1
+    if sh <= ch then
+        vp.style:setProperty("display", "none")
+        return
+    end
+    vp.style:setProperty("display", "block")
+    local mh = mini.clientHeight or 1
+    local top = (ta.scrollTop or 0) / sh * mh
+    local h = ch / sh * mh
+    if h < 12 then h = 12 end
+    vp.style:setProperty("top", math.floor(top) .. "px")
+    vp.style:setProperty("height", math.floor(h) .. "px")
+end
+
+codeArea:addEventListener("scroll", syncMinimapViewport)
+codeArea:addEventListener("input",  syncMinimapViewport)
+
+-- Click on minimap: center textarea on the clicked Y position.
+doc:getElementById("minimap"):addEventListener("click", function(e)
+    local ta = doc:getElementById("code-area")
+    local mini = doc:getElementById("minimap")
+    if not ta or not mini then return end
+    local rect = mini:getBoundingClientRect()
+    local relY = (e.clientY or 0) - rect.top
+    local mh = mini.clientHeight or 1
+    local sh = ta.scrollHeight or 1
+    local ch = ta.clientHeight or 1
+    if sh <= ch then return end
+    local target = (relY / mh) * sh - ch / 2
+    if target < 0 then target = 0 end
+    if target > sh - ch then target = sh - ch end
+    ta.scrollTop = target
+    syncMinimapViewport()
+end)
+
+-- ===== Initial render + greeting toast ===========================
+renderAll()
+setTimeout(syncMinimapViewport, 100)
+setTimeout(function() showToast("info", "Welcome to KUI IDE. Press Ctrl+P for commands.", 4000) end, 300)
+setTimeout(function() showToast("success", "Workspace loaded (12 files)", 3000) end, 800)
+</script>
+</body>
+</html>

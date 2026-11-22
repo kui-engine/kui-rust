@@ -1,0 +1,55 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="root">
+    <span id="child">text</span>
+    <!-- comment -->
+</div>
+<script type="text/lua">
+local ok = true
+
+local root = document:getElementById("root")
+local child = document:getElementById("child")
+
+-- nodeType: 1 = Element
+ok = ok and (root.nodeType == 1)
+ok = ok and (child.nodeType == 1)
+
+-- nodeName: uppercase tag name
+ok = ok and (root.nodeName == "DIV" or root.nodeName == "div")
+ok = ok and (child.nodeName == "SPAN" or child.nodeName == "span")
+
+-- isConnected: true for elements in DOM tree
+ok = ok and (root.isConnected == true)
+ok = ok and (child.isConnected == true)
+
+-- ownerDocument
+ok = ok and (child:ownerDocument() == document)
+
+-- childNodes includes text and element nodes
+local nodes = root:childNodes()
+ok = ok and (#nodes >= 1)
+
+-- Node usertype: access text node via childNodes
+local foundText = false
+local foundElement = false
+for _, n in ipairs(nodes) do
+    if n.nodeType == 3 then foundText = true end
+    if n.nodeType == 1 then foundElement = true end
+end
+ok = ok and foundElement
+
+-- hasChildNodes / childCount
+ok = ok and (root:hasChildNodes() == true)
+ok = ok and (root.childCount >= 1)
+
+-- getRootNode
+local rn = root:getRootNode()
+ok = ok and (rn ~= nil)
+
+-- isConnected for orphan node
+local orphan = document:createElement("div")
+ok = ok and (orphan.isConnected == false)
+
+document:getElementById("result").textContent = ok and "PASS" or "FAIL"
+</script>
+</body></html>

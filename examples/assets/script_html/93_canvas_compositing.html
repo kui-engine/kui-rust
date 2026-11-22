@@ -1,0 +1,154 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="200" height="200"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: globalAlpha property round-trip
+ctx.globalAlpha = 0.5
+local ga = ctx.globalAlpha
+if ga == nil then fail("T1: globalAlpha nil")
+elseif math.abs(ga - 0.5) > 0.05 then fail("T1: globalAlpha="..tostring(ga))
+end
+ctx.globalAlpha = 1.0
+
+-- T2: globalAlpha affects fill opacity
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#ff0000"
+ctx.globalAlpha = 0.5
+ctx:fillRect(0, 0, 50, 50)
+ctx.globalAlpha = 1.0
+local px2 = ctx:getImageData(25, 25, 1, 1)
+if px2 == nil then fail("T2: nil")
+else
+    local a = px2:get(4)
+    -- Alpha should be around 128 (50% of 255)
+    if a < 80 or a > 180 then fail("T2: globalAlpha alpha="..tostring(a)) end
+end
+
+-- T3: globalCompositeOperation property round-trip
+ctx.globalCompositeOperation = "multiply"
+local gco = ctx.globalCompositeOperation
+if gco ~= "multiply" then fail("T3: gco="..tostring(gco)) end
+ctx.globalCompositeOperation = "source-over"
+
+-- T4: source-over compositing (default — draws on top)
+ctx:clearRect(0, 0, 200, 200)
+ctx.globalCompositeOperation = "source-over"
+ctx.fillStyle = "#ff0000"
+ctx:fillRect(60, 60, 40, 40)
+ctx.fillStyle = "#00ff00"
+ctx:fillRect(70, 70, 40, 40)
+-- Overlap region (70-100, 70-100) should be green (drawn on top)
+local px4 = ctx:getImageData(85, 85, 1, 1)
+if px4 == nil then fail("T4: nil")
+else
+    local g = px4:get(2)
+    if g < 200 then fail("T4: source-over green="..tostring(g)) end
+end
+
+-- T5: destination-over compositing (draws behind)
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#ff0000"
+ctx:fillRect(60, 60, 40, 40)
+ctx.globalCompositeOperation = "destination-over"
+ctx.fillStyle = "#0000ff"
+ctx:fillRect(70, 70, 40, 40)
+ctx.globalCompositeOperation = "source-over"
+-- Overlap region should be red (first drawn, stays on top with dest-over)
+local px5 = ctx:getImageData(85, 85, 1, 1)
+if px5 == nil then fail("T5: nil")
+else
+    local r = px5:get(1); local b = px5:get(3)
+    if r < 200 then fail("T5: dest-over red="..tostring(r)) end
+    if b > 50 then fail("T5: dest-over blue="..tostring(b)) end
+end
+
+-- T6: shadowColor and shadowBlur properties
+ctx.shadowColor = "#000000"
+local sc = ctx.shadowColor
+if sc == nil then fail("T6: shadowColor nil") end
+ctx.shadowBlur = 5
+if ctx.shadowBlur ~= 5 then fail("T6: shadowBlur="..tostring(ctx.shadowBlur)) end
+
+-- T7: shadowOffsetX/Y properties
+ctx.shadowOffsetX = 10
+ctx.shadowOffsetY = 10
+if ctx.shadowOffsetX ~= 10 then fail("T7: shadowOffsetX="..tostring(ctx.shadowOffsetX)) end
+if ctx.shadowOffsetY ~= 10 then fail("T7: shadowOffsetY="..tostring(ctx.shadowOffsetY)) end
+
+-- T8: shadow draws offset pixels
+ctx:clearRect(0, 0, 200, 200)
+ctx.shadowColor = "rgba(0,0,0,1)"
+ctx.shadowBlur = 0
+ctx.shadowOffsetX = 20
+ctx.shadowOffsetY = 20
+ctx.fillStyle = "#ff0000"
+ctx:fillRect(10, 10, 30, 30)
+-- Shadow should appear at (30,30) offset by (20,20) from (10,10)
+local px8 = ctx:getImageData(35, 35, 1, 1)
+if px8 ~= nil then
+    local a = px8:get(4)
+    -- The shadow or the rect itself should have pixels here
+    if a < 100 then
+        -- Check shadow area specifically at offset
+        local px8s = ctx:getImageData(45, 45, 1, 1)
+        if px8s ~= nil and px8s:get(4) < 50 then
+            fail("T8: shadow no pixels at offset")
+        end
+    end
+end
+-- Reset shadow
+ctx.shadowColor = "rgba(0,0,0,0)"
+ctx.shadowBlur = 0
+ctx.shadowOffsetX = 0
+ctx.shadowOffsetY = 0
+
+-- T9: imageSmoothingEnabled property
+ctx.imageSmoothingEnabled = false
+if ctx.imageSmoothingEnabled ~= false then fail("T9: smoothing="..tostring(ctx.imageSmoothingEnabled)) end
+ctx.imageSmoothingEnabled = true
+if ctx.imageSmoothingEnabled ~= true then fail("T9: smoothing true="..tostring(ctx.imageSmoothingEnabled)) end
+
+-- T10: clip restricts drawing area
+ctx:clearRect(0, 0, 200, 200)
+ctx:save()
+ctx:beginPath()
+ctx:rect(50, 50, 50, 50)
+ctx:clip()
+ctx.fillStyle = "#ff0000"
+ctx:fillRect(0, 0, 200, 200)
+ctx:restore()
+-- Inside clip should be red
+local px10i = ctx:getImageData(75, 75, 1, 1)
+if px10i == nil then fail("T10: nil")
+else
+    local r = px10i:get(1)
+    if r < 200 then fail("T10: clip inside red="..tostring(r)) end
+end
+-- Outside clip should be clear
+local px10o = ctx:getImageData(10, 10, 1, 1)
+if px10o ~= nil then
+    local a = px10o:get(4)
+    if a > 50 then fail("T10: clip outside alpha="..tostring(a)) end
+end
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "compositing ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

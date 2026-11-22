@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html frameless shadow sizeable>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: "Segoe UI", sans-serif;
+        background: #1e1e2e;
+        color: #cdd6f4;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Title bar — draggable region */
+    .titlebar {
+        -webkit-app-region: drag;
+        -kui-app-region: drag;
+        background: #181825;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        flex-shrink: 0;
+        border-bottom: 1px solid #313244;
+    }
+
+    .titlebar-icon {
+        width: 16px;
+        height: 16px;
+        background: #89b4fa;
+        border-radius: 3px;
+        margin-right: 10px;
+    }
+
+    .titlebar-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: #cdd6f4;
+        flex: 1;
+    }
+
+    /* Window control buttons — NOT draggable */
+    .titlebar-buttons {
+        -webkit-app-region: no-drag;
+        -kui-app-region: no-drag;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    /* 按钮是圆角悬浮块，不是满高的传统窗口按钮，所以不能撑满标题栏：
+       36px 标题栏配 28px 按钮，上下各留 4px 呼吸，圆角才立得住。 */
+    .titlebar-btn {
+        width: 40px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        color: #9399b2;
+        cursor: pointer;
+        border-radius: 7px;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .titlebar-btn:hover {
+        background: rgba(205, 214, 244, 0.1);
+        color: #cdd6f4;
+    }
+
+    .titlebar-btn:active {
+        background: rgba(205, 214, 244, 0.06);
+        color: #a6adc8;
+    }
+
+    .titlebar-btn.close:hover {
+        background: #e5484d;
+        color: #ffffff;
+    }
+
+    .titlebar-btn.close:active {
+        background: #c62a2f;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* ---- 窗口控制图标 ----
+       用 CSS 画几何图形，而不是 &#x2014; / &#x25A1; / &#x2715; 这类字符实体。
+       字符实体的字形尺寸、线宽和基线由字体决定，三个符号并排必然不齐、不等重，
+       字号调小后更是糊成一团。这里三个图标共用一块 10×10 画布、统一 1px 线宽，
+       颜色继承按钮的 color，所以 hover / active 换色不需要额外规则。 */
+    .ico {
+        position: relative;
+        display: block;
+        width: 10px;
+        height: 10px;
+    }
+
+    .ico::before,
+    .ico::after {
+        content: "";
+        position: absolute;
+        background: currentColor;
+    }
+
+    /* 最小化：一条居中横线 */
+    .ico-min::before {
+        left: 0;
+        top: 5px;
+        width: 10px;
+        height: 1px;
+    }
+
+    /* 最大化：1px 描边方框（border-box，外廓正好 10×10） */
+    .ico-max::before {
+        left: 0;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        background: none;
+        border: 1px solid currentColor;
+        border-radius: 1.5px;
+    }
+
+    /* 还原：前一个完整小方框 + 后一个只露出上边和右边的方框。
+       后框画成 ⌐ 形而不是完整方框再拿底色去盖，这样 hover 换背景时
+       不会露出一块和按钮底色不一致的补丁。 */
+    .ico-restore::before {
+        left: 0;
+        top: 3px;
+        width: 7px;
+        height: 7px;
+        background: none;
+        border: 1px solid currentColor;
+        border-radius: 1.5px;
+    }
+
+    .ico-restore::after {
+        left: 3px;
+        top: 0;
+        width: 7px;
+        height: 7px;
+        background: none;
+        border-top: 1px solid currentColor;
+        border-right: 1px solid currentColor;
+        border-top-right-radius: 1.5px;
+    }
+
+    /* 关闭：两条 ±45° 斜线。取 12px 让 X 的外廓略小于最大化的方框——
+       实心线比空心框视觉更重，画等大反而显胖。 */
+    .ico-close::before,
+    .ico-close::after {
+        left: -1px;
+        top: 5px;
+        width: 12px;
+        height: 1px;
+    }
+
+    .ico-close::before { transform: rotate(45deg); }
+    .ico-close::after  { transform: rotate(-45deg); }
+
+    /* Main content */
+    .content {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+    }
+
+    h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        color: #89b4fa;
+    }
+
+    h2 {
+        font-size: 18px;
+        font-weight: 500;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #f5c2e7;
+    }
+
+    p {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+        color: #a6adc8;
+    }
+
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .feature-card {
+        background: #313244;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #45475a;
+    }
+
+    .feature-card h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #f9e2af;
+        margin-bottom: 6px;
+    }
+
+    .feature-card p {
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        margin-right: 6px;
+    }
+
+    .badge-html { background: #a6e3a1; color: #1e1e2e; }
+    .badge-css  { background: #89b4fa; color: #1e1e2e; }
+    .badge-api  { background: #f5c2e7; color: #1e1e2e; }
+
+    /* Interactive test section */
+    .test-section {
+        margin-top: 24px;
+        background: #181825;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid #313244;
+    }
+
+    .test-section h2 {
+        margin-top: 0;
+    }
+
+    .test-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid #313244;
+    }
+
+    .test-item:last-child {
+        border-bottom: none;
+    }
+
+    .test-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #a6e3a1;
+        flex-shrink: 0;
+    }
+
+    .test-label {
+        font-size: 13px;
+        flex: 1;
+    }
+
+    .test-hint {
+        font-size: 11px;
+        color: #6c7086;
+    }
+
+    /* Status bar */
+    .statusbar {
+        -webkit-app-region: drag;
+        background: #181825;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        border-top: 1px solid #313244;
+        flex-shrink: 0;
+    }
+
+    .statusbar-text {
+        font-size: 11px;
+        color: #6c7086;
+    }
+
+    .statusbar-link {
+        -webkit-app-region: no-drag;
+        font-size: 11px;
+        color: #89b4fa;
+        cursor: pointer;
+        margin-left: auto;
+    }
+
+    .statusbar-link:hover {
+        color: #b4d0fb;
+    }
+</style>
+</head>
+<body>
+    <!-- Custom title bar (draggable) -->
+    <div class="titlebar">
+        <div class="titlebar-icon"></div>
+        <div class="titlebar-title">KUI Frameless Window Demo</div>
+        <div class="titlebar-buttons">
+            <div class="titlebar-btn" id="btn-minimize" title="Minimize">
+                <span class="ico ico-min"></span>
+            </div>
+            <div class="titlebar-btn" id="btn-maximize" title="Maximize">
+                <span class="ico ico-max" id="ico-maximize"></span>
+            </div>
+            <div class="titlebar-btn close" id="btn-close" title="Close">
+                <span class="ico ico-close"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content (scrollable) -->
+    <div class="content">
+        <h1>Frameless Window</h1>
+        <p>This window has no native title bar or borders. The custom title bar above
+           can be used to drag the window. The close/minimize/maximize buttons are
+           not draggable (no-drag override).</p>
+
+        <h2>Features</h2>
+        <div class="feature-list">
+            <div class="feature-card">
+                <h3><span class="badge badge-html">HTML</span> &lt;html frameless shadow sizeable&gt;</h3>
+                <p>Boolean attributes on the &lt;html&gt; element control window chrome.
+                   <b>frameless</b> removes the native frame, <b>shadow</b> enables
+                   DWM drop shadow, <b>sizeable</b> allows edge-drag resize.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="badge badge-css">CSS</span> -webkit-app-region: drag</h3>
+                <p>Makes an element act as a window drag handle. Inherited by children.
+                   Also available as <b>-kui-app-region</b>.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="badge badge-css">CSS</span> -webkit-app-region: no-drag</h3>
+                <p>Overrides inherited drag on child elements. Used for interactive
+                   controls (buttons, inputs) inside a drag region.</p>
+            </div>
+            <div class="feature-card">
+                <h3><span class="badge badge-api">API</span> Window::setFrameless(bool)</h3>
+                <p>C++ API for programmatic frameless mode control. Also:
+                   setFramelessShadow(bool), setFramelessSizeable(bool).</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Interactive Tests</h2>
+            <div class="test-item">
+                <div class="test-status"></div>
+                <div class="test-label">Drag the title bar to move the window</div>
+                <div class="test-hint">Title bar has -webkit-app-region: drag</div>
+            </div>
+            <div class="test-item">
+                <div class="test-status"></div>
+                <div class="test-label">Click the window control buttons (no drag)</div>
+                <div class="test-hint">Buttons have -webkit-app-region: no-drag</div>
+            </div>
+            <div class="test-item">
+                <div class="test-status"></div>
+                <div class="test-label">Resize by dragging window edges</div>
+                <div class="test-hint">Enabled by &lt;html sizeable&gt;</div>
+            </div>
+            <div class="test-item">
+                <div class="test-status"></div>
+                <div class="test-label">Observe native drop shadow around window</div>
+                <div class="test-hint">Enabled by &lt;html shadow&gt;</div>
+            </div>
+            <div class="test-item">
+                <div class="test-status"></div>
+                <div class="test-label">Drag the status bar to move the window</div>
+                <div class="test-hint">Status bar also has -webkit-app-region: drag</div>
+            </div>
+            <div class="test-item">
+                <div class="test-status"></div>
+                <div class="test-label">Click status bar link (no drag)</div>
+                <div class="test-hint">Link has -webkit-app-region: no-drag</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status bar (also draggable, with no-drag link) -->
+    <div class="statusbar">
+        <div class="statusbar-text">KUI Frameless Window v1.0</div>
+        <div class="statusbar-link">Documentation</div>
+    </div>
+
+    <script type="text/lua">
+        -- Window control buttons
+        local btnMin = document:getElementById("btn-minimize")
+        local btnMax = document:getElementById("btn-maximize")
+        local btnClose = document:getElementById("btn-close")
+        local icoMax = document:getElementById("ico-maximize")
+
+        -- Minimize
+        if btnMin then
+            btnMin:addEventListener("click", function()
+                window.minimize()
+            end)
+        end
+
+        -- Maximize / Restore toggle
+        if btnMax then
+            btnMax:addEventListener("click", function()
+                window.toggleMaximize()
+                -- 图标是 CSS 画的，切 class 即可，不用替换文字
+                if icoMax then
+                    if window.isMaximized then
+                        icoMax:setAttribute("class", "ico ico-restore")
+                        btnMax:setAttribute("title", "Restore")
+                    else
+                        icoMax:setAttribute("class", "ico ico-max")
+                        btnMax:setAttribute("title", "Maximize")
+                    end
+                end
+            end)
+        end
+
+        -- Close
+        if btnClose then
+            btnClose:addEventListener("click", function()
+                window.close()
+            end)
+        end
+    </script>
+</body>
+</html>

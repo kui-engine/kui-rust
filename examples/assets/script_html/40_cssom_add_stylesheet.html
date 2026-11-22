@@ -1,0 +1,30 @@
+<html><body>
+<div id="box">Test</div>
+<div id="result"></div>
+<script>
+-- Test adding stylesheets dynamically via document:addStylesheet
+local countBefore = #document.styleSheets
+
+document:addStylesheet("#box { font-size: 32px; }")
+
+local countAfter = #document.styleSheets
+local ok = (countAfter == countBefore + 1)
+
+-- Verify the new stylesheet is accessible
+local sheets = document.styleSheets
+local lastSheet = sheets[#sheets]
+ok = ok and (lastSheet ~= nil)
+ok = ok and (lastSheet.ruleCount >= 1)
+
+-- The computed style should reflect the new rule
+local el = document:getElementById("box")
+local cs = document:getComputedStyle(el)
+if cs then
+    local fs = cs:getPropertyValue("font-size")
+    ok = ok and (fs == "32px" or fs:find("32") ~= nil)
+end
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

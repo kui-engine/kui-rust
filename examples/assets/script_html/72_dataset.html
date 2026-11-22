@@ -1,0 +1,31 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="el" data-color="red" data-font-size="14">hello</div>
+<script type="text/lua">
+local ok = true
+
+local el = document:getElementById("el")
+
+-- Read dataset via proxy (camelCase)
+ok = ok and (el.dataset.color == "red")
+ok = ok and (el.dataset.fontSize == "14")
+
+-- Write dataset via proxy
+el.dataset.color = "blue"
+ok = ok and (el.dataset.color == "blue")
+ok = ok and (el:getAttribute("data-color") == "blue")
+
+-- Write new key
+el.dataset.newKey = "value"
+ok = ok and (el:getAttribute("data-new-key") == "value")
+
+-- setDataset legacy API
+el:setDataset("color", "green")
+ok = ok and (el:getAttribute("data-color") == "green")
+
+-- Non-existent key returns nil
+ok = ok and (el.dataset.nonExistent == nil)
+
+document:getElementById("result").textContent = ok and "PASS" or "FAIL"
+</script>
+</body></html>

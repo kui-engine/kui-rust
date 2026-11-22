@@ -1,0 +1,171 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="src" width="32" height="32"></canvas>
+<canvas id="dst" width="160" height="120"></canvas>
+<img id="testImg" />
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local function fail(s)
+    ok = false
+    msg = msg .. s .. "; "
+end
+
+local src = document:getElementById("src")
+local dst = document:getElementById("dst")
+local imgEl = document:getElementById("testImg")
+
+if src == nil or dst == nil then
+    fail("missing canvas elements")
+elseif imgEl == nil then
+    fail("missing img element")
+else
+    -- Paint a red square on the source canvas
+    local sctx = src:getContext("2d")
+    local dctx = dst:getContext("2d")
+    if sctx == nil or dctx == nil then
+        fail("missing 2d context")
+    else
+        sctx.fillStyle = "#ff0000"
+        sctx:fillRect(0, 0, 32, 32)
+
+        -- Test 1: drawImage with <canvas> source (regression)
+        dctx:drawImage(src, 0, 0)
+        local px1 = dctx:getImageData(0, 0, 1, 1)
+        if px1 == nil then
+            fail("T1: getImageData nil")
+        else
+            local r = px1:get(1)
+            if r == nil or r < 200 then
+                fail("T1: drawImage(canvas) red=" .. tostring(r))
+            end
+        end
+
+        -- Test 2: drawImage with <canvas> 5-arg overload
+        dctx:clearRect(0, 0, 160, 120)
+        dctx:drawImage(src, 10, 10, 50, 50)
+        local px2 = dctx:getImageData(20, 20, 1, 1)
+        if px2 == nil then
+            fail("T2: getImageData nil")
+        else
+            local r = px2:get(1)
+            if r == nil or r < 200 then
+                fail("T2: drawImage(canvas,5arg) red=" .. tostring(r))
+            end
+        end
+
+        -- Test 3: drawImage with <canvas> 9-arg overload
+        dctx:clearRect(0, 0, 160, 120)
+        dctx:drawImage(src, 0, 0, 16, 16, 0, 0, 32, 32)
+        local px3 = dctx:getImageData(5, 5, 1, 1)
+        if px3 == nil then
+            fail("T3: getImageData nil")
+        else
+            local r = px3:get(1)
+            if r == nil or r < 200 then
+                fail("T3: drawImage(canvas,9arg) red=" .. tostring(r))
+            end
+        end
+
+        -- Test 4: createImageBitmap from ImageData
+        local imgData = dctx:createImageData(4, 4)
+        for i = 1, 4 * 4 * 4, 4 do
+            imgData:set(i, 0)
+            imgData:set(i + 1, 255)
+            imgData:set(i + 2, 0)
+            imgData:set(i + 3, 255)
+        end
+        local bmp = createImageBitmap(imgData)
+        if bmp == nil then
+            fail("T4: createImageBitmap(imageData) nil")
+        else
+            if bmp.width ~= 4 or bmp.height ~= 4 then
+                fail("T4: bitmap dims " .. tostring(bmp.width) .. "x" .. tostring(bmp.height))
+            end
+        end
+
+        -- Test 5: drawImageBitmap
+        if bmp ~= nil then
+            dctx:clearRect(0, 0, 160, 120)
+            dctx:drawImageBitmap(bmp, 0, 0, 32, 32)
+            local px5 = dctx:getImageData(5, 5, 1, 1)
+            if px5 == nil then
+                fail("T5: getImageData nil")
+            else
+                local g = px5:get(2)
+                if g == nil or g < 200 then
+                    fail("T5: drawImageBitmap green=" .. tostring(g))
+                end
+            end
+        end
+
+        -- Test 6: createImageBitmap from <canvas>
+        local bmpCanvas = createImageBitmap(src)
+        if bmpCanvas == nil then
+            fail("T6: createImageBitmap(canvas) nil")
+        else
+            if bmpCanvas.width ~= 32 or bmpCanvas.height ~= 32 then
+                fail("T6: bitmap dims " .. tostring(bmpCanvas.width) .. "x" .. tostring(bmpCanvas.height))
+            end
+            dctx:clearRect(0, 0, 160, 120)
+            dctx:drawImageBitmap(bmpCanvas, 0, 0)
+            local px6 = dctx:getImageData(10, 10, 1, 1)
+            if px6 == nil then
+                fail("T6: getImageData nil")
+            else
+                local r = px6:get(1)
+                if r == nil or r < 200 then
+                    fail("T6: drawImageBitmap(canvas) red=" .. tostring(r))
+                end
+            end
+        end
+
+        -- Test 7: createPattern with <canvas> (regression)
+        dctx:clearRect(0, 0, 160, 120)
+        local pat = dctx:createPattern(src, "repeat")
+        if pat == nil then
+            fail("T7: createPattern(canvas) nil")
+        else
+            dctx.fillStyle = pat
+            dctx:fillRect(0, 0, 64, 64)
+            local px7 = dctx:getImageData(10, 10, 1, 1)
+            if px7 ~= nil then
+                local r = px7:get(1)
+                if r == nil or r < 200 then
+                    fail("T7: pattern fill red=" .. tostring(r))
+                end
+            end
+        end
+
+        -- Test 8: createPatternBitmap with ImageBitmap
+        if bmp ~= nil then
+            dctx:clearRect(0, 0, 160, 120)
+            local patBmp = dctx:createPatternBitmap(bmp, "repeat")
+            if patBmp == nil then
+                fail("T8: createPatternBitmap nil")
+            else
+                dctx.fillStyle = patBmp
+                dctx:fillRect(0, 0, 64, 64)
+                local px8 = dctx:getImageData(2, 2, 1, 1)
+                if px8 ~= nil then
+                    local g = px8:get(2)
+                    if g == nil or g < 200 then
+                        fail("T8: patternBitmap green=" .. tostring(g))
+                    end
+                end
+            end
+        end
+    end
+end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "canvas image source ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

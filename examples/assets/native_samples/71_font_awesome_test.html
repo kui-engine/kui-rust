@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Font Awesome / Unicode CSS Test</title>
+<style>
+/* ===========================================================
+   Test 1: Unicode escape in content property (core fix)
+   Uses system font — should display actual Unicode characters.
+   =========================================================== */
+body {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+    color: #333;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+h2 {
+    font-size: 18px;
+    margin: 20px 0 10px;
+    color: #1a1a2e;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 6px;
+}
+
+.test-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.test-label {
+    min-width: 200px;
+    font-size: 13px;
+    color: #666;
+}
+
+.test-value {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* --- Unicode content via ::before pseudo-element --- */
+.icon-star::before    { content: "\2605"; color: #f39c12; }
+.icon-heart::before   { content: "\2764"; color: #e74c3c; }
+.icon-check::before   { content: "\2713"; color: #27ae60; }
+.icon-cross::before   { content: "\2717"; color: #c0392b; }
+.icon-arrow::before   { content: "\2192"; color: #3498db; }
+.icon-bullet::before  { content: "\2022"; color: #8e44ad; }
+.icon-music::before   { content: "\266B"; color: #e67e22; }
+.icon-sun::before     { content: "\2600"; color: #f1c40f; }
+.icon-copy::before    { content: "\00A9"; color: #95a5a6; }
+
+/* Test: Font Awesome Private Use Area codepoints
+   These won't render as icons without FA font, but the
+   UTF-8 encoding in the content string must be correct. */
+.fa-user::before      { content: "\f007"; }
+.fa-home::before      { content: "\f015"; }
+.fa-search::before    { content: "\f002"; }
+.fa-cog::before       { content: "\f013"; }
+.fa-envelope::before  { content: "\f0e0"; }
+
+/* Fallback style for PUA icons without FA font loaded */
+.fa-icon {
+    display: inline-block;
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* FA icon content definitions (matching real FA icon definitions) */
+.fa-user::before    { content: "\f007"; }
+.fa-house::before   { content: "\f015"; }
+.fa-magnifying-glass::before { content: "\f002"; }
+.fa-gear::before    { content: "\f013"; }
+.fa-envelope::before { content: "\f0e0"; }
+.fa-heart::before   { content: "\f004"; }
+.fa-star::before    { content: "\f005"; }
+.fa-check::before   { content: "\f00c"; }
+.fa-xmark::before   { content: "\f00d"; }
+.fa-bell::before    { content: "\f0f3"; }
+
+/* ===========================================================
+   Test 2: @font-face with font-weight descriptor
+   (Will only render if fa-solid-900.ttf is present)
+   =========================================================== */
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    font-style: normal;
+    font-weight: 900;
+    src: url("fonts/fa-solid-900.woff2") format("woff2"),
+         url("fonts/fa-solid-900.ttf") format("truetype");
+}
+
+/* Matches real FA CSS: .fas, .fa-solid set font-family + weight on element */
+.fa-solid {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-style: normal;
+    display: inline-block;
+    font-size: 20px;
+    line-height: 1;
+    text-rendering: auto;
+}
+
+/* ===========================================================
+   Test 3: ::after pseudo-element with Unicode content
+   =========================================================== */
+.badge-new::after {
+    content: " \2605 NEW";
+    font-size: 10px;
+    color: white;
+    background: #e74c3c;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 8px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* ===========================================================
+   Test 4: Multiple Unicode characters in one content
+   =========================================================== */
+.rating::before {
+    content: "\2605\2605\2605\2605\2606";
+    color: #f39c12;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+/* ===========================================================
+   Test 5: SMP (4-byte UTF-8) emoji via CSS content
+   =========================================================== */
+.emoji-smile::before  { content: "\1F600"; font-size: 24px; }
+.emoji-rocket::before { content: "\1F680"; font-size: 24px; }
+.emoji-fire::before   { content: "\1F525"; font-size: 24px; }
+
+/* ===========================================================
+   Result summary section
+   =========================================================== */
+.results {
+    margin-top: 24px;
+    padding: 16px;
+    background: #eaf7ea;
+    border: 1px solid #b7e4b7;
+    border-radius: 8px;
+}
+
+.results h2 {
+    color: #27ae60;
+    border-bottom-color: #b7e4b7;
+}
+
+.pass { color: #27ae60; }
+.warn { color: #f39c12; }
+</style>
+</head>
+<body>
+
+<h2>Test 1: Unicode Escape in ::before (BMP)</h2>
+<div class="test-row">
+    <span class="test-label">U+2605 BLACK STAR</span>
+    <span class="test-value"><span class="icon-star"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+2764 HEAVY BLACK HEART</span>
+    <span class="test-value"><span class="icon-heart"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+2713 CHECK MARK</span>
+    <span class="test-value"><span class="icon-check"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+2717 BALLOT X</span>
+    <span class="test-value"><span class="icon-cross"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+2192 RIGHTWARDS ARROW</span>
+    <span class="test-value"><span class="icon-arrow"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+2022 BULLET</span>
+    <span class="test-value"><span class="icon-bullet"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+266B BEAMED EIGHTH NOTES</span>
+    <span class="test-value"><span class="icon-music"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+2600 BLACK SUN</span>
+    <span class="test-value"><span class="icon-sun"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+00A9 COPYRIGHT</span>
+    <span class="test-value"><span class="icon-copy"></span></span>
+</div>
+
+<h2>Test 2: Font Awesome Solid Icons (with @font-face)</h2>
+<div class="test-row">
+    <span class="test-label">fa-user (U+F007)</span>
+    <span class="test-value"><span class="fa-solid fa-user"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-house (U+F015)</span>
+    <span class="test-value"><span class="fa-solid fa-house"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-magnifying-glass (U+F002)</span>
+    <span class="test-value"><span class="fa-solid fa-magnifying-glass"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-gear (U+F013)</span>
+    <span class="test-value"><span class="fa-solid fa-gear"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-envelope (U+F0E0)</span>
+    <span class="test-value"><span class="fa-solid fa-envelope"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-heart (U+F004)</span>
+    <span class="test-value"><span class="fa-solid fa-heart"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-star (U+F005)</span>
+    <span class="test-value"><span class="fa-solid fa-star"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-check (U+F00C)</span>
+    <span class="test-value"><span class="fa-solid fa-check"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-xmark (U+F00D)</span>
+    <span class="test-value"><span class="fa-solid fa-xmark"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">fa-bell (U+F0F3)</span>
+    <span class="test-value"><span class="fa-solid fa-bell"></span></span>
+</div>
+
+<h2>Test 3: ::after with Unicode + Text</h2>
+<div class="test-row">
+    <span class="test-label">Badge with star + NEW</span>
+    <span class="test-value"><span class="badge-new">Feature</span></span>
+</div>
+
+<h2>Test 4: Multiple Unicode in One Content</h2>
+<div class="test-row">
+    <span class="test-label">5-star rating (4 filled + 1 empty)</span>
+    <span class="test-value"><span class="rating"></span></span>
+</div>
+
+<h2>Test 5: SMP Emoji (4-byte UTF-8)</h2>
+<div class="test-row">
+    <span class="test-label">U+1F600 Grinning Face</span>
+    <span class="test-value"><span class="emoji-smile"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+1F680 Rocket</span>
+    <span class="test-value"><span class="emoji-rocket"></span></span>
+</div>
+<div class="test-row">
+    <span class="test-label">U+1F525 Fire</span>
+    <span class="test-value"><span class="emoji-fire"></span></span>
+</div>
+
+<div class="results">
+    <h2>Expected Results</h2>
+    <p class="pass">Test 1: Each row should show the corresponding Unicode symbol (star, heart, check, etc.)</p>
+    <p class="pass">Test 2: FA icons should render as recognizable icons (user, house, gear, heart, etc.)</p>
+    <p class="pass">Test 3: "Feature" text should be followed by a red badge "★ NEW"</p>
+    <p class="pass">Test 4: Should show ★★★★☆ (4 filled stars + 1 empty star)</p>
+    <p class="warn">Test 5: Emoji may show as boxes if system font lacks emoji glyphs — encoding is still correct</p>
+</div>
+
+</body>
+</html>

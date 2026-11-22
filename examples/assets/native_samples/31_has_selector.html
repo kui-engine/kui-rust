@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; }
+    .code { background: #0f172a; padding: 10px 14px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #10b981; margin-bottom: 12px; }
+
+    /* :has() — descendant */
+    .card { padding: 16px; background: #334155; border-radius: 8px; margin-bottom: 8px; border: 2px solid transparent; }
+    .card:has(.highlight) { border-color: #f59e0b; background: #1c2333; }
+    .highlight { color: #f59e0b; font-weight: bold; }
+
+    /* :has() — direct child > */
+    .list-item { padding: 8px 12px; background: #334155; border-radius: 4px; margin-bottom: 4px; font-size: 13px; }
+    .list-item:has(> .badge) { background: #1e3a5f; border-left: 3px solid #3b82f6; }
+    .badge { display: inline-block; padding: 1px 8px; background: #3b82f6; border-radius: 10px; font-size: 10px; color: white; margin-left: 8px; }
+
+    /* :has() — adjacent sibling + */
+    .field-label { font-size: 12px; color: #94a3b8; margin-bottom: 2px; }
+    .field-label:has(+ .required) { color: #ef4444; font-weight: bold; }
+    .required { border: 1px solid #ef4444; }
+    .optional { border: 1px solid #475569; }
+    .field-input { padding: 6px 10px; background: #0f172a; border-radius: 4px; font-size: 13px; color: #e2e8f0; margin-bottom: 10px; }
+
+    /* :has() — general sibling ~ */
+    .step { padding: 10px 14px; background: #334155; border-radius: 6px; margin-bottom: 4px; font-size: 13px; }
+    .step:has(~ .active) { opacity: 0.5; }
+    .active { background: #10b981; color: white; font-weight: bold; }
+</style>
+</head>
+<body>
+    <h2>:has() Pseudo-Class Selector</h2>
+
+    <h3>Descendant :has(.highlight)</h3>
+    <div class="section">
+        <div class="code">.card:has(.highlight) { border-color: #f59e0b; }</div>
+        <div class="card">
+            <div style="font-size: 14px; font-weight: 600;">Normal Card</div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">No highlighted content inside</div>
+        </div>
+        <div class="card">
+            <div style="font-size: 14px; font-weight: 600;">Featured Card</div>
+            <div style="font-size: 12px; margin-top: 4px;">This card has a <span class="highlight">highlighted</span> element</div>
+        </div>
+        <div class="card">
+            <div style="font-size: 14px; font-weight: 600;">Another Normal Card</div>
+            <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Plain content only</div>
+        </div>
+    </div>
+
+    <h3>Direct Child :has(&gt; .badge)</h3>
+    <div class="section">
+        <div class="code">.list-item:has(&gt; .badge) { background: #1e3a5f; }</div>
+        <div class="list-item">Normal item</div>
+        <div class="list-item">Item with <span class="badge">NEW</span></div>
+        <div class="list-item">Another normal item</div>
+        <div class="list-item">Premium item <span class="badge">PRO</span></div>
+    </div>
+
+    <h3>Adjacent Sibling :has(+ .required)</h3>
+    <div class="section">
+        <div class="code">.field-label:has(+ .required) { color: #ef4444; }</div>
+        <div class="field-label">Username</div>
+        <div class="field-input required">alice_dev</div>
+        <div class="field-label">Email</div>
+        <div class="field-input required">alice@example.com</div>
+        <div class="field-label">Nickname</div>
+        <div class="field-input optional">Alice</div>
+    </div>
+
+    <h3>General Sibling :has(~ .active)</h3>
+    <div class="section">
+        <div class="code">.step:has(~ .active) { opacity: 0.5; }</div>
+        <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Steps before the active step are dimmed:</div>
+        <div class="step">Step 1: Setup</div>
+        <div class="step">Step 2: Configure</div>
+        <div class="step active">Step 3: Build (active)</div>
+        <div class="step">Step 4: Deploy</div>
+    </div>
+</body>
+</html>

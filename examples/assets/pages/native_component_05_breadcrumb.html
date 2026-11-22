@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.bc{display:flex;align-items:center;gap:8px;font-size:14px}
+.bc .sep{color:#cbd5e1}
+.bc .link{color:#3b82f6;text-decoration:none;cursor:pointer}
+.bc .link:hover{text-decoration:underline}
+.bc .cur{color:#1e293b;font-weight:600}
+.pill{display:flex;align-items:center;gap:4px;background:#f1f5f9;padding:6px 12px;border-radius:20px;font-size:13px}
+.pill .link{color:#3b82f6;text-decoration:none;cursor:pointer}.pill .sep{color:#cbd5e1;margin:0 2px}
+.pill .cur{color:#1e293b;font-weight:600;background:white;padding:4px 12px;border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.status{margin-top:12px;padding:12px;background:#f1f5f9;border-radius:8px;font-size:13px;color:#475569}
+</style></head><body>
+<h2>Breadcrumb</h2>
+<div class="card"><h3>Standard</h3>
+<div class="bc"><span class="link" id="bc0">Home</span><span class="sep">/</span><span class="link" id="bc1">Products</span><span class="sep">/</span><span class="link" id="bc2">Electronics</span><span class="sep">/</span><span class="cur">Headphones</span></div></div>
+<div class="card"><h3>Arrow</h3>
+<div class="bc"><span class="link" id="bc3">Dashboard</span><span class="sep">›</span><span class="link" id="bc4">Projects</span><span class="sep">›</span><span class="cur">Settings</span></div></div>
+<div class="card"><h3>Pill</h3>
+<div class="pill"><span class="link" id="bc5">Home</span><span class="sep">›</span><span class="link" id="bc6">Docs</span><span class="sep">›</span><span class="cur">Window</span></div></div>
+<div class="status" id="status">Click a breadcrumb link to navigate.</div>
+</body></html>

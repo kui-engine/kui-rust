@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",sans-serif;background:#0f172a;color:#f8fafc}
+.app{display:grid;grid-template-columns:200px 1fr;grid-template-rows:56px 1fr;height:100vh}
+.hdr{grid-column:1/-1;background:#0f172a;border-bottom:1px solid #1e293b;display:flex;align-items:center;padding:0 20px;gap:16px}
+.hdr .logo{font-size:18px;font-weight:700;color:#3b82f6}.hdr .search{flex:1;max-width:360px;padding:8px 16px;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#94a3b8;font-size:13px}
+.hdr .av{width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;margin-left:auto}
+.sb{background:#0f172a;border-right:1px solid #1e293b;padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+.sb .it{padding:10px 14px;border-radius:8px;font-size:13px;color:#94a3b8;cursor:pointer}.sb .it.a{background:#1e293b;color:#f8fafc;font-weight:600}
+.sb .it:hover{background:#1e293b;color:#f8fafc}
+.mn{padding:20px;overflow-y:auto}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.cd{background:#1e293b;border-radius:12px;padding:18px}
+.cd .val{font-size:28px;font-weight:700}.cd .lbl{font-size:12px;color:#64748b;margin-top:2px}
+.cd .chg{font-size:12px;margin-top:8px;font-weight:600}
+.up{color:#10b981}.down{color:#ef4444}
+.cd .bar{height:4px;background:#334155;border-radius:2px;margin-top:8px}.cd .bar .f{height:100%;border-radius:2px}
+.chart{background:#1e293b;border-radius:12px;padding:20px;margin-bottom:20px}
+.chart h3{font-size:14px;margin-bottom:12px;color:#e2e8f0}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding-top:8px}
+.chart-bar{flex:1;border-radius:4px 4px 0 0;min-width:0;position:relative}
+.chart-bar .tip{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#94a3b8}
+.tbl{background:#1e293b;border-radius:12px;overflow:hidden}
+.tbl h3{font-size:14px;padding:16px 20px;border-bottom:1px solid #334155;color:#e2e8f0}
+.tbl table{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:10px 20px;color:#64748b;font-weight:600;border-bottom:1px solid #334155}
+.tbl td{padding:10px 20px;border-bottom:1px solid rgba(255,255,255,.03);color:#94a3b8}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.bg{background:#dcfce7;color:#166534}.by{background:#fef3c7;color:#92400e}.br{background:#fee2e2;color:#991b1b}
+</style></head><body>
+<div class="app">
+<div class="hdr"><div class="logo">KUI Dashboard</div><div class="search">Search...</div><div class="av">U</div></div>
+<div class="sb"><div class="it a">Overview</div><div class="it">Analytics</div><div class="it">Customers</div><div class="it">Products</div><div class="it">Orders</div><div class="it">Settings</div></div>
+<div class="mn">
+<div class="cards">
+<div class="cd"><div class="val">$48.2K</div><div class="lbl">Revenue</div><div class="chg up">+12.5%</div><div class="bar"><div class="f" style="width:85%;background:#10b981"></div></div></div>
+<div class="cd"><div class="val">2,847</div><div class="lbl">Users</div><div class="chg up">+8.2%</div><div class="bar"><div class="f" style="width:72%;background:#3b82f6"></div></div></div>
+<div class="cd"><div class="val">1,234</div><div class="lbl">Orders</div><div class="chg down">-3.1%</div><div class="bar"><div class="f" style="width:56%;background:#f59e0b"></div></div></div>
+<div class="cd"><div class="val">98.5%</div><div class="lbl">Uptime</div><div class="chg up">+0.3%</div><div class="bar"><div class="f" style="width:98%;background:#8b5cf6"></div></div></div>
+</div>
+<div class="chart"><h3>Monthly Revenue</h3>
+<div class="chart-bars">
+<div class="chart-bar" style="height:45%;background:#3b82f6"><div class="tip">$22K</div></div>
+<div class="chart-bar" style="height:62%;background:#3b82f6"><div class="tip">$31K</div></div>
+<div class="chart-bar" style="height:38%;background:#3b82f6"><div class="tip">$19K</div></div>
+<div class="chart-bar" style="height:75%;background:#3b82f6"><div class="tip">$38K</div></div>
+<div class="chart-bar" style="height:58%;background:#3b82f6"><div class="tip">$29K</div></div>
+<div class="chart-bar" style="height:82%;background:#3b82f6"><div class="tip">$41K</div></div>
+<div class="chart-bar" style="height:90%;background:#10b981"><div class="tip">$45K</div></div>
+<div class="chart-bar" style="height:96%;background:#10b981"><div class="tip">$48K</div></div>
+</div></div>
+<div class="tbl"><h3>Recent Orders</h3>
+<table><tr><th>ID</th><th>Customer</th><th>Amount</th><th>Status</th></tr>
+<tr><td>#1234</td><td>Alice Liu</td><td>$299</td><td><span class="badge bg">Completed</span></td></tr>
+<tr><td>#1233</td><td>Bob Kim</td><td>$149</td><td><span class="badge by">Pending</span></td></tr>
+<tr><td>#1232</td><td>Carol Wang</td><td>$599</td><td><span class="badge bg">Completed</span></td></tr>
+<tr><td>#1231</td><td>Dave Miller</td><td>$89</td><td><span class="badge br">Cancelled</span></td></tr>
+</table></div>
+</div></div>
+</body></html>

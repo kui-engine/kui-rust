@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.bar{height:36px;border-radius:6px;display:flex;align-items:center;padding:0 12px;font-size:12px;font-weight:600;color:white;margin-bottom:6px}
+.pair{display:flex;gap:8px;margin-bottom:8px}
+.pair .box{border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:600;padding:16px 8px}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+</style></head><body>
+<h2>Percentage Sizing</h2>
+<div class="card"><h3>Width Percentages</h3>
+<div class="bar" style="width:100%;background:#3b82f6">100%</div>
+<div class="bar" style="width:75%;background:#60a5fa">75%</div>
+<div class="bar" style="width:50%;background:#93c5fd;color:#1e40af">50%</div>
+<div class="bar" style="width:25%;background:#dbeafe;color:#1e40af">25%</div>
+<div class="info">Width % resolves against parent's content width</div></div>
+<div class="card"><h3>Column Splits</h3>
+<div class="pair">
+<div class="box" style="width:30%;background:#10b981">30%</div>
+<div class="box" style="width:70%;background:#059669">70%</div></div>
+<div class="pair">
+<div class="box" style="width:25%;background:#f59e0b">25%</div>
+<div class="box" style="width:50%;background:#d97706">50%</div>
+<div class="box" style="width:25%;background:#f59e0b">25%</div></div>
+<div class="info">Percentage widths create fluid layouts</div></div>
+</body></html>

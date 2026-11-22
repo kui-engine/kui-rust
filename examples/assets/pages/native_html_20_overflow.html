@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { margin-bottom: 16px; color: #1e293b; }
+.row { display: flex; gap: 16px; margin-bottom: 16px; }
+.box { width: 200px; height: 150px; background: white; border-radius: 8px; padding: 12px;
+       box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-size: 14px; color: #475569; }
+.box h3 { font-size: 13px; color: #1e293b; margin-bottom: 8px; }
+.overflow-hidden { overflow: hidden; }
+.overflow-scroll { overflow: scroll; }
+.overflow-auto { overflow: auto; }
+.clip-box { overflow: hidden; border-radius: 50%; width: 150px; height: 150px; }
+.clip-box div { width: 200px; height: 200px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+.long-text { width: 200px; }
+</style></head><body>
+<h2>Overflow &amp; Clipping</h2>
+<div class="row">
+  <div class="box overflow-hidden">
+    <h3>overflow: hidden</h3>
+    <p>This text is long enough to overflow the container and will be clipped without scrollbars. Extra content here to make it overflow properly.</p>
+  </div>
+  <div class="box overflow-scroll">
+    <h3>overflow: scroll</h3>
+    <p>This container always shows scrollbars. The content extends beyond the visible area. Scroll down to see more content that is hidden.</p>
+  </div>
+  <div class="box overflow-auto">
+    <h3>overflow: auto</h3>
+    <p>Shows scrollbars only when content overflows. This text is long enough to trigger the scrollbar appearance in this container.</p>
+  </div>
+  <div class="clip-box"><div></div></div>
+</div>
+</body></html>

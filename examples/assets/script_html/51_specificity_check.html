@@ -1,0 +1,44 @@
+<html><body>
+<style>
+div { font-size: 10px; }
+.cls { font-size: 14px; }
+#myid { font-size: 18px; }
+div.cls#myid { font-size: 22px; }
+</style>
+<div id="myid" class="cls">Test</div>
+<div id="plain">Plain div</div>
+<div id="clsonly" class="cls">Class only</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test CSS specificity ordering
+local ok = true
+local detail = ""
+
+-- div.cls#myid has highest specificity (0,1,1,1)
+local el = document:getElementById("myid")
+local cs = document:getComputedStyle(el)
+local fs = cs:getPropertyValue("font-size")
+detail = detail .. "myid=" .. fs .. "; "
+ok = ok and (fs == "22px")
+
+-- plain div: only element selector
+local plain = document:getElementById("plain")
+local pcs = document:getComputedStyle(plain)
+local pfs = pcs:getPropertyValue("font-size")
+detail = detail .. "plain=" .. pfs .. "; "
+ok = ok and (pfs == "10px")
+
+-- class only: .cls wins over div
+local cls = document:getElementById("clsonly")
+local ccs = document:getComputedStyle(cls)
+local cfs = ccs:getPropertyValue("font-size")
+detail = detail .. "cls=" .. cfs .. "; "
+ok = ok and (cfs == "14px")
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

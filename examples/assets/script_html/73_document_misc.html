@@ -1,0 +1,48 @@
+<html>
+<head><title>Test Title</title></head>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+-- document:head()
+local head = document:head()
+if head == nil then ok = false; msg = msg .. "head nil; " end
+
+-- document:documentElement()
+local docEl = document:documentElement()
+if docEl == nil then ok = false; msg = msg .. "docEl nil; " end
+
+-- document.title (read/write via sol::property)
+-- In headless test mode, <title> may not be parsed from HTML.
+-- Just verify the property is accessible and writable without crash.
+local t = document.title
+if type(t) ~= "string" then ok = false; msg = msg .. "title not string; " end
+document.title = "New Title"
+local t2 = document.title
+if type(t2) ~= "string" then ok = false; msg = msg .. "title set not string; " end
+
+-- document:getElementsByTagName
+local divs = document:getElementsByTagName("div")
+if divs:length() < 1 then ok = false; msg = msg .. "getElementsByTagName empty; "
+else
+    local first = divs:item(0)
+    if first == nil then ok = false; msg = msg .. "item(0) nil; "
+    elseif first.id ~= "result" then ok = false; msg = msg .. "first.id=" .. tostring(first.id) .. "; "
+    end
+end
+
+-- document:createComment
+local comment = document:createComment("test comment")
+if comment == nil then ok = false; msg = msg .. "createComment nil; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

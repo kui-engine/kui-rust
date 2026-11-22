@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 22px; color: #38bdf8; margin-bottom: 16px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 20px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; align-items: flex-start; }
+    .box { width: 100px; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: white; }
+    .label { font-size: 10px; color: #64748b; margin-top: 4px; text-align: center; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: bold; margin-right: 4px; }
+    .tag-new { background: #10b981; color: white; }
+
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    @keyframes slide { from { transform: translateX(0); } to { transform: translateX(200px); } }
+
+    @supports (display: flex) {
+        .feat-flex { display: flex; gap: 8px; }
+    }
+</style>
+</head>
+<body>
+    <h2>All New Features Showcase</h2>
+    <div style="font-size: 12px; color: #64748b; margin-bottom: 20px;">Comprehensive demo of all newly implemented CSS features in KUI engine</div>
+
+    <!-- 1. text-shadow -->
+    <h3><span class="tag tag-new">NEW</span> text-shadow</h3>
+    <div class="section">
+        <div class="row">
+            <div style="font-size: 24px; text-shadow: 2px 2px 4px #000;">Drop Shadow</div>
+            <div style="font-size: 24px; color: #3b82f6; text-shadow: 0 0 12px #3b82f6;">Neon Glow</div>
+            <div style="font-size: 24px; text-shadow: 3px 3px 0 #ef4444;">Hard Offset</div>
+        </div>
+    </div>
+
+    <!-- 2. aspect-ratio -->
+    <h3><span class="tag tag-new">NEW</span> aspect-ratio</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div style="width: 100px; aspect-ratio: 1; background: #3b82f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px;">1:1</div>
+                <div class="label">square</div>
+            </div>
+            <div>
+                <div style="width: 140px; aspect-ratio: 16 / 9; background: #8b5cf6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px;">16:9</div>
+                <div class="label">widescreen</div>
+            </div>
+            <div>
+                <div style="width: 90px; aspect-ratio: 3 / 4; background: #10b981; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px;">3:4</div>
+                <div class="label">portrait</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. filter + clip-path -->
+    <h3><span class="tag tag-new">NEW</span> filter &amp; clip-path</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="box" style="background: linear-gradient(135deg, #3b82f6, #ec4899); filter: blur(2px);">blur</div>
+                <div class="label">filter: blur(2px)</div>
+            </div>
+            <div>
+                <div class="box" style="background: linear-gradient(135deg, #3b82f6, #ec4899); clip-path: circle(50%);">circle</div>
+                <div class="label">clip-path: circle</div>
+            </div>
+            <div>
+                <div class="box" style="background: linear-gradient(135deg, #3b82f6, #ec4899); clip-path: polygon(50% 0%, 100% 100%, 0% 100%);">tri</div>
+                <div class="label">clip-path: polygon</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. backdrop-filter -->
+    <h3><span class="tag tag-new">NEW</span> backdrop-filter</h3>
+    <div class="section">
+        <div style="position: relative; height: 100px; background: linear-gradient(to right, #ef4444, #3b82f6, #10b981); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <div style="backdrop-filter: blur(6px); background: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 6px; font-size: 13px;">Frosted Glass Effect</div>
+        </div>
+    </div>
+
+    <!-- 5. conic + repeating gradients -->
+    <h3><span class="tag tag-new">NEW</span> conic-gradient &amp; repeating gradients</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="box" style="background: conic-gradient(#ef4444, #f59e0b, #10b981, #3b82f6, #ef4444); border-radius: 50%;"></div>
+                <div class="label">conic wheel</div>
+            </div>
+            <div>
+                <div class="box" style="background: conic-gradient(from 90deg, #3b82f6, #8b5cf6);"></div>
+                <div class="label">conic from 90deg</div>
+            </div>
+            <div>
+                <div class="box" style="background: repeating-linear-gradient(45deg, #3b82f6 0%, #3b82f6 10%, #1e293b 10%, #1e293b 20%);"></div>
+                <div class="label">repeating-linear</div>
+            </div>
+            <div>
+                <div class="box" style="background: repeating-radial-gradient(#8b5cf6 0%, #8b5cf6 8%, #1e293b 8%, #1e293b 16%);"></div>
+                <div class="label">repeating-radial</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. @supports -->
+    <h3><span class="tag tag-new">NEW</span> @supports</h3>
+    <div class="section">
+        <div class="feat-flex">
+            <div style="background: #10b981; padding: 6px 12px; border-radius: 4px; font-size: 12px; color: white;">@supports works!</div>
+            <div style="background: #3b82f6; padding: 6px 12px; border-radius: 4px; font-size: 12px; color: white;">Flex inside @supports</div>
+        </div>
+    </div>
+
+    <!-- 7. CSS counters -->
+    <h3><span class="tag tag-new">NEW</span> CSS counters</h3>
+    <div class="section">
+        <div style="counter-reset: item;">
+            <div style="counter-increment: item; padding: 6px 10px; background: #334155; margin-bottom: 3px; border-radius: 4px; font-size: 12px;">counter-reset: item</div>
+            <div style="counter-increment: item; padding: 6px 10px; background: #334155; margin-bottom: 3px; border-radius: 4px; font-size: 12px;">counter-increment: item</div>
+            <div style="counter-increment: item; padding: 6px 10px; background: #334155; border-radius: 4px; font-size: 12px;">counter-increment: item</div>
+        </div>
+    </div>
+
+    <!-- 8. cubic-bezier / steps -->
+    <h3><span class="tag tag-new">NEW</span> cubic-bezier() &amp; steps()</h3>
+    <div class="section">
+        <div style="width: 50px; height: 24px; background: #ec4899; border-radius: 4px; animation: slide 2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite alternate; display: flex; align-items: center; justify-content: center; font-size: 9px;">bounce</div>
+        <div style="height: 6px;"></div>
+        <div style="width: 50px; height: 24px; background: #06b6d4; border-radius: 4px; animation: slide 2s steps(6) infinite alternate; display: flex; align-items: center; justify-content: center; font-size: 9px;">steps</div>
+    </div>
+
+    <!-- 9. skewX / skewY / matrix -->
+    <h3><span class="tag tag-new">NEW</span> skewX / skewY / matrix()</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="box" style="background: #f59e0b; transform: skewX(15deg); width: 80px; height: 60px;">skewX</div>
+                <div class="label">skewX(15deg)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #ef4444; transform: skewY(10deg); width: 80px; height: 60px;">skewY</div>
+                <div class="label">skewY(10deg)</div>
+            </div>
+            <div>
+                <div class="box" style="background: #10b981; transform: matrix(1, 0.2, -0.2, 1, 0, 0); width: 80px; height: 60px;">matrix</div>
+                <div class="label">matrix()</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 10. resize / direction -->
+    <h3><span class="tag tag-new">NEW</span> resize &amp; direction</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div style="width: 160px; height: 70px; background: #334155; border: 1px solid #475569; border-radius: 6px; resize: both; overflow: auto; padding: 8px; font-size: 11px;">resize: both</div>
+                <div class="label">drag corner to resize</div>
+            </div>
+            <div>
+                <div style="width: 160px; background: #334155; padding: 8px; border-radius: 6px; direction: rtl; font-size: 12px;">RTL text direction</div>
+                <div class="label">direction: rtl</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 11. calc functions -->
+    <h3><span class="tag tag-new">NEW</span> calc() / min() / max() / clamp()</h3>
+    <div class="section">
+        <div style="width: calc(100% - 60px); height: 28px; background: #3b82f6; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; margin-bottom: 6px;">calc(100% - 60px)</div>
+        <div style="width: min(300px, 80%); height: 28px; background: #8b5cf6; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; margin-bottom: 6px;">min(300px, 80%)</div>
+        <div style="width: clamp(100px, 50%, 350px); height: 28px; background: #10b981; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 11px;">clamp(100px, 50%, 350px)</div>
+    </div>
+
+    <!-- 12. mix-blend-mode -->
+    <h3><span class="tag tag-new">NEW</span> mix-blend-mode</h3>
+    <div class="section">
+        <div style="position: relative; height: 70px; background: linear-gradient(to right, #3b82f6, #ec4899); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <div style="font-size: 28px; font-weight: 900; color: white; mix-blend-mode: overlay;">BLEND</div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <div style="flex: 1; height: 40px; background: #f59e0b; mix-blend-mode: multiply; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px;">multiply</div>
+            <div style="flex: 1; height: 40px; background: #f59e0b; mix-blend-mode: screen; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px;">screen</div>
+            <div style="flex: 1; height: 40px; background: #f59e0b; mix-blend-mode: difference; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px;">difference</div>
+        </div>
+    </div>
+
+    <!-- 13. :has() selector -->
+    <h3><span class="tag tag-new">NEW</span> :has() pseudo-class</h3>
+    <div class="section">
+        <style>
+            .has-card { padding: 10px; background: #334155; border-radius: 6px; margin-bottom: 4px; border: 2px solid transparent; font-size: 12px; }
+            .has-card:has(.has-star) { border-color: #f59e0b; background: #1c2333; }
+            .has-star { color: #f59e0b; font-weight: bold; }
+        </style>
+        <div class="has-card">Normal card — no star</div>
+        <div class="has-card">Featured card — <span class="has-star">starred</span></div>
+        <div class="has-card">Another normal card</div>
+    </div>
+
+    <!-- 14. @font-face -->
+    <h3><span class="tag tag-new">NEW</span> @font-face</h3>
+    <div class="section">
+        <div style="font-size: 12px; color: #94a3b8; line-height: 1.6;">
+            @font-face rule parsing is now supported. Custom fonts can be declared with font-family and src descriptors.
+            The engine parses url() sources and makes them available via the font loading API.
+        </div>
+        <div style="margin-top: 8px; background: #0f172a; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 11px; color: #10b981;">@font-face { font-family: "Custom"; src: url("font.woff2"); }</div>
+    </div>
+
+    <!-- 15. content: counter() -->
+    <h3><span class="tag tag-new">NEW</span> content: counter()</h3>
+    <div class="section">
+        <style>
+            .auto-list { counter-reset: item; }
+            .auto-item { counter-increment: item; padding: 6px 10px; background: #334155; margin-bottom: 3px; border-radius: 4px; font-size: 12px; }
+            .auto-item::before { content: counter(item); color: #3b82f6; font-weight: bold; margin-right: 8px; }
+        </style>
+        <div class="auto-list">
+            <div class="auto-item">Auto-numbered via counter()</div>
+            <div class="auto-item">Second item</div>
+            <div class="auto-item">Third item</div>
+        </div>
+    </div>
+
+    <!-- 16. Multi-column layout -->
+    <h3><span class="tag tag-new">NEW</span> Multi-column layout</h3>
+    <div class="section">
+        <div style="column-count: 2; column-gap: 20px; font-size: 12px; line-height: 1.5; color: #94a3b8;">
+            Multi-column layout allows content to flow across multiple columns automatically.
+            This is useful for text-heavy content, creating newspaper-style layouts.
+            Column count, width, gap, and decorative rules are all configurable.
+            The browser balances content across columns for even distribution.
+        </div>
+    </div>
+
+    <!-- 17. writing-mode -->
+    <h3><span class="tag tag-new">NEW</span> writing-mode</h3>
+    <div class="section">
+        <div style="display: flex; gap: 12px; align-items: stretch;">
+            <div style="writing-mode: vertical-rl; background: #3b82f6; color: white; padding: 8px 6px; border-radius: 6px; font-size: 12px; font-weight: bold;">vertical-rl</div>
+            <div style="flex: 1; font-size: 12px; color: #94a3b8; line-height: 1.6;">
+                The writing-mode property controls text direction. vertical-rl flows top-to-bottom
+                with columns right-to-left (traditional CJK). vertical-lr is similar but columns go left-to-right.
+            </div>
+            <div style="writing-mode: vertical-lr; background: #8b5cf6; color: white; padding: 8px 6px; border-radius: 6px; font-size: 12px; font-weight: bold;">vertical-lr</div>
+        </div>
+    </div>
+
+    <!-- 18. 3D Transforms -->
+    <h3><span class="tag tag-new">NEW</span> 3D transforms</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div style="perspective: 400px; width: 100px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                    <div class="box" style="background: #3b82f6; transform: rotateY(30deg);">rotY</div>
+                </div>
+                <div class="label">rotateY(30)</div>
+            </div>
+            <div>
+                <div style="perspective: 400px; width: 100px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                    <div class="box" style="background: #ec4899; transform: rotateX(30deg);">rotX</div>
+                </div>
+                <div class="label">rotateX(30)</div>
+            </div>
+            <div>
+                <div style="perspective: 400px; width: 100px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                    <div class="box" style="background: #10b981; transform: rotateX(15deg) rotateY(25deg);">XY</div>
+                </div>
+                <div class="label">combined 3D</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 24px; text-align: center; color: #475569; font-size: 11px;">
+        KUI Engine — All new CSS features verified
+    </div>
+</body>
+</html>

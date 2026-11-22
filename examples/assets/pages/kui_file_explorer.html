@@ -1,0 +1,200 @@
+<!doctype html><html><head><style>
+:root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-hover: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent: #38bdf8;
+    --border: #334155;
+}
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+.app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    grid-template-rows: 48px 1fr;
+    height: 100vh;
+}
+
+/* Toolbar */
+.toolbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+}
+
+.toolbar .title {
+    font-weight: bold;
+    font-size: 15px;
+    color: var(--accent);
+    margin-right: 16px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.breadcrumb .seg {
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.breadcrumb .seg:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.breadcrumb .sep {
+    color: var(--text-secondary);
+}
+
+/* Sidebar */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    overflow: auto;
+    padding: 8px 0;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 16px;
+    cursor: pointer;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.sidebar-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.sidebar-item.active {
+    background: rgba(56, 189, 248, 0.1);
+    color: var(--accent);
+}
+
+.sidebar-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-section {
+    padding: 8px 16px 4px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+}
+
+/* File grid */
+.file-area {
+    padding: 16px;
+    overflow: auto;
+}
+
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.file-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    gap: 6px;
+}
+
+.file-item:hover {
+    background: var(--bg-hover);
+}
+
+.file-icon {
+    font-size: 32px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-icon.folder { color: #fbbf24; }
+.file-icon.file   { color: #64748b; }
+.file-icon.image  { color: #a78bfa; }
+.file-icon.code   { color: #34d399; }
+.file-icon.doc    { color: #60a5fa; }
+
+.file-name {
+    font-size: 12px;
+    text-align: center;
+    color: var(--text-secondary);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 110px;
+}
+
+.file-item:hover .file-name {
+    color: var(--text-primary);
+}
+
+/* Status bar */
+.statusbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 24px;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Empty state */
+.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+</style></head><body>
+            <div class="app">
+                <div class="toolbar">
+                    <span class="title">File Explorer</span>
+                    <div class="breadcrumb" id="breadcrumb"></div>
+                </div>
+                <div class="sidebar" id="sidebar"></div>
+                <div class="file-area" id="file-area">
+                    <div class="file-grid" id="file-grid"></div>
+                </div>
+            </div>
+        </body></html>

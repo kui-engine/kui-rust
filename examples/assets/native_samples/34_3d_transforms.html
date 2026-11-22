@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; text-align: center; }
+    .code { background: #0f172a; padding: 10px 14px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #10b981; margin-bottom: 12px; }
+    .row { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; align-items: center; }
+
+    .scene {
+        width: 120px; height: 100px;
+        perspective: 400px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .card-3d {
+        width: 100px; height: 80px;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 600; color: white;
+    }
+
+    @keyframes spin-y { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+    @keyframes spin-x { from { transform: rotateX(0deg); } to { transform: rotateX(360deg); } }
+    @keyframes wobble-3d {
+        0%   { transform: rotateX(0deg) rotateY(0deg); }
+        25%  { transform: rotateX(15deg) rotateY(15deg); }
+        50%  { transform: rotateX(0deg) rotateY(30deg); }
+        75%  { transform: rotateX(-15deg) rotateY(15deg); }
+        100% { transform: rotateX(0deg) rotateY(0deg); }
+    }
+</style>
+</head>
+<body>
+    <h2>3D CSS Transforms</h2>
+
+    <h3>rotateX</h3>
+    <div class="section">
+        <div class="code">transform: rotateX(Ndeg); perspective: 400px;</div>
+        <div class="row">
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #3b82f6; transform: rotateX(0deg);">0deg</div>
+                </div>
+                <div class="label">rotateX(0)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #8b5cf6; transform: rotateX(30deg);">30deg</div>
+                </div>
+                <div class="label">rotateX(30)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #ec4899; transform: rotateX(45deg);">45deg</div>
+                </div>
+                <div class="label">rotateX(45)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #f59e0b; transform: rotateX(60deg);">60deg</div>
+                </div>
+                <div class="label">rotateX(60)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>rotateY</h3>
+    <div class="section">
+        <div class="code">transform: rotateY(Ndeg); perspective: 400px;</div>
+        <div class="row">
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #3b82f6; transform: rotateY(0deg);">0deg</div>
+                </div>
+                <div class="label">rotateY(0)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #22c55e; transform: rotateY(30deg);">30deg</div>
+                </div>
+                <div class="label">rotateY(30)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #ef4444; transform: rotateY(45deg);">45deg</div>
+                </div>
+                <div class="label">rotateY(45)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #06b6d4; transform: rotateY(60deg);">60deg</div>
+                </div>
+                <div class="label">rotateY(60)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>rotateZ</h3>
+    <div class="section">
+        <div class="code">transform: rotateZ(Ndeg);</div>
+        <div class="row">
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #d946ef; transform: rotateZ(15deg);">15deg</div>
+                </div>
+                <div class="label">rotateZ(15)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #84cc16; transform: rotateZ(45deg);">45deg</div>
+                </div>
+                <div class="label">rotateZ(45)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #f97316; transform: rotateZ(-30deg);">-30deg</div>
+                </div>
+                <div class="label">rotateZ(-30)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>translate3d &amp; translateZ</h3>
+    <div class="section">
+        <div class="code">transform: translate3d(x, y, z); perspective: 400px;</div>
+        <div class="row">
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #3b82f6; transform: translateZ(40px);">Z+40</div>
+                </div>
+                <div class="label">translateZ(40px) — closer</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #ef4444; transform: translateZ(-40px);">Z-40</div>
+                </div>
+                <div class="label">translateZ(-40px) — further</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: #10b981; transform: translate3d(10px, -10px, 30px);">3D</div>
+                </div>
+                <div class="label">translate3d(10, -10, 30)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Combined 3D Transforms</h3>
+    <div class="section">
+        <div class="code">transform: rotateX() rotateY() translateZ();</div>
+        <div class="row">
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); transform: rotateX(20deg) rotateY(20deg);">X+Y</div>
+                </div>
+                <div class="label">rotateX(20) rotateY(20)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: linear-gradient(135deg, #ec4899, #f59e0b); transform: rotateY(30deg) translateZ(20px);">Y+Z</div>
+                </div>
+                <div class="label">rotateY(30) translateZ(20)</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: linear-gradient(135deg, #10b981, #06b6d4); transform: rotateX(-15deg) rotateY(25deg) rotateZ(10deg);">XYZ</div>
+                </div>
+                <div class="label">rotateX(-15) Y(25) Z(10)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Perspective Comparison</h3>
+    <div class="section">
+        <div class="code">Different perspective values affect the intensity of the 3D effect</div>
+        <div class="row">
+            <div>
+                <div style="perspective: 200px; width: 120px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                    <div class="card-3d" style="background: #ef4444; transform: rotateY(40deg);">200px</div>
+                </div>
+                <div class="label">perspective: 200px (strong)</div>
+            </div>
+            <div>
+                <div style="perspective: 500px; width: 120px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                    <div class="card-3d" style="background: #f59e0b; transform: rotateY(40deg);">500px</div>
+                </div>
+                <div class="label">perspective: 500px (medium)</div>
+            </div>
+            <div>
+                <div style="perspective: 1000px; width: 120px; height: 100px; display: flex; align-items: center; justify-content: center;">
+                    <div class="card-3d" style="background: #22c55e; transform: rotateY(40deg);">1000px</div>
+                </div>
+                <div class="label">perspective: 1000px (subtle)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Animated 3D (rotateY spin)</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: linear-gradient(135deg, #3b82f6, #ec4899); animation: spin-y 3s linear infinite;">Spin Y</div>
+                </div>
+                <div class="label">rotateY 360 loop</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: linear-gradient(135deg, #10b981, #f59e0b); animation: spin-x 4s linear infinite;">Spin X</div>
+                </div>
+                <div class="label">rotateX 360 loop</div>
+            </div>
+            <div>
+                <div class="scene">
+                    <div class="card-3d" style="background: linear-gradient(135deg, #8b5cf6, #06b6d4); animation: wobble-3d 3s ease-in-out infinite;">Wobble</div>
+                </div>
+                <div class="label">wobble XY</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

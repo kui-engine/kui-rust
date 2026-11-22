@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 200px; }
+
+    /* Font sizes */
+    .fs-xs  { font-size: 10px; } .fs-sm  { font-size: 12px; } .fs-md  { font-size: 16px; }
+    .fs-lg  { font-size: 24px; } .fs-xl  { font-size: 32px; } .fs-xxl { font-size: 48px; }
+
+    /* Font weights */
+    .fw-100 { font-weight: 100; } .fw-300 { font-weight: 300; } .fw-400 { font-weight: 400; }
+    .fw-600 { font-weight: 600; } .fw-700 { font-weight: 700; } .fw-900 { font-weight: 900; }
+
+    /* Text decoration */
+    .td-under  { text-decoration: underline; }
+    .td-over   { text-decoration: overline; }
+    .td-through { text-decoration: line-through; }
+    .td-color  { text-decoration: underline; text-decoration-color: #ef4444; }
+
+    /* Text transform */
+    .tt-upper { text-transform: uppercase; }
+    .tt-lower { text-transform: lowercase; }
+    .tt-cap   { text-transform: capitalize; }
+
+    /* Text align */
+    .ta-left   { text-align: left; }
+    .ta-center { text-align: center; }
+    .ta-right  { text-align: right; }
+
+    /* Spacing */
+    .ls-wide { letter-spacing: 4px; }
+    .ls-tight { letter-spacing: -1px; }
+    .ws-wide { word-spacing: 12px; }
+
+    /* Line height */
+    .lh-tight { line-height: 1.0; }
+    .lh-normal { line-height: 1.5; }
+    .lh-loose { line-height: 2.5; }
+
+    /* White space & overflow */
+    .ws-nowrap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 200px; background: #334155; padding: 8px; border-radius: 4px; }
+    .ws-pre { white-space: pre; background: #334155; padding: 8px; border-radius: 4px; font-size: 12px; }
+
+    /* Text indent */
+    .indent { text-indent: 32px; }
+
+    .demo-text { padding: 8px; background: #0f172a; border-radius: 4px; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+    <h2>Typography</h2>
+
+    <h3>Font Size</h3>
+    <div class="section">
+        <div class="fs-xs demo-text">10px — Extra Small</div>
+        <div class="fs-sm demo-text">12px — Small</div>
+        <div class="fs-md demo-text">16px — Medium (default)</div>
+        <div class="fs-lg demo-text">24px — Large</div>
+        <div class="fs-xl demo-text">32px — Extra Large</div>
+        <div class="fs-xxl demo-text">48px — XXL</div>
+    </div>
+
+    <h3>Font Weight</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col"><div class="fw-100 demo-text">100 Thin</div></div>
+            <div class="col"><div class="fw-300 demo-text">300 Light</div></div>
+            <div class="col"><div class="fw-400 demo-text">400 Normal</div></div>
+            <div class="col"><div class="fw-600 demo-text">600 SemiBold</div></div>
+            <div class="col"><div class="fw-700 demo-text">700 Bold</div></div>
+            <div class="col"><div class="fw-900 demo-text">900 Black</div></div>
+        </div>
+    </div>
+
+    <h3>Font Style</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col"><div class="demo-text" style="font-style: normal;">Normal</div></div>
+            <div class="col"><div class="demo-text" style="font-style: italic;">Italic</div></div>
+        </div>
+    </div>
+
+    <h3>Text Decoration</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col"><div class="td-under demo-text">underline</div></div>
+            <div class="col"><div class="td-over demo-text">overline</div></div>
+            <div class="col"><div class="td-through demo-text">line-through</div></div>
+            <div class="col"><div class="td-color demo-text">underline (red)</div></div>
+        </div>
+    </div>
+
+    <h3>Text Transform</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col"><div class="tt-upper demo-text">uppercase text</div></div>
+            <div class="col"><div class="tt-lower demo-text">LOWERCASE TEXT</div></div>
+            <div class="col"><div class="tt-cap demo-text">capitalize each word</div></div>
+        </div>
+    </div>
+
+    <h3>Text Align</h3>
+    <div class="section">
+        <div class="ta-left demo-text">Left aligned</div>
+        <div class="ta-center demo-text">Center aligned</div>
+        <div class="ta-right demo-text">Right aligned</div>
+    </div>
+
+    <h3>Letter Spacing / Word Spacing</h3>
+    <div class="section">
+        <div class="ls-wide demo-text">Wide letter spacing (4px)</div>
+        <div class="ls-tight demo-text">Tight letter spacing (-1px)</div>
+        <div class="ws-wide demo-text">Wide word spacing (12px)</div>
+    </div>
+
+    <h3>Line Height</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">line-height: 1.0</div>
+                <div class="lh-tight demo-text" style="font-size: 13px;">This text has tight line height. Multiple lines will be very close together in vertical spacing.</div>
+            </div>
+            <div class="col">
+                <div class="label">line-height: 1.5</div>
+                <div class="lh-normal demo-text" style="font-size: 13px;">This text has normal line height. Multiple lines have comfortable reading spacing.</div>
+            </div>
+            <div class="col">
+                <div class="label">line-height: 2.5</div>
+                <div class="lh-loose demo-text" style="font-size: 13px;">This text has loose line height. Lines are spaced very far apart for emphasis.</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>White Space / Text Overflow</h3>
+    <div class="section">
+        <div class="label">nowrap + ellipsis (200px container)</div>
+        <div class="ws-nowrap" style="margin-bottom: 8px;">This very long text should be truncated with an ellipsis because it exceeds the container width</div>
+        <div class="label">white-space: pre</div>
+        <div class="ws-pre">  Preserved   whitespace
+    and line breaks
+        and indentation</div>
+    </div>
+
+    <h3>Text Indent</h3>
+    <div class="section">
+        <div class="indent demo-text">This paragraph has a 32px text indent on the first line. The remaining text wraps normally without indentation.</div>
+    </div>
+</body>
+</html>

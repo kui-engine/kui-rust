@@ -1,0 +1,36 @@
+<html><body>
+<style>
+#box { font-size: 24px; margin: 10px; display: block; }
+</style>
+<div id="box">Hello</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test document:getComputedStyle(element)
+local el = document:getElementById("box")
+local cs = document:getComputedStyle(el)
+local ok = (cs ~= nil)
+local detail = ""
+
+if cs then
+    local fs = cs:getPropertyValue("font-size")
+    detail = detail .. "fs=[" .. tostring(fs) .. "]; "
+    -- font-size should be 24px
+    ok = ok and (fs == "24px" or fs:find("24") ~= nil)
+
+    -- getProperty alias should work too
+    local m = cs:getProperty("margin-top")
+    detail = detail .. "margin-top=[" .. tostring(m) .. "]; "
+    ok = ok and (m == "10px" or m:find("10") ~= nil)
+
+    -- Test a property not in stylesheet returns default
+    local pad = cs:getPropertyValue("padding-top")
+    detail = detail .. "pad=[" .. tostring(pad) .. "]; "
+end
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

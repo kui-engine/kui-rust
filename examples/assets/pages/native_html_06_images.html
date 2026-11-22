@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 20px; font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { margin-bottom: 16px; color: #1e293b; }
+.row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.img-card { background: white; padding: 12px; border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+.img-card img { width: 160px; height: 120px; border-radius: 6px;
+                background: #e2e8f0; display: block; margin-bottom: 8px; }
+.img-card .label { font-size: 12px; color: #64748b; }
+.cover img { object-fit: cover; }
+.contain img { object-fit: contain; }
+.fill img { object-fit: fill; }
+.none img { object-fit: none; }
+.round img { border-radius: 50%; }
+</style></head><body>
+<h2>Image Display</h2>
+<div class="row">
+  <div class="img-card cover"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%233b82f6' width='300' height='200'/%3E%3Ctext x='150' y='100' fill='white' text-anchor='middle' dy='.3em' font-size='24'%3ECOVER%3C/text%3E%3C/svg%3E"><div class="label">object-fit: cover</div></div>
+  <div class="img-card contain"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%2310b981' width='300' height='200'/%3E%3Ctext x='150' y='100' fill='white' text-anchor='middle' dy='.3em' font-size='24'%3ECONTAIN%3C/text%3E%3C/svg%3E"><div class="label">object-fit: contain</div></div>
+  <div class="img-card fill"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23f59e0b' width='300' height='200'/%3E%3Ctext x='150' y='100' fill='white' text-anchor='middle' dy='.3em' font-size='24'%3EFILL%3C/text%3E%3C/svg%3E"><div class="label">object-fit: fill</div></div>
+  <div class="img-card round"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%238b5cf6' width='200' height='200'/%3E%3Ctext x='100' y='100' fill='white' text-anchor='middle' dy='.3em' font-size='20'%3EROUND%3C/text%3E%3C/svg%3E"><div class="label">border-radius: 50%</div></div>
+</div>
+</body></html>

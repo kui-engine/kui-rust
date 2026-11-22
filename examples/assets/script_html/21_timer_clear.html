@@ -1,0 +1,19 @@
+<html><body>
+<div id="result"></div>
+<script>
+clearCount = 0
+local id = setTimeout(function()
+    clearCount = clearCount + 1
+end, 10)
+clearTimeout(id)
+-- Timer was cleared, should never fire
+</script>
+<script>
+local r = document:getElementById("result")
+if clearCount == 0 then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL: count=" .. tostring(clearCount)
+end
+</script>
+</body></html>

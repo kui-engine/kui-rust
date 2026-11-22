@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; }
+
+    @keyframes slideRight {
+        from { transform: translateX(0); }
+        to   { transform: translateX(300px); }
+    }
+
+    .anim-bar {
+        width: 60px; height: 30px; border-radius: 4px; margin-bottom: 8px;
+        display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;
+    }
+
+    .ease       { animation: slideRight 2s ease infinite alternate; background: #3b82f6; }
+    .linear     { animation: slideRight 2s linear infinite alternate; background: #10b981; }
+    .ease-in    { animation: slideRight 2s ease-in infinite alternate; background: #f59e0b; }
+    .ease-out   { animation: slideRight 2s ease-out infinite alternate; background: #ef4444; }
+    .ease-in-out { animation: slideRight 2s ease-in-out infinite alternate; background: #8b5cf6; }
+    .bounce     { animation: slideRight 2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite alternate; background: #ec4899; }
+    .steps-4    { animation: slideRight 2s steps(4) infinite alternate; background: #06b6d4; }
+    .steps-8    { animation: slideRight 2s steps(8) infinite alternate; background: #14b8a6; }
+</style>
+</head>
+<body>
+    <h2>Custom Timing Functions</h2>
+
+    <h3>Standard Easing Comparison</h3>
+    <div class="section">
+        <div class="anim-bar ease">ease</div>
+        <div class="anim-bar linear">linear</div>
+        <div class="anim-bar ease-in">ease-in</div>
+        <div class="anim-bar ease-out">ease-out</div>
+        <div class="anim-bar ease-in-out">in-out</div>
+    </div>
+
+    <h3>cubic-bezier() &amp; steps()</h3>
+    <div class="section">
+        <div class="anim-bar bounce">bounce</div>
+        <div class="label">cubic-bezier(0.68, -0.55, 0.27, 1.55)</div>
+        <div style="height: 8px;"></div>
+        <div class="anim-bar steps-4">steps(4)</div>
+        <div class="label">steps(4) - 4 discrete jumps</div>
+        <div style="height: 8px;"></div>
+        <div class="anim-bar steps-8">steps(8)</div>
+        <div class="label">steps(8) - 8 discrete jumps</div>
+    </div>
+
+    <h3>Multiple Animations</h3>
+    <div class="section">
+        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 50%; animation: slideRight 3s ease-in-out infinite alternate;"></div>
+        <div class="label">circle with slideRight animation</div>
+    </div>
+</body>
+</html>

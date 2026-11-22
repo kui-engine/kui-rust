@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",sans-serif;background:#f8fafc;color:#1e293b}
+.app{display:flex;height:100vh}
+.side{width:200px;background:white;border-right:1px solid #e2e8f0;padding:16px 8px}
+.side h3{font-size:12px;color:#94a3b8;padding:8px 12px;text-transform:uppercase;letter-spacing:.5px}
+.side .it{padding:10px 14px;border-radius:8px;font-size:13px;color:#64748b;cursor:pointer;margin-bottom:2px}
+.side .it.a{background:#dbeafe;color:#1e40af;font-weight:600}.side .it:hover{background:#f1f5f9}
+.main{flex:1;padding:24px;overflow-y:auto}
+.main h2{font-size:20px;margin-bottom:4px}.main .sub{font-size:13px;color:#64748b;margin-bottom:20px}
+.section{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.section h3{font-size:15px;margin-bottom:12px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f1f5f9}
+.row:last-child{border-bottom:none}
+.row .label{font-size:14px;color:#475569}.row .desc{font-size:12px;color:#94a3b8;margin-top:2px}
+.toggle{width:44px;height:24px;border-radius:12px;background:#e2e8f0;position:relative;cursor:pointer}
+.toggle.on{background:#3b82f6}
+.toggle .dot{width:20px;height:20px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on .dot{left:22px}
+.select{padding:6px 12px;border-radius:6px;border:1px solid #e2e8f0;font-size:13px;color:#475569;background:white}
+</style></head><body>
+<div class="app">
+<div class="side">
+<h3>Settings</h3>
+<div class="it a">General</div><div class="it">Appearance</div><div class="it">Notifications</div><div class="it">Privacy</div><div class="it">About</div>
+</div>
+<div class="main">
+<h2>General Settings</h2><div class="sub">Manage your app preferences</div>
+<div class="section"><h3>Account</h3>
+<div class="row"><div><div class="label">Email notifications</div><div class="desc">Receive updates via email</div></div><div class="toggle on" id="t0"><div class="dot"></div></div></div>
+<div class="row"><div><div class="label">Auto-save</div><div class="desc">Save changes automatically</div></div><div class="toggle on" id="t1"><div class="dot"></div></div></div>
+<div class="row"><div><div class="label">Dark mode</div><div class="desc">Use dark color scheme</div></div><div class="toggle" id="t2"><div class="dot"></div></div></div>
+</div>
+<div class="section"><h3>Display</h3>
+<div class="row"><div><div class="label">Language</div><div class="desc">Interface language</div></div><div class="select">English</div></div>
+<div class="row"><div><div class="label">Font size</div><div class="desc">Base text size</div></div><div class="select">14px</div></div>
+<div class="row"><div><div class="label">Timezone</div><div class="desc">Your local timezone</div></div><div class="select">UTC+8</div></div>
+</div>
+</div></div>
+</body></html>

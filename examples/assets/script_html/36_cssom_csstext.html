@@ -1,0 +1,28 @@
+<html><body>
+<div id="box"></div>
+<div id="result"></div>
+<script>
+-- Test cssText read/write
+local el = document:getElementById("box")
+local s = el.style
+
+-- Set via cssText
+s.cssText = "font-size: 24px; margin: 5px;"
+
+local ok = (s:getPropertyValue("font-size") == "24px")
+    and (s:getPropertyValue("margin") == "5px")
+    and (s.length >= 2)
+
+-- Read cssText back
+local text = s.cssText
+ok = ok and (text:find("font%-size") ~= nil)
+
+-- Overwrite cssText clears old properties
+s.cssText = "padding: 10px;"
+ok = ok and (s:getPropertyValue("font-size") == "")
+    and (s:getPropertyValue("padding") == "10px")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

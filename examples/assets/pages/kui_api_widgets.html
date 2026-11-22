@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — native widgets</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 14px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 8px; }
+#tour-result { padding: 7px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 10px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.panel { background: white; border-radius: 10px; padding: 10px 12px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 6px; min-height: 32px; }
+.frame { border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 6px; background: #ffffff; }
+.pair { display: flex; gap: 8px; margin-bottom: 6px; }
+.pair .frame { margin-bottom: 0; }
+.cap { font-size: 11px; color: #64748b; margin-bottom: 2px; }
+/* The widget containers: no border or padding, so the pixel checks can address rows by their
+   offset from the container's top edge (row i of height h spans i*h .. (i+1)*h). */
+#lv-single, #lv-multi { width: 150px; height: 180px; background: #ffffff; }
+#tree-box { width: 300px; height: 182px; background: #ffffff; }
+#vl-box { width: 300px; height: 180px; background: #ffffff; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+button { padding: 4px 7px; border: none; border-radius: 4px; background: #3b82f6; color: white;
+         font-size: 11px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 5px 8px;
+       border-radius: 5px; color: #334155; }
+.out div { min-height: 16px; }
+.log-title { margin: 14px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+#scratch { display: none; }
+#scratch-tree, #scratch-list { width: 200px; height: 120px; }
+</style></head><body>
+<h1>KUI API — native widgets</h1>
+<p class="lead">ListView, TreeView and VirtualList: native widgets the host mounts into a
+container. Only the rows in view are in the DOM; every call below is checked against the state
+read back (selection, focus, node and row counts, rendered range).</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-list">
+    <h2>ListView</h2>
+    <div class="api">select · deselect · select_range · clear_selection · is_selected ·
+      get_selected · get_focused_index · set_item_count · refresh · scroll_to_index /
+      top / bottom · get_state</div>
+    <p class="note">Two lists of 200 rows (30px): single selection on the left, multi selection
+      on the right. Click rows or use the buttons.</p>
+    <div class="pair">
+      <div><div class="cap">single</div><div class="frame"><div id="lv-single"></div></div></div>
+      <div><div class="cap">multi</div><div class="frame"><div id="lv-multi"></div></div></div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-lv-sel2">select(2)</button>
+      <button id="btn-lv-sel4">select(4)</button>
+      <button id="btn-lv-range">select_range(6,9)</button>
+      <button id="btn-lv-desel">deselect(2)</button>
+      <button id="btn-lv-clear">clear</button>
+      <button id="btn-lv-goto">scroll_to_index(100)</button>
+      <button id="btn-lv-top">top</button>
+      <button id="btn-lv-bottom">bottom</button>
+      <button id="btn-lv-count">set_item_count</button>
+      <button id="btn-lv-refresh">refresh</button>
+    </div>
+    <div class="out">
+      <div>single: <span id="lv-single-sel">[]</span></div>
+      <div>multi: <span id="lv-multi-sel">[]</span></div>
+      <div>focus: <span id="lv-focus">-1</span> · rows <span id="lv-start">0</span>-<span id="lv-end">0</span> of <span id="lv-total">0</span></div>
+      <div>event: <span id="lv-event">-</span></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-tree">
+    <h2>TreeView</h2>
+    <div class="api">expand_all · collapse_all · collapse · toggle · select · toggle_select ·
+      select_range · select_all · clear_selection · is_selected · get_selected(_index) ·
+      get_node(_child) · get_node_count · set_node · refresh · scroll_to_node ·
+      get_visible_row_count</div>
+    <p class="note">A 12-node multi-select tree (26px rows). Expanding and collapsing changes the
+      visible row count; click a row or ▶ to try it by hand.</p>
+    <div class="frame"><div id="tree-box"></div></div>
+    <div class="toolbar">
+      <button id="btn-tree-expand-all">expand_all</button>
+      <button id="btn-tree-collapse-all">collapse_all</button>
+      <button id="btn-tree-toggle">toggle(src)</button>
+      <button id="btn-tree-collapse">collapse(core)</button>
+      <button id="btn-tree-select">select(core)</button>
+      <button id="btn-tree-toggle-sel">toggle_select(docs)</button>
+      <button id="btn-tree-range">select_range(main.c)</button>
+      <button id="btn-tree-all">select_all</button>
+      <button id="btn-tree-clear">clear</button>
+      <button id="btn-tree-scroll">scroll_to_node(README)</button>
+      <button id="btn-tree-rename">set_node(README)</button>
+    </div>
+    <div class="out">
+      <div>selected: <span id="tree-sel">[]</span> · index <span id="tree-idx">-1</span></div>
+      <div>visible rows: <span id="tree-rows">0</span> of <span id="tree-nodes">0</span> nodes</div>
+      <div>README: <span id="tree-readme">README</span> · scroll <span id="tree-scroll">0</span></div>
+      <div>event: <span id="tree-event">-</span></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-vlist">
+    <h2>VirtualList</h2>
+    <div class="api">set_focused_index · move_focus · insert_items · remove_items ·
+      set_total_items · refresh · scroll_to_index / top / bottom · get_state</div>
+    <p class="note">1000 rows of 24px; only the rows in view are rendered. The focused row is
+      amber; inserted rows read “New n”.</p>
+    <div class="frame"><div id="vl-box"></div></div>
+    <div class="toolbar">
+      <button id="btn-vl-focus">set_focused_index(10)</button>
+      <button id="btn-vl-prev">move_focus(-1)</button>
+      <button id="btn-vl-next">move_focus(+1)</button>
+      <button id="btn-vl-insert">insert_items(0,3)</button>
+      <button id="btn-vl-remove">remove_items(0,3)</button>
+      <button id="btn-vl-goto">scroll_to_index(500)</button>
+      <button id="btn-vl-top">top</button>
+      <button id="btn-vl-bottom">bottom</button>
+      <button id="btn-vl-total">set_total_items</button>
+      <button id="btn-vl-refresh">refresh</button>
+    </div>
+    <div class="out">
+      <div>total: <span id="vl-total">0</span> · focus <span id="vl-focus">-1</span></div>
+      <div>rendered rows: <span id="vl-start">0</span>-<span id="vl-end">0</span></div>
+      <div>first row: <span id="vl-first">-</span></div>
+      <div>event: <span id="vl-event">-</span></div>
+    </div>
+  </section>
+</div>
+
+<div id="scratch"><div id="scratch-tree"></div><div id="scratch-list"></div></div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+</body></html>

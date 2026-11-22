@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; }
+    .code { background: #0f172a; padding: 12px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #10b981; margin-bottom: 12px; white-space: pre; }
+
+    .chapter-list { counter-reset: chapter; }
+    .chapter-list li {
+        counter-increment: chapter;
+        list-style: none;
+        padding: 8px 12px;
+        margin-bottom: 4px;
+        background: #334155;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .step-list { counter-reset: step; }
+    .step-list .step {
+        counter-increment: step;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        margin-bottom: 6px;
+        background: #334155;
+        border-radius: 6px;
+    }
+    .step-num {
+        width: 32px; height: 32px;
+        background: #3b82f6;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; font-weight: bold; color: white;
+        flex-shrink: 0;
+    }
+</style>
+</head>
+<body>
+    <h2>CSS Counters</h2>
+
+    <h3>counter-reset &amp; counter-increment</h3>
+    <div class="section">
+        <div class="code">counter-reset: chapter;
+counter-increment: chapter;</div>
+        <ul class="chapter-list">
+            <li>Introduction to CSS</li>
+            <li>Selectors and Specificity</li>
+            <li>Box Model</li>
+            <li>Flexbox Layout</li>
+            <li>Grid Layout</li>
+            <li>Animations and Transitions</li>
+        </ul>
+    </div>
+
+    <h3>Numbered Steps</h3>
+    <div class="section">
+        <div class="step-list">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div>Clone the repository</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div>Install dependencies with vcpkg</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div>Configure with CMake</div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div>Build and run tests</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>content: counter() in ::before</h3>
+    <div class="section">
+        <div class="code">li::before { content: counter(section); }</div>
+        <div style="counter-reset: section;">
+            <div style="counter-increment: section; padding: 8px 12px; background: #334155; border-radius: 4px; margin-bottom: 4px; font-size: 14px;">Introduction to CSS</div>
+            <div style="counter-increment: section; padding: 8px 12px; background: #334155; border-radius: 4px; margin-bottom: 4px; font-size: 14px;">Selectors and Specificity</div>
+            <div style="counter-increment: section; padding: 8px 12px; background: #334155; border-radius: 4px; margin-bottom: 4px; font-size: 14px;">Box Model</div>
+            <div style="counter-increment: section; padding: 8px 12px; background: #334155; border-radius: 4px; margin-bottom: 4px; font-size: 14px;">Flexbox Layout</div>
+        </div>
+        <div class="label">Each item auto-numbered via counter()</div>
+    </div>
+
+    <h3>Multiple Counters</h3>
+    <div class="section">
+        <div class="code">counter-reset: section 0 subsection 0;</div>
+        <div style="counter-reset: section 0;">
+            <div style="counter-increment: section; padding: 8px; background: #3b82f6; color: white; border-radius: 4px; margin-bottom: 4px; font-weight: bold;">Section A</div>
+            <div style="padding-left: 20px; margin-bottom: 8px;">
+                <div style="padding: 4px 8px; color: #94a3b8; font-size: 13px;">Subsection content here</div>
+            </div>
+            <div style="counter-increment: section; padding: 8px; background: #8b5cf6; color: white; border-radius: 4px; margin-bottom: 4px; font-weight: bold;">Section B</div>
+            <div style="padding-left: 20px; margin-bottom: 8px;">
+                <div style="padding: 4px 8px; color: #94a3b8; font-size: 13px;">More content</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Counter with Custom Initial Value</h3>
+    <div class="section">
+        <div class="code">counter-reset: page 99;</div>
+        <div style="counter-reset: page 99;">
+            <div style="counter-increment: page; padding: 6px 12px; background: #334155; border-radius: 4px; margin-bottom: 4px; font-size: 13px;">Page starts at 100</div>
+            <div style="counter-increment: page; padding: 6px 12px; background: #334155; border-radius: 4px; margin-bottom: 4px; font-size: 13px;">Page 101</div>
+            <div style="counter-increment: page; padding: 6px 12px; background: #334155; border-radius: 4px; font-size: 13px;">Page 102</div>
+        </div>
+    </div>
+</body>
+</html>

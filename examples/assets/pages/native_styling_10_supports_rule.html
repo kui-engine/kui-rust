@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.test{padding:16px;border-radius:8px;margin-bottom:8px;font-size:13px;font-weight:600;background:#f1f5f9;color:#94a3b8}
+@supports (display:flex){.flex-test{background:#dcfce7;color:#166534}}
+@supports (display:grid){.grid-test{background:#dcfce7;color:#166534}}
+@supports (aspect-ratio:1/1){.ar-test{background:#dcfce7;color:#166534}}
+@supports not (display:subgrid){.subgrid-test{background:#fef3c7;color:#92400e}}
+.code{font-family:"Consolas",monospace;background:#1e293b;color:#e2e8f0;padding:12px;border-radius:8px;font-size:12px;line-height:1.6;margin-top:8px}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+</style></head><body>
+<h2>CSS @supports</h2>
+<div class="card"><h3>Feature Detection</h3>
+<div class="test flex-test">@supports (display: flex) — Supported</div>
+<div class="test grid-test">@supports (display: grid) — Supported</div>
+<div class="test ar-test">@supports (aspect-ratio: 1/1) — Supported</div>
+<div class="test subgrid-test">@supports not (display: subgrid) — Not Supported</div>
+<div class="info">@supports applies styles conditionally based on CSS feature support</div></div>
+<div class="card"><h3>Syntax</h3>
+<div class="code">@supports (display: flex) {<br>  .container { display: flex; }<br>}<br>@supports not (display: subgrid) {<br>  .fallback { display: grid; }<br>}</div></div>
+</body></html>

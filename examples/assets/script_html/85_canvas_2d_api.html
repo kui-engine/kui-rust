@@ -1,0 +1,99 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="src" width="64" height="64"></canvas>
+<canvas id="dst" width="160" height="120"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local function fail(s)
+    ok = false
+    msg = msg .. s .. "; "
+end
+
+local src = document:getElementById("src")
+local dst = document:getElementById("dst")
+if src == nil or dst == nil then
+    fail("missing canvas")
+else
+    local sctx = src:getContext("2d")
+    local dctx = dst:getContext("2d")
+    if sctx == nil or dctx == nil then
+        fail("missing 2d context")
+    else
+        local lg = sctx:createLinearGradient(0, 0, 64, 64)
+        lg:addColorStop(0, "#ff0000")
+        lg:addColorStop(1, "#0000ff")
+        sctx.fillStyle = lg
+        sctx:fillRect(0, 0, 64, 64)
+
+        local metrics = dctx:measureText("Canvas")
+        local width = nil
+        if type(metrics) == "table" then
+            width = metrics.width or metrics["width"]
+        elseif type(metrics) == "number" then
+            width = metrics
+        end
+        if width ~= nil and width < 0 then
+            fail("measureText width invalid")
+        end
+
+        local img = dctx:createImageData(4, 4)
+        for y = 0, 3 do
+            for x = 0, 3 do
+                local idx = (y * 4 + x) * 4 + 1
+                img:set(idx, 255)
+                img:set(idx + 1, x * 40)
+                img:set(idx + 2, y * 40)
+                img:set(idx + 3, 255)
+            end
+        end
+        dctx:putImageData(img, 0, 0)
+
+        local readback = dctx:getImageData(0, 0, 4, 4)
+        if readback == nil or readback.length ~= 64 then
+            fail("getImageData length invalid")
+        else
+            local first = readback:get(1)
+            if first == nil then
+                fail("getImageData first byte nil")
+            end
+        end
+
+        dctx:drawImage(src, 10, 10)
+        dctx:drawImage(src, 80, 10, 40, 40)
+        dctx:drawImage(src, 0, 0, 32, 32, 10, 70, 50, 40)
+
+        local pat = dctx:createPattern(src, "repeat")
+        if pat == nil then
+            fail("createPattern nil")
+        else
+            dctx.fillStyle = pat
+            dctx:fillRect(120, 0, 40, 40)
+        end
+
+        dctx.globalCompositeOperation = "multiply"
+        dctx.fillStyle = "#00ff00"
+        dctx:fillRect(60, 20, 50, 50)
+        dctx.globalCompositeOperation = "source-over"
+
+        dctx:save()
+        dctx:beginPath()
+        dctx:arc(130, 90, 20, 0, 6.283)
+        dctx:clip()
+        dctx.fillStyle = "#ffff00"
+        dctx:fillRect(110, 70, 40, 40)
+        dctx:restore()
+    end
+end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "canvas ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

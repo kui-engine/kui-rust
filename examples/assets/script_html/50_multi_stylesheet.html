@@ -1,0 +1,50 @@
+<html><body>
+<style>
+.box { font-size: 16px; color: blue; }
+</style>
+<style>
+.box { color: green; margin: 10px; }
+</style>
+<div id="box" class="box" style="font-weight: bold;">Styled</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test multiple stylesheets + inline style interaction
+local el = document:getElementById("box")
+local ok = true
+local detail = ""
+
+local cs = document:getComputedStyle(el)
+
+-- font-size from first stylesheet
+local fs = cs:getPropertyValue("font-size")
+detail = detail .. "fs=" .. fs .. "; "
+ok = ok and (fs == "16px")
+
+-- color should be green (second stylesheet wins by order)
+-- Note: colors serialize to hex
+local col = cs:getPropertyValue("color")
+detail = detail .. "color=" .. col .. "; "
+
+-- margin from second stylesheet
+local mt = cs:getPropertyValue("margin-top")
+detail = detail .. "mt=" .. mt .. "; "
+ok = ok and (mt == "10px")
+
+-- font-weight from inline style (highest specificity)
+local fw = cs:getPropertyValue("font-weight")
+detail = detail .. "fw=" .. fw .. "; "
+
+-- Inline style overrides everything
+el.style:setProperty("font-size", "24px")
+local cs2 = document:getComputedStyle(el)
+local fs2 = cs2:getPropertyValue("font-size")
+detail = detail .. "fs2=" .. fs2 .. "; "
+ok = ok and (fs2 == "24px")
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

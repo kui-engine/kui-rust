@@ -1,0 +1,14 @@
+<html><body>
+<div id="result"></div>
+<script>
+-- console.log should not crash
+console.log("Hello from Lua")
+console.log(42, true, "mixed")
+
+-- print should also work
+print("print test")
+
+local r = document:getElementById("result")
+r.textContent = "PASS"
+</script>
+</body></html>

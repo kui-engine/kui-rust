@@ -1,0 +1,38 @@
+<html><body>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Verify dangerous modules are not available
+local ok = true
+local detail = ""
+
+if io then
+    ok = false
+    detail = detail .. "io available; "
+end
+
+if os then
+    ok = false
+    detail = detail .. "os available; "
+end
+
+if debug then
+    ok = false
+    detail = detail .. "debug available; "
+end
+
+if package then
+    ok = false
+    detail = detail .. "package available; "
+end
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL"
+    d.textContent = detail
+end
+</script>
+</body></html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 8px; text-align: center; }
+    .row { display: flex; gap: 32px; margin-bottom: 12px; flex-wrap: wrap; justify-content: center; }
+
+    .t-box {
+        width: 80px; height: 80px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 600; color: white;
+    }
+
+    /* Static transforms */
+    .tx-20  { transform: translateX(20px); background: #3b82f6; }
+    .ty-15  { transform: translateY(-15px); background: #8b5cf6; }
+    .txy    { transform: translate(10px, 10px); background: #ec4899; }
+    .r-45   { transform: rotate(45deg); background: #f59e0b; }
+    .r-90   { transform: rotate(90deg); background: #22c55e; }
+    .r-180  { transform: rotate(180deg); background: #ef4444; }
+    .s-150  { transform: scale(1.5); background: #06b6d4; }
+    .s-50   { transform: scale(0.5); background: #84cc16; }
+    .sx-200 { transform: scaleX(2); background: #d946ef; }
+
+    /* Combined transforms */
+    .combo1 { transform: rotate(30deg) scale(1.2); background: #3b82f6; }
+    .combo2 { transform: translateX(20px) rotate(-15deg); background: #8b5cf6; }
+    .combo3 { transform: scale(0.8) rotate(45deg) translateY(-10px); background: #ec4899; }
+
+    /* Transform origin */
+    .origin-center { transform: rotate(45deg); transform-origin: center; background: #3b82f6; }
+    .origin-tl     { transform: rotate(45deg); transform-origin: 0% 0%; background: #22c55e; }
+    .origin-br     { transform: rotate(45deg); transform-origin: 100% 100%; background: #ef4444; }
+
+    /* Hover transforms */
+    .hover-t {
+        width: 100px; height: 60px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    .ht-scale { background: #3b82f6; }
+    .ht-scale:hover { transform: scale(1.2); }
+    .ht-rotate { background: #8b5cf6; }
+    .ht-rotate:hover { transform: rotate(15deg); }
+    .ht-lift { background: #22c55e; }
+    .ht-lift:hover { transform: translateY(-8px); }
+    .ht-combo { background: #f59e0b; }
+    .ht-combo:hover { transform: scale(1.1) rotate(-5deg); }
+</style>
+</head>
+<body>
+    <h2>CSS Transforms</h2>
+
+    <h3>Translate</h3>
+    <div class="section">
+        <div class="row">
+            <div><div class="t-box tx-20">X+20</div><div class="label">translateX(20px)</div></div>
+            <div><div class="t-box ty-15">Y-15</div><div class="label">translateY(-15px)</div></div>
+            <div><div class="t-box txy">XY</div><div class="label">translate(10,10)</div></div>
+        </div>
+    </div>
+
+    <h3>Rotate</h3>
+    <div class="section">
+        <div class="row">
+            <div><div class="t-box r-45">45°</div><div class="label">rotate(45deg)</div></div>
+            <div><div class="t-box r-90">90°</div><div class="label">rotate(90deg)</div></div>
+            <div><div class="t-box r-180">180°</div><div class="label">rotate(180deg)</div></div>
+        </div>
+    </div>
+
+    <h3>Scale</h3>
+    <div class="section">
+        <div class="row">
+            <div><div class="t-box s-150">1.5x</div><div class="label">scale(1.5)</div></div>
+            <div><div class="t-box s-50">0.5x</div><div class="label">scale(0.5)</div></div>
+            <div><div class="t-box sx-200">2x W</div><div class="label">scaleX(2)</div></div>
+        </div>
+    </div>
+
+    <h3>Combined Transforms</h3>
+    <div class="section">
+        <div class="row">
+            <div><div class="t-box combo1">R+S</div><div class="label">rotate(30) scale(1.2)</div></div>
+            <div><div class="t-box combo2">T+R</div><div class="label">translateX(20) rotate(-15)</div></div>
+            <div><div class="t-box combo3">S+R+T</div><div class="label">scale(.8) rotate(45) translateY(-10)</div></div>
+        </div>
+    </div>
+
+    <h3>Transform Origin</h3>
+    <div class="section">
+        <div class="row">
+            <div><div class="t-box origin-center">center</div><div class="label">origin: center</div></div>
+            <div><div class="t-box origin-tl">top-left</div><div class="label">origin: 0% 0%</div></div>
+            <div><div class="t-box origin-br">bot-right</div><div class="label">origin: 100% 100%</div></div>
+        </div>
+    </div>
+
+    <h3>Hover Transforms (interactive)</h3>
+    <div class="section">
+        <div class="row">
+            <div class="hover-t ht-scale">Scale Up</div>
+            <div class="hover-t ht-rotate">Rotate</div>
+            <div class="hover-t ht-lift">Lift Up</div>
+            <div class="hover-t ht-combo">Combo</div>
+        </div>
+    </div>
+</body>
+</html>

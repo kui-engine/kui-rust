@@ -1,0 +1,17 @@
+<html><body>
+<div id="target"></div>
+<div id="result"></div>
+<script>
+local el = document:getElementById("target")
+el.innerHTML = '<span id="s1">Hello</span><em>World</em>'
+
+local s1 = document:getElementById("s1")
+local ok = (s1 ~= nil) and (s1.textContent == "Hello")
+
+local kids = el:children()
+ok = ok and (#kids == 2) and (kids[2].tagName == "em")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

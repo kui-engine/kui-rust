@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif; background: #0f172a; color: #f8fafc; }
+h2 { margin-bottom: 16px; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.cell { position: relative; height: 100px; border-radius: 8px; overflow: hidden; }
+.cell .bg { position: absolute; inset: 0; background: linear-gradient(135deg, #ef4444, #3b82f6); }
+.cell .fg { position: absolute; inset: 0; background: linear-gradient(45deg, #fbbf24, #10b981); }
+.cell .name { position: absolute; bottom: 4px; left: 8px; font-size: 11px; color: white;
+              text-shadow: 0 1px 2px rgba(0,0,0,0.8); z-index: 1; }
+.m-multiply .fg { mix-blend-mode: multiply; }
+.m-screen .fg { mix-blend-mode: screen; }
+.m-overlay .fg { mix-blend-mode: overlay; }
+.m-darken .fg { mix-blend-mode: darken; }
+.m-lighten .fg { mix-blend-mode: lighten; }
+.m-difference .fg { mix-blend-mode: difference; }
+.m-exclusion .fg { mix-blend-mode: exclusion; }
+.m-normal .fg { mix-blend-mode: normal; }
+</style></head><body>
+<h2>Mix Blend Modes</h2>
+<div class="grid">
+  <div class="cell m-normal"><div class="bg"></div><div class="fg"></div><div class="name">normal</div></div>
+  <div class="cell m-multiply"><div class="bg"></div><div class="fg"></div><div class="name">multiply</div></div>
+  <div class="cell m-screen"><div class="bg"></div><div class="fg"></div><div class="name">screen</div></div>
+  <div class="cell m-overlay"><div class="bg"></div><div class="fg"></div><div class="name">overlay</div></div>
+  <div class="cell m-darken"><div class="bg"></div><div class="fg"></div><div class="name">darken</div></div>
+  <div class="cell m-lighten"><div class="bg"></div><div class="fg"></div><div class="name">lighten</div></div>
+  <div class="cell m-difference"><div class="bg"></div><div class="fg"></div><div class="name">difference</div></div>
+  <div class="cell m-exclusion"><div class="bg"></div><div class="fg"></div><div class="name">exclusion</div></div>
+</div>
+</body></html>

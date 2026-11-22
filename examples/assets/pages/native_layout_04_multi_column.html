@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.c2{column-count:2;column-gap:32px;column-rule:1px solid #e2e8f0}
+.c3{column-count:3;column-gap:24px;column-rule:2px dashed #3b82f6}
+.cw{column-width:200px;column-gap:20px;column-rule:1px solid #e2e8f0}
+.c2 p,.c3 p,.cw p{font-size:13px;color:#475569;line-height:1.7;margin-bottom:8px;text-align:justify}
+.span-all{column-span:all;background:#dbeafe;padding:10px 16px;border-radius:8px;color:#1e40af;font-weight:600;font-size:14px;margin:12px 0;text-align:center}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#dbeafe;color:#1e40af;margin-right:4px}
+</style></head><body>
+<h2>Multi-Column Layout</h2>
+<div class="card"><h3>2 Columns</h3>
+<div class="c2"><p>KUI uses Skia for high-quality 2D rendering with GPU acceleration optimized for desktop.</p>
+<p>The layout engine implements CSS box model including block, inline, flexbox, grid, and multi-column.</p>
+<p>Lua 5.4 is embedded providing DOM manipulation, events, and animations.</p>
+<p>The platform layer abstracts Windows APIs for windows, input, clipboard, and file dialogs.</p></div>
+<div class="info"><span class="tag">column-count:2</span><span class="tag">column-gap:32px</span></div></div>
+<div class="card"><h3>3 Columns with Span</h3>
+<div class="c3"><p>Column content flows automatically from one column to the next.</p>
+<div class="span-all">This spans all columns</div>
+<p>After the span, content continues flowing across columns.</p>
+<p>Columns are balanced automatically.</p><p>Column-rule draws separator lines.</p></div>
+<div class="info"><span class="tag">column-count:3</span><span class="tag">column-span:all</span></div></div>
+<div class="card"><h3>Auto Columns</h3>
+<div class="cw"><p>column-width creates a responsive layout. Browser determines column count.</p>
+<p>Each column is at least 200px wide.</p><p>Ideal for responsive designs.</p></div>
+<div class="info"><span class="tag">column-width:200px</span> Auto column count</div></div>
+</body></html>

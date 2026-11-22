@@ -1,0 +1,84 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="100" height="100"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: fillRect pixel verification
+ctx.fillStyle = "#ff0000"
+ctx:fillRect(0, 0, 10, 10)
+local px = ctx:getImageData(5, 5, 1, 1)
+if px == nil then fail("T1: nil")
+else
+    local r = px:get(1); local g = px:get(2); local b = px:get(3); local a = px:get(4)
+    if r < 200 or g > 50 or b > 50 then fail("T1: fillRect color r="..tostring(r).." g="..tostring(g).." b="..tostring(b)) end
+    if a < 200 then fail("T1: fillRect alpha="..tostring(a)) end
+end
+
+-- T2: clearRect clears pixels
+ctx.fillStyle = "#00ff00"
+ctx:fillRect(20, 0, 10, 10)
+ctx:clearRect(20, 0, 10, 10)
+local px2 = ctx:getImageData(25, 5, 1, 1)
+if px2 == nil then fail("T2: nil")
+else
+    local a = px2:get(4)
+    if a > 10 then fail("T2: clearRect alpha="..tostring(a)) end
+end
+
+-- T3: strokeRect draws border
+ctx.strokeStyle = "#0000ff"
+ctx.lineWidth = 2
+ctx:strokeRect(40, 0, 20, 20)
+local px3 = ctx:getImageData(40, 10, 1, 1)
+if px3 == nil then fail("T3: nil")
+else
+    local b = px3:get(3)
+    if b < 200 then fail("T3: strokeRect blue="..tostring(b)) end
+end
+-- Interior should be clear
+local px3i = ctx:getImageData(50, 10, 1, 1)
+if px3i ~= nil then
+    local a = px3i:get(4)
+    if a > 50 then fail("T3: strokeRect interior alpha="..tostring(a)) end
+end
+
+-- T4: fillRect with different colors sequential
+ctx:clearRect(0, 0, 100, 100)
+ctx.fillStyle = "#ff00ff"
+ctx:fillRect(0, 0, 50, 50)
+ctx.fillStyle = "#00ffff"
+ctx:fillRect(50, 0, 50, 50)
+local pxA = ctx:getImageData(25, 25, 1, 1)
+local pxB = ctx:getImageData(75, 25, 1, 1)
+if pxA == nil or pxB == nil then fail("T4: nil")
+else
+    local rA = pxA:get(1); local bA = pxA:get(3)
+    local gB = pxB:get(2); local bB = pxB:get(3)
+    if rA < 200 or bA < 200 then fail("T4: magenta r="..tostring(rA).." b="..tostring(bA)) end
+    if gB < 200 or bB < 200 then fail("T4: cyan g="..tostring(gB).." b="..tostring(bB)) end
+end
+
+-- T5: context dimensions
+if ctx.width ~= 100 then fail("T5: width="..tostring(ctx.width)) end
+if ctx.height ~= 100 then fail("T5: height="..tostring(ctx.height)) end
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "rect ops ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

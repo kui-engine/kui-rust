@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lua Scripting Demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f172a; color: #cbd5e1;
+    font-family: 'Segoe UI', sans-serif; font-size: 14px;
+    padding: 24px; line-height: 1.5;
+  }
+  h1 { color: #38bdf8; font-size: 22px; margin-bottom: 4px; }
+  .subtitle { color: #475569; font-size: 13px; margin-bottom: 24px; }
+  h2 { color: #7dd3fc; font-size: 15px; margin-bottom: 12px;
+       border-bottom: 1px solid #1e293b; padding-bottom: 6px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card {
+    background: #1e293b; border: 1px solid #334155;
+    border-radius: 8px; padding: 16px;
+  }
+
+  /* Counter */
+  .counter-display {
+    font-size: 48px; font-weight: 700; text-align: center;
+    color: #38bdf8; margin: 12px 0; transition: color 0.2s;
+  }
+  .counter-display.positive { color: #34d399; }
+  .counter-display.negative { color: #f87171; }
+  .btn-row { display: flex; gap: 8px; justify-content: center; }
+  button {
+    background: #334155; border: 1px solid #475569; color: #cbd5e1;
+    padding: 6px 14px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; transition: background 0.1s;
+  }
+  button:hover { background: #475569; }
+  button.primary { background: #2563eb; border-color: #3b82f6; color: #fff; }
+  button.primary:hover { background: #3b82f6; }
+  button.danger { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
+  button.danger:hover { background: #991b1b; }
+
+  /* Todo */
+  .todo-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .todo-input {
+    flex: 1; background: #0f172a; border: 1px solid #475569;
+    color: #e2e8f0; padding: 6px 10px; border-radius: 6px;
+    font-size: 13px; outline: none;
+  }
+  .todo-input:focus { border-color: #38bdf8; }
+  .todo-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .todo-item {
+    display: flex; align-items: center; gap: 8px;
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 6px; padding: 6px 10px;
+  }
+  .todo-item.done span.todo-text {
+    text-decoration: line-through; color: #475569;
+  }
+  .todo-check { cursor: pointer; accent-color: #38bdf8; }
+  .todo-text { flex: 1; font-size: 13px; }
+  .todo-del {
+    background: none; border: none; color: #64748b;
+    cursor: pointer; font-size: 16px; padding: 0 2px;
+    line-height: 1;
+  }
+  .todo-del:hover { color: #f87171; background: none; }
+  .todo-count { font-size: 11px; color: #475569; margin-top: 8px; text-align: right; }
+
+  /* Palette */
+  .palette-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .swatch {
+    width: 40px; height: 40px; border-radius: 6px;
+    cursor: pointer; border: 2px solid transparent;
+    transition: transform 0.1s, border-color 0.1s;
+  }
+  .swatch:hover { transform: scale(1.15); border-color: #fff; }
+  .swatch.selected { border-color: #38bdf8; transform: scale(1.1); }
+  .color-info {
+    font-size: 12px; color: #94a3b8; margin-top: 8px;
+    font-family: 'Consolas', monospace;
+  }
+
+  /* Timer */
+  .timer-display {
+    font-size: 36px; font-weight: 700; text-align: center;
+    color: #a78bfa; margin: 8px 0; font-family: 'Consolas', monospace;
+  }
+  .progress-bar {
+    height: 6px; background: #1e293b; border-radius: 3px;
+    margin: 8px 0; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: #7c3aed; border-radius: 3px;
+    width: 0%; transition: background 0.3s;
+  }
+
+  /* Console log panel */
+  .log-panel {
+    grid-column: 1 / -1;
+  }
+  .log-output {
+    background: #020617; border: 1px solid #1e293b; border-radius: 6px;
+    padding: 10px; height: 160px; overflow-y: auto;
+    font-family: 'Consolas', monospace; font-size: 12px;
+  }
+  .log-line { padding: 1px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .log-line.log  { color: #94a3b8; }
+  .log-line.info { color: #7dd3fc; }
+  .log-line.warn { color: #fbbf24; }
+  .log-line.error{ color: #f87171; }
+  .log-line.debug{ color: #a78bfa; }
+  .log-controls { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+  .log-controls span { font-size: 11px; color: #475569; margin-left: auto; }
+</style>
+</head>
+<body>
+
+<h1>Lua Scripting Demo</h1>
+<p class="subtitle">DOM manipulation · Event handling · Timers · console output — all in <code style="color:#38bdf8">&lt;script type="text/lua"&gt;</code></p>
+
+<div class="grid">
+
+  <!-- Counter -->
+  <div class="card" id="counter-card">
+    <h2>Counter</h2>
+    <div class="counter-display" id="counter-val">0</div>
+    <div class="btn-row">
+      <button id="btn-dec">−</button>
+      <button id="btn-reset">Reset</button>
+      <button id="btn-inc">+</button>
+    </div>
+    <p id="counter-msg" style="text-align:center;font-size:12px;color:#475569;margin-top:8px;"></p>
+  </div>
+
+  <!-- Todo List -->
+  <div class="card" id="todo-card">
+    <h2>Todo List</h2>
+    <div class="todo-input-row">
+      <input class="todo-input" id="todo-input" placeholder="Add a task..." type="text">
+      <button class="primary" id="btn-todo-add">Add</button>
+    </div>
+    <ul class="todo-list" id="todo-list"></ul>
+    <div class="todo-count" id="todo-count">0 tasks</div>
+  </div>
+
+  <!-- Color Palette -->
+  <div class="card" id="palette-card">
+    <h2>Color Palette</h2>
+    <div class="btn-row" style="justify-content:flex-start;margin-bottom:8px;">
+      <button id="btn-gen-palette">Generate</button>
+      <button id="btn-complement">Complement</button>
+    </div>
+    <div class="palette-grid" id="palette"></div>
+    <div class="color-info" id="color-info">Click a swatch to inspect</div>
+  </div>
+
+  <!-- Timer -->
+  <div class="card" id="timer-card">
+    <h2>Stopwatch</h2>
+    <div class="timer-display" id="timer-display">00:00.0</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="btn-row">
+      <button id="btn-timer-start">Start</button>
+      <button id="btn-timer-pause">Pause</button>
+      <button id="btn-timer-reset">Reset</button>
+    </div>
+    <p id="timer-laps" style="font-size:11px;color:#475569;margin-top:8px;min-height:16px;"></p>
+  </div>
+
+  <!-- Log panel -->
+  <div class="card log-panel" id="log-card">
+    <h2>Console Output</h2>
+    <div class="log-output" id="log-output"></div>
+    <div class="log-controls">
+      <button id="btn-log-test">Run test logs</button>
+      <button id="btn-log-clear">Clear</button>
+      <span id="log-line-count">0 lines</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     Lua Script
+     ============================================================ -->
+<script type="text/lua">
+
+-- ================================================================
+-- Utility: append a line to the on-screen log panel AND DevTools
+-- ================================================================
+local logLineCount = 0
+
+local function appendLog(level, msg)
+  logLineCount = logLineCount + 1
+  local output = document:getElementById("log-output")
+  local countEl = document:getElementById("log-line-count")
+  if not output then return end
+
+  local line = document:createElement("div")
+  line:setAttribute("class", "log-line " .. level)
+  local ts = os and os.date and os.date("%H:%M:%S") or ""
+  line.textContent = "[" .. level:upper() .. "] " .. msg
+  output:appendChild(line)
+  -- Auto-scroll to bottom
+  output.scrollTop = output.scrollHeight
+  if countEl then countEl.textContent = logLineCount .. " lines" end
+end
+
+-- Override console to also mirror to the log panel
+local _consoleLog = console.log
+console.log = function(...)
+  local parts = {}
+  for i = 1, select("#", ...) do
+    parts[#parts + 1] = tostring(select(i, ...))
+  end
+  local msg = table.concat(parts, "\t")
+  appendLog("log", msg)
+  _consoleLog(msg)
+end
+
+local function cInfo(msg)  appendLog("info",  msg); console.info(msg)  end
+local function cWarn(msg)  appendLog("warn",  msg); console.warn(msg)  end
+local function cError(msg) appendLog("error", msg); console.error(msg) end
+local function cDebug(msg) appendLog("debug", msg); console.debug(msg) end
+
+console.log("Lua scripting demo initialised")
+
+-- ================================================================
+-- 1. Counter
+-- ================================================================
+local counterValue = 0
+
+local function updateCounter()
+  local el = document:getElementById("counter-val")
+  local msg = document:getElementById("counter-msg")
+  if not el then return end
+  el.textContent = tostring(counterValue)
+  -- Colour class
+  el:removeClass("positive")
+  el:removeClass("negative")
+  if counterValue > 0 then
+    el:addClass("positive")
+  elseif counterValue < 0 then
+    el:addClass("negative")
+  end
+  -- Status message
+  if msg then
+    if counterValue == 0 then
+      msg.textContent = "Back to zero"
+    elseif counterValue > 100 then
+      msg.textContent = "Over 100! Impressive."
+    elseif counterValue < -10 then
+      msg.textContent = "That's quite negative."
+    else
+      msg.textContent = ""
+    end
+  end
+end
+
+local btnInc   = document:getElementById("btn-inc")
+local btnDec   = document:getElementById("btn-dec")
+local btnReset = document:getElementById("btn-reset")
+
+if btnInc then
+  btnInc:addEventListener("click", function(e)
+    counterValue = counterValue + 1
+    updateCounter()
+    console.log("Counter incremented to " .. counterValue)
+  end)
+end
+
+if btnDec then
+  btnDec:addEventListener("click", function(e)
+    counterValue = counterValue - 1
+    updateCounter()
+    console.log("Counter decremented to " .. counterValue)
+  end)
+end
+
+if btnReset then
+  btnReset:addEventListener("click", function(e)
+    local prev = counterValue
+    counterValue = 0
+    updateCounter()
+    cWarn("Counter reset (was " .. prev .. ")")
+  end)
+end
+
+-- ================================================================
+-- 2. Todo List
+-- ================================================================
+local todoItems = {}
+local nextTodoId = 1
+
+local function updateTodoCount()
+  local countEl = document:getElementById("todo-count")
+  if not countEl then return end
+  local done = 0
+  for _, item in ipairs(todoItems) do
+    if item.done then done = done + 1 end
+  end
+  countEl.textContent = #todoItems .. " tasks, " .. done .. " done"
+end
+
+local function renderTodoItem(item)
+  local list = document:getElementById("todo-list")
+  if not list then return end
+
+  local li = document:createElement("li")
+  li:setAttribute("class", "todo-item" .. (item.done and " done" or ""))
+  li:setAttribute("id", "todo-" .. item.id)
+
+  local chk = document:createElement("input")
+  chk:setAttribute("type", "checkbox")
+  chk:setAttribute("class", "todo-check")
+  if item.done then chk:setAttribute("checked", "checked") end
+
+  local span = document:createElement("span")
+  span:setAttribute("class", "todo-text")
+  span.textContent = item.text
+
+  local del = document:createElement("button")
+  del:setAttribute("class", "todo-del")
+  del.textContent = "x"
+
+  chk:addEventListener("click", function(e)
+    item.done = not item.done
+    local liEl = document:getElementById("todo-" .. item.id)
+    if liEl then
+      if item.done then
+        liEl:addClass("done")
+      else
+        liEl:removeClass("done")
+      end
+    end
+    updateTodoCount()
+    cDebug("Task \"" .. item.text .. "\" marked " .. (item.done and "done" or "pending"))
+  end)
+
+  del:addEventListener("click", function(e)
+    -- Remove from list
+    for i, t in ipairs(todoItems) do
+      if t.id == item.id then
+        table.remove(todoItems, i)
+        break
+      end
+    end
+    local liEl = document:getElementById("todo-" .. item.id)
+    if liEl then liEl:remove() end
+    updateTodoCount()
+    cWarn("Task deleted: \"" .. item.text .. "\"")
+  end)
+
+  li:appendChild(chk)
+  li:appendChild(span)
+  li:appendChild(del)
+  list:appendChild(li)
+  updateTodoCount()
+end
+
+local function addTodo(text)
+  if not text or text == "" then
+    cError("Cannot add empty task")
+    return
+  end
+  local item = { id = nextTodoId, text = text, done = false }
+  nextTodoId = nextTodoId + 1
+  todoItems[#todoItems + 1] = item
+  renderTodoItem(item)
+  console.log("Task added: \"" .. text .. "\"")
+end
+
+-- Seed a few items
+addTodo("Learn KUI Lua scripting")
+addTodo("Read the DOM bindings docs")
+addTodo("Build something awesome")
+
+local todoInput = document:getElementById("todo-input")
+local btnTodoAdd = document:getElementById("btn-todo-add")
+
+if btnTodoAdd then
+  btnTodoAdd:addEventListener("click", function(e)
+    if todoInput then
+      addTodo(todoInput.textContent ~= "" and todoInput.textContent
+              or todoInput:getAttribute("value") or "")
+      -- Clear input via innerHTML
+      todoInput.textContent = ""
+    end
+  end)
+end
+
+-- ================================================================
+-- 3. Color Palette
+-- ================================================================
+local selectedSwatch = nil
+local hsvColors = {}
+
+local function hsvToHex(h, s, v)
+  -- h: 0-360, s: 0-1, v: 0-1
+  local r, g, b
+  local i = math.floor(h / 60) % 6
+  local f = (h / 60) - math.floor(h / 60)
+  local p = v * (1 - s)
+  local q = v * (1 - f * s)
+  local t = v * (1 - (1 - f) * s)
+  if     i == 0 then r,g,b = v,t,p
+  elseif i == 1 then r,g,b = q,v,p
+  elseif i == 2 then r,g,b = p,v,t
+  elseif i == 3 then r,g,b = p,q,v
+  elseif i == 4 then r,g,b = t,p,v
+  else               r,g,b = v,p,q
+  end
+  return string.format("#%02x%02x%02x",
+    math.floor(r * 255 + 0.5),
+    math.floor(g * 255 + 0.5),
+    math.floor(b * 255 + 0.5))
+end
+
+local baseHue = 200
+
+local function generatePalette(hue)
+  hue = hue or baseHue
+  hsvColors = {}
+  local palette = document:getElementById("palette")
+  if not palette then return end
+  palette.innerHTML = ""
+  selectedSwatch = nil
+
+  -- 12 swatches: vary saturation and value
+  local configs = {
+    {0.3, 0.95}, {0.5, 0.90}, {0.7, 0.85}, {0.85, 0.80},
+    {0.90, 0.70}, {0.90, 0.55}, {0.85, 0.40}, {0.80, 0.30},
+    {0.30, 0.60}, {0.50, 0.50}, {0.70, 0.40}, {0.90, 0.20},
+  }
+
+  for i, cfg in ipairs(configs) do
+    local hex = hsvToHex(hue, cfg[1], cfg[2])
+    hsvColors[i] = { hex = hex, s = cfg[1], v = cfg[2], h = hue }
+
+    local sw = document:createElement("div")
+    sw:setAttribute("class", "swatch")
+    sw.style:setProperty("background-color", hex)
+    sw:setAttribute("id", "swatch-" .. i)
+    sw:setAttribute("title", hex)
+
+    local swIdx = i
+    sw:addEventListener("click", function(e)
+      -- Deselect previous
+      if selectedSwatch then
+        local prev = document:getElementById("swatch-" .. selectedSwatch)
+        if prev then prev:removeClass("selected") end
+      end
+      selectedSwatch = swIdx
+      sw:addClass("selected")
+      local info = document:getElementById("color-info")
+      local col = hsvColors[swIdx]
+      if info and col then
+        info.textContent = col.hex .. "  H:" .. math.floor(col.h) ..
+          "  S:" .. math.floor(col.s * 100) .. "%  V:" .. math.floor(col.v * 100) .. "%"
+      end
+      console.log("Selected color: " .. hex)
+    end)
+
+    palette:appendChild(sw)
+  end
+  cInfo("Palette generated for hue " .. math.floor(hue) .. "°")
+end
+
+local btnGenPalette = document:getElementById("btn-gen-palette")
+local btnComplement = document:getElementById("btn-complement")
+
+if btnGenPalette then
+  btnGenPalette:addEventListener("click", function(e)
+    baseHue = (baseHue + 37) % 360
+    generatePalette(baseHue)
+  end)
+end
+
+if btnComplement then
+  btnComplement:addEventListener("click", function(e)
+    local compHue = (baseHue + 180) % 360
+    generatePalette(compHue)
+    cInfo("Complement hue: " .. math.floor(compHue) .. "°")
+  end)
+end
+
+generatePalette(200)
+
+-- ================================================================
+-- 4. Stopwatch
+-- ================================================================
+local timerMs   = 0
+local timerRunning = false
+local timerInterval = nil
+local lapCount  = 0
+
+local function formatTime(ms)
+  local s  = math.floor(ms / 1000)
+  local m  = math.floor(s / 60)
+  local ds = math.floor((ms % 1000) / 100)
+  return string.format("%02d:%02d.%d", m, s % 60, ds)
+end
+
+local function updateTimerUI()
+  local disp  = document:getElementById("timer-display")
+  local fill  = document:getElementById("progress-fill")
+  if disp then disp.textContent = formatTime(timerMs) end
+  if fill then
+    local pct = (timerMs % 10000) / 10000 * 100
+    fill.style:setProperty("width", pct .. "%")
+    if pct > 75 then
+      fill.style:setProperty("background", "#ef4444")
+    elseif pct > 50 then
+      fill.style:setProperty("background", "#f59e0b")
+    else
+      fill.style:setProperty("background", "#7c3aed")
+    end
+  end
+end
+
+local btnTimerStart = document:getElementById("btn-timer-start")
+local btnTimerPause = document:getElementById("btn-timer-pause")
+local btnTimerReset = document:getElementById("btn-timer-reset")
+
+if btnTimerStart then
+  btnTimerStart:addEventListener("click", function(e)
+    if timerRunning then return end
+    timerRunning = true
+    timerInterval = setInterval(function()
+      timerMs = timerMs + 100
+      updateTimerUI()
+    end, 100)
+    cInfo("Stopwatch started")
+  end)
+end
+
+if btnTimerPause then
+  btnTimerPause:addEventListener("click", function(e)
+    if not timerRunning then
+      -- Record a lap
+      lapCount = lapCount + 1
+      local lapsEl = document:getElementById("timer-laps")
+      if lapsEl then
+        lapsEl.textContent = "Lap " .. lapCount .. ": " .. formatTime(timerMs)
+      end
+      cDebug("Lap " .. lapCount .. " recorded: " .. formatTime(timerMs))
+    else
+      timerRunning = false
+      if timerInterval then
+        clearInterval(timerInterval)
+        timerInterval = nil
+      end
+      cInfo("Stopwatch paused at " .. formatTime(timerMs))
+    end
+  end)
+end
+
+if btnTimerReset then
+  btnTimerReset:addEventListener("click", function(e)
+    timerRunning = false
+    if timerInterval then clearInterval(timerInterval); timerInterval = nil end
+    timerMs = 0
+    lapCount = 0
+    updateTimerUI()
+    local lapsEl = document:getElementById("timer-laps")
+    if lapsEl then lapsEl.textContent = "" end
+    cWarn("Stopwatch reset")
+  end)
+end
+
+-- ================================================================
+-- 5. Log panel controls
+-- ================================================================
+local btnLogTest  = document:getElementById("btn-log-test")
+local btnLogClear = document:getElementById("btn-log-clear")
+
+if btnLogTest then
+  btnLogTest:addEventListener("click", function(e)
+    console.log("This is a plain log message")
+    cInfo("Info: DOM has " .. (document:querySelectorAll("div").length or 0) .. " div elements")
+    cWarn("Warning: this is a sample warning from Lua")
+    cError("Error: this is a simulated error (not real)")
+    cDebug("Debug: timerMs=" .. timerMs .. "  counterValue=" .. counterValue)
+    console.log("Todo items: " .. #todoItems .. " total")
+
+    -- Demonstrate getComputedStyle
+    local card = document:getElementById("counter-card")
+    if card then
+      local cs = document:getComputedStyle(card)
+      if cs then
+        local bg = cs:getPropertyValue("background-color")
+        cDebug("counter-card background-color = " .. (bg or "n/a"))
+      end
+    end
+  end)
+end
+
+if btnLogClear then
+  btnLogClear:addEventListener("click", function(e)
+    local output = document:getElementById("log-output")
+    if output then output.innerHTML = "" end
+    logLineCount = 0
+    local countEl = document:getElementById("log-line-count")
+    if countEl then countEl.textContent = "0 lines" end
+    console.clear()
+  end)
+end
+
+-- ================================================================
+-- Startup banner
+-- ================================================================
+cInfo("=== Lua Scripting Demo ready ===")
+cInfo("All four widgets are powered by <script type=\"text/lua\">")
+cDebug("document.title = " .. (document.title or "(none)"))
+
+-- Delayed greeting to demonstrate setTimeout
+setTimeout(function()
+  cInfo("setTimeout fired after 1.5s — async Lua works!")
+end, 1500)
+
+</script>
+</body>
+</html>

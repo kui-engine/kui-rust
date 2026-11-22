@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.content{background:#f1f5f9;padding:16px;border-radius:8px;margin-bottom:16px;min-height:80px}
+.content p{font-size:14px;color:#475569}
+.nav{display:flex;gap:4px;align-items:center;justify-content:center}
+.pg{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;cursor:pointer;font-weight:500;color:#64748b;border:1px solid #e2e8f0;background:white}
+.pg:hover{background:#f1f5f9;border-color:#3b82f6;color:#3b82f6}
+.pg.active{background:#3b82f6;color:white;border-color:#3b82f6}
+.pg.disabled{opacity:.4;cursor:default;pointer-events:none}
+.info{text-align:center;margin-top:12px;font-size:13px;color:#94a3b8}
+</style></head><body>
+<h2>Pagination</h2>
+<div class="card">
+<div class="content" id="content"><p>Page 1: Items 1-10 of 50.</p></div>
+<div class="nav">
+<div class="pg disabled" id="prev">‹</div>
+<div class="pg active" id="pg1">1</div>
+<div class="pg" id="pg2">2</div>
+<div class="pg" id="pg3">3</div>
+<div class="pg" id="pg4">4</div>
+<div class="pg" id="pg5">5</div>
+<div class="pg" id="next">›</div>
+</div>
+<div class="info" id="info">Page 1 of 5</div>
+</div></body></html>

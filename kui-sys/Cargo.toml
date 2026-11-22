@@ -1,0 +1,15 @@
+[package]
+name = "kui-sys"
+version = "3.1.0"
+edition = "2021"
+links = "kui_c"
+authors = ["Alloy"]
+license = "MIT"
+description = "Raw FFI bindings for the KUI C ABI"
+repository = "https://github.com/kui-engine/kui-rust"
+homepage = "https://github.com/kui-engine/kui"
+# 与 ../Cargo.toml 同一理由暂不发布到 crates.io。
+publish = false
+
+[lib]
+path = "src/lib.rs"

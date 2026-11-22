@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — HTTP client &amp; DevTools commands</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 16px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 10px; }
+#tour-result { padding: 8px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 12px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.panel { background: white; border-radius: 10px; padding: 12px 14px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 8px; }
+.sandbox { border: 1px dashed #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 8px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+button { padding: 5px 10px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 6px 8px;
+       border-radius: 5px; color: #334155; min-height: 26px; margin-bottom: 4px; }
+#http-body { font-family: Consolas, monospace; font-size: 11px; color: #475569; max-height: 48px;
+             overflow: hidden; }
+#inj-target { background: #7c3aed; }
+#inj-input, #ime-input { width: 150px; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 4px;
+                         font-size: 13px; margin-right: 6px; }
+#wheel-box { display: inline-block; padding: 6px 12px; border-radius: 6px; background: #e0f2fe;
+             color: #075985; margin-left: 6px; }
+#cdp-target { display: inline-block; padding: 4px 10px; border-radius: 5px; background: #e2e8f0; }
+#cdp-target[data-cdp] { background: #fde68a; }
+#box-target { box-sizing: content-box; width: 120px; height: 40px; padding: 10px; border: 4px solid #0ea5e9; margin: 6px;
+              background: #e0f2fe; font-size: 12px; }
+.log-title { margin: 16px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+</style></head><body>
+<h1>KUI API — HTTP client &amp; DevTools commands</h1>
+<p class="lead">The host fetches over HTTP through the C ABI (and the Go / Rust wrappers) without the
+internet: the window's own DevTools server is a loopback HTTP server (/json/version), and a port with
+no listener produces a transport error. The DevTools functions run CDP commands in-process and inject
+mouse, key and IME input into the page. On start the host runs every call once and checks the result.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-http">
+    <h2>HTTP client (loopback)</h2>
+    <div class="api">http_client_create · set_user_agent · fetch_sync · fetch_async ·
+      fetch_async_on_main_thread · cancel_all · response_get_status / body / content_type / error</div>
+    <p class="note">GET the DevTools server's /json/version (JSON), a closed port (connection error)
+      and a malformed URL.</p>
+    <div class="toolbar">
+      <button id="btn-http-main">GET (main thread callback)</button>
+      <button id="btn-http-sync">GET (sync)</button>
+      <button id="btn-http-closed">Closed port</button>
+      <button id="btn-http-bad">Bad URL</button>
+      <button id="btn-http-cancel">Worker + cancel all</button>
+    </div>
+    <div class="out" id="http-out">—</div>
+    <div id="http-body">—</div>
+  </section>
+
+  <section class="panel" id="p-cdp">
+    <h2>DevTools commands</h2>
+    <div class="api">window_get_devtools_port · window_start_devtools · devtools_dispatch_command</div>
+    <p class="note">Raw CDP JSON in, JSON response out, no WebSocket: DOM.setAttribute paints the tag
+      amber; an unknown method answers with an error object.</p>
+    <div class="sandbox"><span id="cdp-target">CDP target</span></div>
+    <div class="toolbar">
+      <button id="btn-cdp-attr">DOM.setAttribute</button>
+      <button id="btn-cdp-metrics">Page.getLayoutMetrics</button>
+      <button id="btn-cdp-unknown">Unknown method</button>
+    </div>
+    <div class="out" id="cdp-out">—</div>
+  </section>
+
+  <section class="panel" id="p-inject">
+    <h2>Input injection</h2>
+    <div class="api">devtools_dispatch_mouse_event · devtools_dispatch_key_event ·
+      devtools_dispatch_ime_event</div>
+    <p class="note">Synthetic input goes through the same dispatch path as real input: the purple
+      button counts clicks, the inputs receive keys and an IME composition, the blue tag counts wheel
+      events.</p>
+    <div class="sandbox">
+      <button id="inj-target">clicks=0</button><span id="wheel-box">wheel=0</span>
+      <div style="margin-top: 8px"><input id="inj-input" value=""><input id="ime-input" value=""></div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-inj-click">Synthetic click</button>
+      <button id="btn-inj-type">Type "kui"</button>
+      <button id="btn-inj-ime">IME compose</button>
+      <button id="btn-inj-wheel">Wheel</button>
+    </div>
+    <div class="out" id="inj-out">—</div>
+  </section>
+
+  <section class="panel" id="p-box">
+    <h2>Box model</h2>
+    <div class="api">devtools_get_box_model · element_get_bounding_rect</div>
+    <p class="note">120×40 content, 10 px padding, 4 px border, 6 px margin: the content, padding,
+      border and margin quads, compared with the bounding rect.</p>
+    <div class="sandbox"><div id="box-target">box target</div></div>
+    <div class="toolbar">
+      <button id="btn-box">Read box model</button>
+    </div>
+    <div class="out" id="box-out">—</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+</body></html>

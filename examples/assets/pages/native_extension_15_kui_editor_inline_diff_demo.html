@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    padding: 16px;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #0f172a; color: #e2e8f0; min-height: 100vh;
+}
+header { display: flex; align-items: center; justify-content: space-between;
+         margin-bottom: 12px; }
+h1 { font-size: 18px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.toolbar button {
+    padding: 6px 12px; border-radius: 4px; border: 1px solid #334155;
+    background: #1e293b; color: #e2e8f0; font: 13px "Segoe UI"; cursor: pointer;
+}
+.toolbar button:hover { background: #334155; }
+.toolbar button.primary { background: #1e3a8a; border-color: #2563eb; }
+.toolbar button.primary:hover { background: #2563eb; }
+.toolbar button.danger { background: #7f1d1d; border-color: #b91c1c; }
+.toolbar button.danger:hover { background: #b91c1c; }
+.editor-wrap { display: flex; height: 580px; }
+kui-editor { flex: 1; height: 100%;
+             background: #1e293b; border: 1px solid #334155;
+             font-family: "Cascadia Code", "Consolas", monospace; }
+#log {
+    margin-top: 8px; padding: 8px 12px;
+    background: #020617; border: 1px solid #334155; border-radius: 4px;
+    max-height: 150px; overflow-y: auto;
+    font: 11px "Cascadia Code", monospace; color: #cbd5e1; white-space: pre;
+}
+</style></head>
+<body>
+<header>
+    <h1>kui-editor — inline AI diff review (view zones + line widgets)</h1>
+    <small style="color:#94a3b8;">SDK 3.9.0 • KUI-020 • addViewZone / addLineWidget / consumeLineWidgetClick</small>
+</header>
+
+<div class="toolbar">
+    <button id="btn-propose" class="primary">AI: propose 2 hunks</button>
+    <button id="btn-clear" class="danger">Discard all</button>
+</div>
+
+<div class="editor-wrap">
+    <kui-editor id="ed" line-numbers="true"></kui-editor>
+</div>
+<div id="log"></div>
+
+<script>
+local sampleCode = [[// Inline diff review demo.
+// Press "AI: propose 2 hunks", then click the inline buttons.
+function sum(entries) {
+    let total = 0;
+    for (let i = 0; i < entries.length; i++) {
+        total += entries[i].value;
+    }
+    return total;
+}
+
+function main() {
+    const entries = loadEntries();
+    console.log("total:", sum(entries));
+}
+]]
+
+local ed     = document:getElementById("ed")
+local logBox = document:getElementById("log")
+local function logLine(s)
+    logBox.textContent = (logBox.textContent or "") .. tostring(s) .. "\n"
+end
+
+ed:setValue(sampleCode)
+ed:setLanguage("javascript")
+ed:setTheme("mocha")
+ed:focus()
+
+-- ---------------------------------------------------------------------------
+-- Hunk bookkeeping: widgetId -> { zones = {id, ...}, apply = function() }.
+-- Anchors are CURRENT buffer line numbers; like setGitDiff, they are NOT
+-- auto-shifted on edits — re-publish after applying a hunk.
+-- ---------------------------------------------------------------------------
+local hunks = {}
+
+local function clearHunk(widgetId)
+    local h = hunks[widgetId]
+    if not h then return end
+    for _, zid in ipairs(h.zones) do ed:removeViewZone(zid) end
+    ed:removeLineWidget(widgetId)
+    hunks[widgetId] = nil
+end
+
+local function clearAll()
+    ed:clearViewZones()
+    ed:clearLineWidgets()
+    hunks = {}
+end
+
+-- Replace buffer lines [fromLine, toLine] (0-based, inclusive) with `text`.
+-- Selects up to the start of the next line so no per-line length query is
+-- needed; `text` must end with "\n" to keep the following line intact.
+local function replaceLines(fromLine, toLine, text)
+    ed:setSelection(fromLine, 0, toLine + 1, 0)
+    ed:insertText(text)
+end
+
+local BUTTONS = '{"buttons":[{"id":"accept","text":"\u{2713} Accept"},{"id":"reject","text":"\u{2715} Reject"}]}'
+
+local function proposeHunks()
+    clearAll()
+
+    -- Hunk 1 (replace lines 4-6, the for-loop, with a reduce one-liner):
+    -- a red zone previews what goes away, a green zone what replaces it.
+    local del1 = ed:addViewZone(6, '["- (the for-loop above will be replaced)"]', 1)
+    local add1 = ed:addViewZone(6, '["+     return entries.reduce((t, e) => t + e.value, 0);"]', 2)
+    local w1 = ed:addLineWidget(4, 0, BUTTONS)
+    hunks[w1] = {
+        zones = { del1, add1 },
+        apply = function()
+            replaceLines(3, 7,
+                "    return entries.reduce((t, e) => t + e.value, 0);\n")
+            logLine("hunk 1 applied (loop -> reduce)")
+        end,
+    }
+
+    -- Hunk 2 (insert a guard at the top of main()): green zone only.
+    local add2 = ed:addViewZone(11,
+        '["+     if (!entries || entries.length === 0) {", "+         return;", "+     }"]', 2)
+    local w2 = ed:addLineWidget(11, 1, BUTTONS)
+    hunks[w2] = {
+        zones = { add2 },
+        apply = function()
+            -- NOTE: anchors are stale after hunk 1 applies — a real host
+            -- recomputes them. The demo simply re-reads the anchor line.
+            logLine("hunk 2 applied (empty-entries guard) — re-propose to see fresh anchors")
+        end,
+    }
+
+    logLine(string.format(
+        "2 hunks proposed: widgets %d & %d (zones %d/%d/%d). Click the inline buttons.",
+        w1, w2, del1, add1, add2))
+end
+
+document:getElementById("btn-propose"):addEventListener("click", function(e)
+    proposeHunks()
+end)
+
+document:getElementById("btn-clear"):addEventListener("click", function(e)
+    clearAll()
+    logLine("all hunks discarded")
+end)
+
+-- Propose once on startup so the demo shows the feature immediately.
+proposeHunks()
+
+-- Poll widget clicks — same pattern as consumeGutterClick.
+setInterval(function()
+    local hit = ed:consumeLineWidgetClick()
+    if hit ~= "" then
+        local widgetId, buttonId = hit:match("^(%d+),(.+)$")
+        widgetId = tonumber(widgetId)
+        logLine("click: widget=" .. widgetId .. " button=" .. buttonId)
+        local h = hunks[widgetId]
+        if h then
+            if buttonId == "accept" and h.apply then h.apply() end
+            clearHunk(widgetId)
+        end
+    end
+end, 50)
+
+print("[inline-diff demo] ready")
+</script>
+</body></html>

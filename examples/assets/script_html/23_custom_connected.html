@@ -1,0 +1,24 @@
+<html><body>
+<div id="container"></div>
+<div id="result"></div>
+<script>
+connectedMsg = ""
+document:defineElement("my-widget", {
+    connected = function(el)
+        connectedMsg = "connected:" .. el.tagName
+    end
+})
+
+local c = document:getElementById("container")
+local w = document:createElement("my-widget")
+c:appendChild(w)
+</script>
+<script>
+local r = document:getElementById("result")
+if connectedMsg == "connected:my-widget" then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL: " .. connectedMsg
+end
+</script>
+</body></html>

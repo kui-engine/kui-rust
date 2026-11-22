@@ -1,0 +1,21 @@
+<html><body>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Basic eval: arithmetic, string concat, boolean
+local a = 10 + 20
+local b = "hello" .. " " .. "world"
+local c = true
+
+local ok = (a == 30) and (b == "hello world") and (c == true)
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL"
+    d.textContent = "a=" .. tostring(a) .. " b=" .. b .. " c=" .. tostring(c)
+end
+</script>
+</body></html>

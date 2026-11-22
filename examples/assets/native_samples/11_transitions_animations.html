@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+
+    /* Transition demos */
+    .trans-box {
+        width: 100px; height: 60px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 600; cursor: pointer;
+    }
+
+    .t-bg {
+        background: #334155;
+        transition: background 0.3s ease;
+    }
+    .t-bg:hover { background: #3b82f6; }
+
+    .t-size {
+        background: #8b5cf6; width: 80px;
+        transition: width 0.4s ease-in-out;
+    }
+    .t-size:hover { width: 160px; }
+
+    .t-radius {
+        background: #ec4899;
+        transition: border-radius 0.3s ease;
+    }
+    .t-radius:hover { border-radius: 30px; }
+
+    .t-shadow {
+        background: #334155;
+        transition: box-shadow 0.3s ease;
+    }
+    .t-shadow:hover { box-shadow: 0 8px 24px rgba(59,130,246,0.5); }
+
+    .t-opacity {
+        background: #f59e0b;
+        transition: opacity 0.3s ease;
+    }
+    .t-opacity:hover { opacity: 0.3; }
+
+    .t-border {
+        background: #334155; border: 2px solid transparent;
+        transition: border-color 0.3s ease, background 0.3s ease;
+    }
+    .t-border:hover { border-color: #22c55e; background: #14532d; }
+
+    /* Timing functions */
+    .timing-bar {
+        height: 8px; width: 40px; border-radius: 4px; background: #3b82f6;
+    }
+    .timing-container { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .timing-container:hover .timing-bar { width: 300px; }
+    .t-ease    { transition: width 1s ease; }
+    .t-linear  { transition: width 1s linear; }
+    .t-ease-in { transition: width 1s ease-in; }
+    .t-ease-out { transition: width 1s ease-out; }
+    .t-ease-io { transition: width 1s ease-in-out; }
+
+    /* @keyframes animations */
+    @keyframes pulse {
+        0%   { opacity: 1; transform: scale(1); }
+        50%  { opacity: 0.5; transform: scale(1.1); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+    }
+    @keyframes slide {
+        0%   { transform: translateX(0); }
+        50%  { transform: translateX(100px); }
+        100% { transform: translateX(0); }
+    }
+    @keyframes colorCycle {
+        0%   { background: #ef4444; }
+        25%  { background: #f59e0b; }
+        50%  { background: #22c55e; }
+        75%  { background: #3b82f6; }
+        100% { background: #ef4444; }
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-20px); }
+    }
+
+    .anim-box {
+        width: 50px; height: 50px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 600; color: white;
+    }
+    .a-pulse  { background: #3b82f6; animation: pulse 2s ease-in-out infinite; }
+    .a-spin   { background: #8b5cf6; animation: spin 3s linear infinite; }
+    .a-slide  { background: #22c55e; animation: slide 2s ease-in-out infinite; }
+    .a-color  { animation: colorCycle 4s linear infinite; }
+    .a-bounce { background: #f59e0b; animation: bounce 1s ease-in-out infinite; }
+</style>
+</head>
+<body>
+    <h2>Transitions &amp; Animations</h2>
+
+    <h3>CSS Transitions (hover to trigger)</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="trans-box t-bg">BG color</div>
+                <div class="label">background</div>
+            </div>
+            <div>
+                <div class="trans-box t-size">Width</div>
+                <div class="label">width</div>
+            </div>
+            <div>
+                <div class="trans-box t-radius">Radius</div>
+                <div class="label">border-radius</div>
+            </div>
+            <div>
+                <div class="trans-box t-shadow">Shadow</div>
+                <div class="label">box-shadow</div>
+            </div>
+            <div>
+                <div class="trans-box t-opacity">Opacity</div>
+                <div class="label">opacity</div>
+            </div>
+            <div>
+                <div class="trans-box t-border">Border</div>
+                <div class="label">border-color</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Timing Functions (hover the section)</h3>
+    <div class="section" style="cursor: pointer;">
+        <div class="label">Hover this section to animate all bars simultaneously</div>
+        <div class="timing-container">
+            <div style="width:80px; font-size:12px;">ease</div>
+            <div class="timing-bar t-ease"></div>
+        </div>
+        <div class="timing-container">
+            <div style="width:80px; font-size:12px;">linear</div>
+            <div class="timing-bar t-linear"></div>
+        </div>
+        <div class="timing-container">
+            <div style="width:80px; font-size:12px;">ease-in</div>
+            <div class="timing-bar t-ease-in"></div>
+        </div>
+        <div class="timing-container">
+            <div style="width:80px; font-size:12px;">ease-out</div>
+            <div class="timing-bar t-ease-out"></div>
+        </div>
+        <div class="timing-container">
+            <div style="width:80px; font-size:12px;">ease-in-out</div>
+            <div class="timing-bar t-ease-io"></div>
+        </div>
+    </div>
+
+    <h3>@keyframes Animations (running continuously)</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="anim-box a-pulse">Pulse</div>
+                <div class="label">pulse</div>
+            </div>
+            <div>
+                <div class="anim-box a-spin">Spin</div>
+                <div class="label">spin</div>
+            </div>
+            <div>
+                <div class="anim-box a-slide">Slide</div>
+                <div class="label">slide</div>
+            </div>
+            <div>
+                <div class="anim-box a-color">Color</div>
+                <div class="label">color cycle</div>
+            </div>
+            <div>
+                <div class="anim-box a-bounce">Bounce</div>
+                <div class="label">bounce</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

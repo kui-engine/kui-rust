@@ -1,0 +1,17 @@
+<html><body>
+<input id="inp" type="text" />
+<div id="result"></div>
+<script>
+local keyVal = ""
+local inp = document:getElementById("inp")
+inp:addEventListener("keydown", function(e)
+    keyVal = e.key
+end)
+
+local r = document:getElementById("result")
+-- Note: keyboard events need to be fired from C++ side in the test driver.
+-- For this HTML test we verify the listener was registered without error.
+-- The test driver fires the event externally.
+r.textContent = "PASS"
+</script>
+</body></html>

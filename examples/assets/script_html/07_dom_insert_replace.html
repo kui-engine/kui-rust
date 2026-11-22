@@ -1,0 +1,34 @@
+<html><body>
+<div id="parent"><div id="a">A</div><div id="c">C</div></div>
+<div id="result"></div>
+<script>
+local parent = document:getElementById("parent")
+local a = document:getElementById("a")
+local c = document:getElementById("c")
+
+-- insertBefore: insert B before C
+local b = document:createElement("div")
+b:setAttribute("id", "b")
+b.textContent = "B"
+parent:insertBefore(b, c)
+
+-- replaceChild: replace A with X
+local x = document:createElement("div")
+x:setAttribute("id", "x")
+x.textContent = "X"
+parent:replaceChild(x, a)
+
+-- Verify order: X, B, C
+local kids = parent:children()
+local ok = (#kids == 3)
+    and (kids[1]:getAttribute("id") == "x")
+    and (kids[2]:getAttribute("id") == "b")
+    and (kids[3]:getAttribute("id") == "c")
+
+-- Verify old A is gone
+ok = ok and (document:getElementById("a") == nil)
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

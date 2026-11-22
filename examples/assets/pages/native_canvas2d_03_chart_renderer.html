@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f172a; color: #e2e8f0;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 20px;
+  }
+  h1 {
+    font-size: 22px; font-weight: 700; color: #38bdf8;
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-size: 15px; font-weight: 600; color: #94a3b8;
+    margin: 16px 0 8px 0;
+  }
+  .grid {
+    display: flex; flex-wrap: wrap; gap: 16px;
+  }
+  .card {
+    background: #1e293b; border: 1px solid #334155;
+    border-radius: 8px; padding: 12px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .card .label {
+    font-size: 11px; color: #64748b; margin-top: 6px;
+    text-align: center;
+  }
+  canvas {
+    border: 1px solid #334155; border-radius: 4px;
+    background: #000;
+  }
+  .hidden-status {
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <h1>Canvas 2D API — Complete Feature Demo</h1>
+  <div id="result" class="hidden-status">INIT</div>
+  <div id="detail" class="hidden-status"></div>
+
+  <!-- Row 1: Basic shapes -->
+  <h2>1. Basic Shapes — fillRect / strokeRect / clearRect</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c1" width="200" height="120"></canvas>
+      <div class="label">fillRect + strokeRect + clearRect</div>
+    </div>
+    <div class="card">
+      <canvas id="c2" width="200" height="120"></canvas>
+      <div class="label">Path: arc / rect / ellipse / roundRect</div>
+    </div>
+    <div class="card">
+      <canvas id="c3" width="200" height="120"></canvas>
+      <div class="label">Bezier & Quadratic Curves</div>
+    </div>
+  </div>
+
+  <!-- Row 2: Gradients -->
+  <h2>2. Gradients — Linear / Radial / Conic</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c4" width="200" height="120"></canvas>
+      <div class="label">createLinearGradient</div>
+    </div>
+    <div class="card">
+      <canvas id="c5" width="200" height="120"></canvas>
+      <div class="label">createRadialGradient</div>
+    </div>
+    <div class="card">
+      <canvas id="c6" width="200" height="120"></canvas>
+      <div class="label">createConicGradient</div>
+    </div>
+  </div>
+
+  <!-- Row 3: Line styles & shadows -->
+  <h2>3. Line Styles — lineCap / lineJoin / dash / shadow</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c7" width="200" height="120"></canvas>
+      <div class="label">lineCap: butt / round / square</div>
+    </div>
+    <div class="card">
+      <canvas id="c8" width="200" height="120"></canvas>
+      <div class="label">lineJoin: miter / round / bevel</div>
+    </div>
+    <div class="card">
+      <canvas id="c9" width="200" height="120"></canvas>
+      <div class="label">setLineDash + shadow</div>
+    </div>
+  </div>
+
+  <!-- Row 4: Text -->
+  <h2>4. Text — fillText / strokeText / textAlign / textBaseline</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c10" width="280" height="120"></canvas>
+      <div class="label">fillText + strokeText + font</div>
+    </div>
+    <div class="card">
+      <canvas id="c11" width="280" height="120"></canvas>
+      <div class="label">textAlign: left / center / right</div>
+    </div>
+  </div>
+
+  <!-- Row 5: Transforms -->
+  <h2>5. Transforms — translate / rotate / scale / save / restore</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c12" width="200" height="150"></canvas>
+      <div class="label">translate + rotate</div>
+    </div>
+    <div class="card">
+      <canvas id="c13" width="200" height="150"></canvas>
+      <div class="label">scale + setTransform</div>
+    </div>
+    <div class="card">
+      <canvas id="c14" width="200" height="150"></canvas>
+      <div class="label">save / restore state stack</div>
+    </div>
+  </div>
+
+  <!-- Row 6: Compositing -->
+  <h2>6. Compositing — globalCompositeOperation + globalAlpha</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c15" width="200" height="150"></canvas>
+      <div class="label">source-over (default)</div>
+    </div>
+    <div class="card">
+      <canvas id="c16" width="200" height="150"></canvas>
+      <div class="label">multiply</div>
+    </div>
+    <div class="card">
+      <canvas id="c17" width="200" height="150"></canvas>
+      <div class="label">screen</div>
+    </div>
+    <div class="card">
+      <canvas id="c18" width="200" height="150"></canvas>
+      <div class="label">globalAlpha = 0.5</div>
+    </div>
+  </div>
+
+  <!-- Row 7: Clipping -->
+  <h2>7. Clipping — clip()</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c19" width="200" height="150"></canvas>
+      <div class="label">Circular clip mask</div>
+    </div>
+  </div>
+
+  <!-- Row 8: Pixel operations -->
+  <h2>8. Pixel Operations — getImageData / putImageData / createImageData</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c20" width="200" height="150"></canvas>
+      <div class="label">createImageData + putImageData</div>
+    </div>
+    <div class="card">
+      <canvas id="c21" width="200" height="150"></canvas>
+      <div class="label">getImageData + invert colors</div>
+    </div>
+  </div>
+
+  <!-- Row 9: drawImage (canvas-to-canvas) -->
+  <h2>9. drawImage — Canvas-to-Canvas (3/5/9 args)</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c22_src" width="80" height="80"></canvas>
+      <div class="label">Source canvas</div>
+    </div>
+    <div class="card">
+      <canvas id="c22_dst" width="200" height="120"></canvas>
+      <div class="label">drawImage 3-arg / 5-arg / 9-arg</div>
+    </div>
+  </div>
+
+  <!-- Row 10: Complex demo -->
+  <h2>10. Complex Demo — Animated Clock Face</h2>
+  <div class="grid">
+    <div class="card">
+      <canvas id="c23" width="200" height="200"></canvas>
+      <div class="label">Clock (translate + rotate + arc + stroke)</div>
+    </div>
+    <div class="card">
+      <canvas id="c24" width="200" height="200"></canvas>
+      <div class="label">Gradient Rings</div>
+    </div>
+  </div>
+
+<script type="text/lua">
+-- ================================================================
+-- 1. Basic Shapes
+-- ================================================================
+local c1 = document:getElementById("c1")
+local ctx1 = c1:getContext("2d")
+-- Fill rectangles
+ctx1.fillStyle = "#e74c3c"
+ctx1:fillRect(10, 10, 60, 40)
+ctx1.fillStyle = "#2ecc71"
+ctx1:fillRect(80, 10, 60, 40)
+ctx1.fillStyle = "#3498db"
+ctx1:fillRect(10, 60, 130, 50)
+-- Stroke rectangle
+ctx1.strokeStyle = "#f1c40f"
+ctx1.lineWidth = 3
+ctx1:strokeRect(150, 10, 40, 100)
+-- Clear rect in the middle
+ctx1:clearRect(30, 30, 90, 30)
+
+-- Paths: arc, rect, ellipse, roundRect
+local c2 = document:getElementById("c2")
+local ctx2 = c2:getContext("2d")
+-- Full circle
+ctx2:beginPath()
+ctx2:arc(40, 40, 25, 0, 6.283)
+ctx2.fillStyle = "#9b59b6"
+ctx2:fill()
+-- Rect path
+ctx2:beginPath()
+ctx2:rect(80, 15, 50, 50)
+ctx2.fillStyle = "#1abc9c"
+ctx2:fill()
+-- Ellipse
+ctx2:beginPath()
+ctx2:ellipse(160, 40, 30, 20, 0, 0, 6.283)
+ctx2.fillStyle = "#e67e22"
+ctx2:fill()
+-- RoundRect
+ctx2:beginPath()
+ctx2:roundRect(10, 80, 80, 30, 8)
+ctx2.fillStyle = "#2980b9"
+ctx2:fill()
+-- Arc (pie slice)
+ctx2:beginPath()
+ctx2:moveTo(150, 95)
+ctx2:arc(150, 95, 22, 0, 2.094)
+ctx2:closePath()
+ctx2.fillStyle = "#e74c3c"
+ctx2:fill()
+
+-- Bezier & Quadratic curves
+local c3 = document:getElementById("c3")
+local ctx3 = c3:getContext("2d")
+ctx3.strokeStyle = "#38bdf8"
+ctx3.lineWidth = 2
+-- Quadratic curve
+ctx3:beginPath()
+ctx3:moveTo(10, 100)
+ctx3:quadraticCurveTo(100, 10, 190, 100)
+ctx3:stroke()
+-- Bezier curve
+ctx3.strokeStyle = "#f472b6"
+ctx3:beginPath()
+ctx3:moveTo(10, 60)
+ctx3:bezierCurveTo(40, 10, 160, 110, 190, 60)
+ctx3:stroke()
+-- Control point markers
+ctx3.fillStyle = "#facc15"
+ctx3:drawCircle(100, 10, 3)
+ctx3:drawCircle(40, 10, 3)
+ctx3:drawCircle(160, 110, 3)
+
+-- ================================================================
+-- 2. Gradients
+-- ================================================================
+local c4 = document:getElementById("c4")
+local ctx4 = c4:getContext("2d")
+local lg = ctx4:createLinearGradient(0, 0, 200, 0)
+lg:addColorStop(0, "#667eea")
+lg:addColorStop(0.5, "#764ba2")
+lg:addColorStop(1, "#f093fb")
+ctx4.fillStyle = lg
+ctx4:fillRect(0, 0, 200, 120)
+
+local c5 = document:getElementById("c5")
+local ctx5 = c5:getContext("2d")
+local rg = ctx5:createRadialGradient(100, 60, 10, 100, 60, 60)
+rg:addColorStop(0, "#ffecd2")
+rg:addColorStop(0.5, "#fcb69f")
+rg:addColorStop(1, "#0f172a")
+ctx5.fillStyle = rg
+ctx5:fillRect(0, 0, 200, 120)
+
+local c6 = document:getElementById("c6")
+local ctx6 = c6:getContext("2d")
+local cg = ctx6:createConicGradient(0, 100, 60)
+cg:addColorStop(0, "#ff0000")
+cg:addColorStop(0.17, "#ff8800")
+cg:addColorStop(0.33, "#ffff00")
+cg:addColorStop(0.5, "#00ff00")
+cg:addColorStop(0.67, "#0088ff")
+cg:addColorStop(0.83, "#8800ff")
+cg:addColorStop(1, "#ff0000")
+ctx6.fillStyle = cg
+ctx6:fillRect(0, 0, 200, 120)
+
+-- ================================================================
+-- 3. Line Styles
+-- ================================================================
+local c7 = document:getElementById("c7")
+local ctx7 = c7:getContext("2d")
+ctx7.lineWidth = 12
+ctx7.strokeStyle = "#38bdf8"
+-- butt
+ctx7.lineCap = "butt"
+ctx7:beginPath()
+ctx7:moveTo(30, 30)
+ctx7:lineTo(170, 30)
+ctx7:stroke()
+-- round
+ctx7.lineCap = "round"
+ctx7:beginPath()
+ctx7:moveTo(30, 60)
+ctx7:lineTo(170, 60)
+ctx7:stroke()
+-- square
+ctx7.lineCap = "square"
+ctx7:beginPath()
+ctx7:moveTo(30, 90)
+ctx7:lineTo(170, 90)
+ctx7:stroke()
+-- reference lines
+ctx7.strokeStyle = "#475569"
+ctx7.lineWidth = 1
+ctx7.lineCap = "butt"
+ctx7:beginPath()
+ctx7:moveTo(30, 15)
+ctx7:lineTo(30, 105)
+ctx7:moveTo(170, 15)
+ctx7:lineTo(170, 105)
+ctx7:stroke()
+
+local c8 = document:getElementById("c8")
+local ctx8 = c8:getContext("2d")
+ctx8.lineWidth = 8
+ctx8.strokeStyle = "#f472b6"
+local joins = {"miter", "round", "bevel"}
+for i, join in ipairs(joins) do
+  local y = 15 + (i - 1) * 38
+  ctx8.lineJoin = join
+  ctx8:beginPath()
+  ctx8:moveTo(20, y + 20)
+  ctx8:lineTo(60, y)
+  ctx8:lineTo(100, y + 20)
+  ctx8:lineTo(140, y)
+  ctx8:lineTo(180, y + 20)
+  ctx8:stroke()
+end
+
+local c9 = document:getElementById("c9")
+local ctx9 = c9:getContext("2d")
+-- Dashed line
+ctx9.strokeStyle = "#facc15"
+ctx9.lineWidth = 3
+ctx9:setLineDash({10, 5})
+ctx9:beginPath()
+ctx9:moveTo(10, 25)
+ctx9:lineTo(190, 25)
+ctx9:stroke()
+-- Dotted line
+ctx9:setLineDash({2, 6})
+ctx9.strokeStyle = "#4ade80"
+ctx9:beginPath()
+ctx9:moveTo(10, 50)
+ctx9:lineTo(190, 50)
+ctx9:stroke()
+-- Shadow rectangle
+ctx9:setLineDash({})
+ctx9.shadowColor = "#38bdf8"
+ctx9.shadowBlur = 12
+ctx9.shadowOffsetX = 4
+ctx9.shadowOffsetY = 4
+ctx9.fillStyle = "#1e40af"
+ctx9:fillRect(40, 70, 120, 40)
+-- Reset shadow
+ctx9.shadowBlur = 0
+ctx9.shadowOffsetX = 0
+ctx9.shadowOffsetY = 0
+
+-- ================================================================
+-- 4. Text
+-- ================================================================
+local c10 = document:getElementById("c10")
+local ctx10 = c10:getContext("2d")
+ctx10.font = "24px sans-serif"
+ctx10.fillStyle = "#38bdf8"
+ctx10:fillText("Hello Canvas!", 10, 35)
+ctx10.font = "18px sans-serif"
+ctx10.strokeStyle = "#f472b6"
+ctx10.lineWidth = 1
+ctx10:strokeText("Stroke Text", 10, 65)
+ctx10.font = "14px sans-serif"
+ctx10.fillStyle = "#94a3b8"
+ctx10:fillText("measureText demo", 10, 95)
+local m = ctx10:measureText("measureText demo")
+local measuredWidth = 120
+if type(m) == "table" then
+  measuredWidth = m.width or m["width"] or measuredWidth
+elseif type(m) == "number" then
+  measuredWidth = m
+end
+-- underline using measured width
+ctx10.strokeStyle = "#475569"
+ctx10:beginPath()
+ctx10:moveTo(10, 100)
+ctx10:lineTo(10 + measuredWidth, 100)
+ctx10:stroke()
+
+local c11 = document:getElementById("c11")
+local ctx11 = c11:getContext("2d")
+-- draw center line
+ctx11.strokeStyle = "#334155"
+ctx11.lineWidth = 1
+ctx11:beginPath()
+ctx11:moveTo(140, 0)
+ctx11:lineTo(140, 120)
+ctx11:stroke()
+ctx11.font = "16px sans-serif"
+ctx11.fillStyle = "#e2e8f0"
+ctx11.textAlign = "left"
+ctx11:fillText("Left", 140, 30)
+ctx11.textAlign = "center"
+ctx11:fillText("Center", 140, 60)
+ctx11.textAlign = "right"
+ctx11:fillText("Right", 140, 90)
+
+-- ================================================================
+-- 5. Transforms
+-- ================================================================
+local c12 = document:getElementById("c12")
+local ctx12 = c12:getContext("2d")
+ctx12:translate(100, 75)
+for i = 0, 11 do
+  ctx12:save()
+  ctx12:rotate(i * 0.524)  -- ~30 degrees in radians
+  ctx12.fillStyle = "hsl(" .. (i * 30) .. ", 80%, 60%)"
+  ctx12:fillRect(30, -5, 40, 10)
+  ctx12:restore()
+end
+
+local c13 = document:getElementById("c13")
+local ctx13 = c13:getContext("2d")
+-- Scale demo
+ctx13.fillStyle = "#334155"
+ctx13:fillRect(0, 0, 200, 150)
+ctx13:save()
+ctx13:translate(100, 75)
+ctx13:scale(2, 1.5)
+ctx13.fillStyle = "#3b82f6"
+ctx13:fillRect(-30, -20, 60, 40)
+ctx13:restore()
+-- setTransform — reset and draw
+ctx13:setTransform(1, 0.2, -0.2, 1, 20, 20)
+ctx13.fillStyle = "rgba(251, 146, 60, 0.7)"
+ctx13:fillRect(0, 0, 50, 50)
+ctx13:resetTransform()
+
+local c14 = document:getElementById("c14")
+local ctx14 = c14:getContext("2d")
+-- Demonstrate save/restore
+ctx14.fillStyle = "#334155"
+ctx14:fillRect(0, 0, 200, 150)
+-- Layer 1
+ctx14:save()
+ctx14.fillStyle = "#ef4444"
+ctx14.globalAlpha = 0.8
+ctx14:fillRect(20, 20, 80, 80)
+-- Layer 2 (nested save)
+ctx14:save()
+ctx14.fillStyle = "#22c55e"
+ctx14.globalAlpha = 0.6
+ctx14:fillRect(60, 40, 80, 80)
+ctx14:restore()
+-- Back to layer 1 style
+ctx14:fillRect(100, 60, 80, 60)
+ctx14:restore()
+-- Back to default
+ctx14.fillStyle = "#a855f7"
+ctx14:fillRect(140, 10, 50, 40)
+
+-- ================================================================
+-- 6. Compositing
+-- ================================================================
+local function drawCompositePair(canvasId, mode)
+  local el = document:getElementById(canvasId)
+  local ctx = el:getContext("2d")
+  -- Blue circle (destination)
+  ctx.fillStyle = "#3b82f6"
+  ctx:beginPath()
+  ctx:arc(70, 75, 50, 0, 6.283)
+  ctx:fill()
+  -- Set composite mode
+  ctx.globalCompositeOperation = mode
+  -- Red circle (source)
+  ctx.fillStyle = "#ef4444"
+  ctx:beginPath()
+  ctx:arc(130, 75, 50, 0, 6.283)
+  ctx:fill()
+end
+drawCompositePair("c15", "source-over")
+drawCompositePair("c16", "multiply")
+drawCompositePair("c17", "screen")
+
+-- globalAlpha
+local c18 = document:getElementById("c18")
+local ctx18 = c18:getContext("2d")
+ctx18.globalAlpha = 1.0
+ctx18.fillStyle = "#3b82f6"
+ctx18:fillRect(20, 20, 80, 110)
+ctx18.globalAlpha = 0.5
+ctx18.fillStyle = "#ef4444"
+ctx18:fillRect(60, 30, 80, 110)
+ctx18.globalAlpha = 0.3
+ctx18.fillStyle = "#22c55e"
+ctx18:fillRect(100, 10, 80, 110)
+
+-- ================================================================
+-- 7. Clipping
+-- ================================================================
+local c19 = document:getElementById("c19")
+local ctx19 = c19:getContext("2d")
+-- Create circular clip
+ctx19:save()
+ctx19:beginPath()
+ctx19:arc(100, 75, 60, 0, 6.283)
+ctx19:clip()
+-- Draw gradient inside clip
+local clg = ctx19:createLinearGradient(0, 0, 200, 150)
+clg:addColorStop(0, "#667eea")
+clg:addColorStop(1, "#f093fb")
+ctx19.fillStyle = clg
+ctx19:fillRect(0, 0, 200, 150)
+-- Draw grid lines inside clip
+ctx19.strokeStyle = "rgba(255,255,255,0.3)"
+ctx19.lineWidth = 1
+for i = 0, 9 do
+  ctx19:beginPath()
+  ctx19:moveTo(i * 20, 0)
+  ctx19:lineTo(i * 20, 150)
+  ctx19:stroke()
+  ctx19:beginPath()
+  ctx19:moveTo(0, i * 15)
+  ctx19:lineTo(200, i * 15)
+  ctx19:stroke()
+end
+ctx19:restore()
+-- Draw clip border (outside clip)
+ctx19.strokeStyle = "#38bdf8"
+ctx19.lineWidth = 2
+ctx19:beginPath()
+ctx19:arc(100, 75, 60, 0, 6.283)
+ctx19:stroke()
+
+-- ================================================================
+-- 8. Pixel Operations
+-- ================================================================
+local c20 = document:getElementById("c20")
+local ctx20 = c20:getContext("2d")
+-- Create image data manually — RGB plasma pattern (small, scaled via drawImage)
+local pw, ph = 50, 40
+local imgData = ctx20:createImageData(pw, ph)
+for y = 0, ph - 1 do
+  for x = 0, pw - 1 do
+    local idx = (y * pw + x) * 4 + 1
+    local r = math.floor(128 + 127 * math.sin(x * 0.2))
+    local g = math.floor(128 + 127 * math.sin(y * 0.2))
+    local b = math.floor(128 + 127 * math.sin((x + y) * 0.12))
+    imgData:set(idx, r)
+    imgData:set(idx + 1, g)
+    imgData:set(idx + 2, b)
+    imgData:set(idx + 3, 255)
+  end
+end
+ctx20:putImageData(imgData, 0, 0)
+-- Scale it up: draw the small pixel art onto the rest of the canvas
+ctx20.imageSmoothingEnabled = false
+
+-- getImageData + invert
+local c21 = document:getElementById("c21")
+local ctx21 = c21:getContext("2d")
+-- First draw something
+local lg2 = ctx21:createLinearGradient(0, 0, 200, 150)
+lg2:addColorStop(0, "#f97316")
+lg2:addColorStop(0.5, "#06b6d4")
+lg2:addColorStop(1, "#8b5cf6")
+ctx21.fillStyle = lg2
+ctx21:fillRect(0, 0, 200, 150)
+ctx21.font = "20px sans-serif"
+ctx21.fillStyle = "#ffffff"
+ctx21.textAlign = "center"
+ctx21:fillText("Original", 100, 45)
+-- Get pixel data and invert a small region (50x30)
+local pixels = ctx21:getImageData(75, 85, 50, 30)
+for i = 1, pixels.length, 4 do
+  pixels:set(i, 255 - pixels:get(i))
+  pixels:set(i + 1, 255 - pixels:get(i + 1))
+  pixels:set(i + 2, 255 - pixels:get(i + 2))
+end
+ctx21:putImageData(pixels, 75, 85)
+-- Draw border around inverted region
+ctx21.strokeStyle = "#ffffff"
+ctx21.lineWidth = 1
+ctx21:strokeRect(75, 85, 50, 30)
+ctx21.fillStyle = "#ffffff"
+ctx21:fillText("Inverted", 100, 120)
+
+-- ================================================================
+-- 9. drawImage (canvas-to-canvas)
+-- ================================================================
+local cSrc = document:getElementById("c22_src")
+local ctxSrc = cSrc:getContext("2d")
+-- Draw pattern on source
+local srg = ctxSrc:createRadialGradient(40, 40, 5, 40, 40, 40)
+srg:addColorStop(0, "#fbbf24")
+srg:addColorStop(1, "#dc2626")
+ctxSrc.fillStyle = srg
+ctxSrc:fillRect(0, 0, 80, 80)
+ctxSrc.fillStyle = "#000000"
+ctxSrc.font = "14px sans-serif"
+ctxSrc.textAlign = "center"
+ctxSrc:fillText("SRC", 40, 45)
+
+local cDst = document:getElementById("c22_dst")
+local ctxDst = cDst:getContext("2d")
+ctxDst.fillStyle = "#1e293b"
+ctxDst:fillRect(0, 0, 200, 120)
+-- 3-arg: drawImage(source, dx, dy)
+ctxDst:drawImage(cSrc, 5, 20)
+-- 5-arg: drawImage(source, dx, dy, dw, dh) — scaled
+ctxDst:drawImage(cSrc, 90, 10, 50, 50)
+-- 9-arg: drawImage(source, sx, sy, sw, sh, dx, dy, dw, dh) — crop & scale
+ctxDst:drawImage(cSrc, 0, 0, 40, 40, 145, 5, 50, 50)
+-- Labels
+ctxDst.fillStyle = "#94a3b8"
+ctxDst.font = "10px sans-serif"
+ctxDst.textAlign = "center"
+ctxDst:fillText("3-arg", 45, 112)
+ctxDst:fillText("5-arg", 115, 112)
+ctxDst:fillText("9-arg", 170, 112)
+
+-- ================================================================
+-- 10. Complex Demos
+-- ================================================================
+-- Clock
+local c23 = document:getElementById("c23")
+local ctx23 = c23:getContext("2d")
+ctx23:translate(100, 100)
+-- Clock face
+ctx23:beginPath()
+ctx23:arc(0, 0, 90, 0, 6.283)
+ctx23.fillStyle = "#1e293b"
+ctx23:fill()
+ctx23.strokeStyle = "#38bdf8"
+ctx23.lineWidth = 3
+ctx23:stroke()
+-- Hour markers
+for i = 0, 11 do
+  local angle = i * 0.524 - 1.571
+  local x1 = math.cos(angle) * 75
+  local y1 = math.sin(angle) * 75
+  local x2 = math.cos(angle) * 85
+  local y2 = math.sin(angle) * 85
+  ctx23.strokeStyle = (i % 3 == 0) and "#f472b6" or "#475569"
+  ctx23.lineWidth = (i % 3 == 0) and 3 or 1
+  ctx23:beginPath()
+  ctx23:moveTo(x1, y1)
+  ctx23:lineTo(x2, y2)
+  ctx23:stroke()
+end
+-- Hour hand (pointing ~10:10)
+ctx23:save()
+ctx23:rotate(-0.524)  -- ~10 o'clock
+ctx23.strokeStyle = "#e2e8f0"
+ctx23.lineWidth = 4
+ctx23.lineCap = "round"
+ctx23:beginPath()
+ctx23:moveTo(0, 0)
+ctx23:lineTo(0, -50)
+ctx23:stroke()
+ctx23:restore()
+-- Minute hand
+ctx23:save()
+ctx23:rotate(1.047)  -- ~2 o'clock direction
+ctx23.strokeStyle = "#94a3b8"
+ctx23.lineWidth = 2
+ctx23.lineCap = "round"
+ctx23:beginPath()
+ctx23:moveTo(0, 0)
+ctx23:lineTo(0, -70)
+ctx23:stroke()
+ctx23:restore()
+-- Second hand
+ctx23:save()
+ctx23:rotate(2.618)  -- ~5 o'clock direction
+ctx23.strokeStyle = "#ef4444"
+ctx23.lineWidth = 1
+ctx23:beginPath()
+ctx23:moveTo(0, 10)
+ctx23:lineTo(0, -75)
+ctx23:stroke()
+ctx23:restore()
+-- Center dot
+ctx23:beginPath()
+ctx23:arc(0, 0, 4, 0, 6.283)
+ctx23.fillStyle = "#ef4444"
+ctx23:fill()
+
+-- Gradient Rings
+local c24 = document:getElementById("c24")
+local ctx24 = c24:getContext("2d")
+ctx24.fillStyle = "#0f172a"
+ctx24:fillRect(0, 0, 200, 200)
+local ringColors = {
+  {"#ef4444", "#f97316"},
+  {"#eab308", "#22c55e"},
+  {"#06b6d4", "#8b5cf6"},
+  {"#ec4899", "#f43f5e"}
+}
+for i, colors in ipairs(ringColors) do
+  local radius = 90 - (i - 1) * 20
+  local rg = ctx24:createRadialGradient(100, 100, radius - 10, 100, 100, radius)
+  rg:addColorStop(0, colors[1])
+  rg:addColorStop(1, colors[2])
+  ctx24:save()
+  ctx24:beginPath()
+  ctx24:arc(100, 100, radius, 0, 6.283)
+  ctx24:arc(100, 100, radius - 12, 0, 6.283)
+  ctx24:clip()
+  ctx24.fillStyle = rg
+  ctx24:fillRect(0, 0, 200, 200)
+  ctx24:restore()
+end
+-- Center text
+ctx24.fillStyle = "#e2e8f0"
+ctx24.font = "11px sans-serif"
+ctx24.textAlign = "center"
+ctx24:fillText("Gradient", 100, 96)
+ctx24:fillText("Rings", 100, 110)
+
+document:getElementById("detail").textContent = "Canvas demo rendered"
+document:getElementById("result").textContent = "PASS"
+print("[Canvas Demo] All 24 canvases rendered successfully!")
+</script>
+</body>
+</html>

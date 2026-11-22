@@ -1,0 +1,30 @@
+<html><body>
+<div id="box" class="old" data-value="123"></div>
+<div id="result"></div>
+<script>
+local el = document:getElementById("box")
+local ok = true
+
+-- getAttribute
+ok = ok and (el:getAttribute("class") == "old")
+ok = ok and (el:getAttribute("data-value") == "123")
+
+-- setAttribute
+el:setAttribute("class", "new")
+ok = ok and (el:getAttribute("class") == "new")
+
+-- hasAttribute / removeAttribute
+ok = ok and (el:hasAttribute("data-value") == true)
+el:removeAttribute("data-value")
+ok = ok and (el:hasAttribute("data-value") == false)
+
+-- addClass / removeClass / hasClass
+el:addClass("active")
+ok = ok and (el:hasClass("active") == true)
+el:removeClass("active")
+ok = ok and (el:hasClass("active") == false)
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

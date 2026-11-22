@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-card: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --accent: #3b82f6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+    }
+
+    body {
+        display: flex;
+        height: 100vh;
+        background: var(--bg-primary);
+        font-family: "Inter", "Segoe UI", sans-serif;
+        color: var(--text-primary);
+    }
+
+    /* ---- Sidebar ---- */
+    .sidebar {
+        width: 260px;
+        background: var(--bg-secondary);
+        display: flex;
+        flex-direction: column;
+        padding: 24px 0;
+        flex-shrink: 0;
+    }
+
+    .sidebar-logo {
+        font-size: 24px;
+        font-weight: 800;
+        padding: 0 24px 24px;
+        color: var(--accent);
+        letter-spacing: -0.5px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 24px;
+        color: var(--text-secondary);
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+    }
+
+    .nav-item.active {
+        color: var(--accent);
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    /* ---- Main Content ---- */
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 32px;
+    }
+
+    .header-title {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .header-btn {
+        padding: 8px 16px;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.15s ease;
+    }
+
+    .header-btn:hover {
+        opacity: 0.85;
+    }
+
+    /* ---- Stats Grid ---- */
+    .stats-grid {
+        display: flex;
+        gap: 20px;
+        padding: 0 32px 24px;
+    }
+
+    .stat-card {
+        flex: 1;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 20px;
+        transition: transform 0.15s ease;
+    }
+
+    .stat-card:hover {
+        transform: scale(1.02);
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .stat-change.up { color: var(--success); }
+    .stat-change.down { color: var(--danger); }
+
+    /* ---- Table ---- */
+    .table-container {
+        margin: 0 32px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        display: flex;
+        padding: 14px 20px;
+        background: var(--bg-card);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-row {
+        display: flex;
+        padding: 14px 20px;
+        font-size: 14px;
+        align-items: center;
+        transition: background 0.1s ease;
+        cursor: pointer;
+    }
+
+    .table-row:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .col-name   { flex: 2; }
+    .col-status { flex: 1; }
+    .col-value  { flex: 1; text-align: right; }
+    .col-change { flex: 1; text-align: right; }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+    .badge-danger  { background: rgba(239, 68, 68, 0.15);  color: var(--danger); }
+</style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-logo">KUI Dashboard</div>
+        <div class="nav-item active" id="nav-overview">Overview</div>
+        <div class="nav-item" id="nav-analytics">Analytics</div>
+        <div class="nav-item" id="nav-reports">Reports</div>
+        <div class="nav-item" id="nav-settings">Settings</div>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <div class="header-title">Overview</div>
+            <div class="header-actions">
+                <div class="header-btn" id="refreshBtn">Refresh</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="stat-users">12,847</div>
+                <div class="stat-change up">+12.5%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Revenue</div>
+                <div class="stat-value" id="stat-revenue">$48,290</div>
+                <div class="stat-change up">+8.2%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Sessions</div>
+                <div class="stat-value" id="stat-sessions">1,429</div>
+                <div class="stat-change down">-3.1%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Conversion</div>
+                <div class="stat-value" id="stat-conv">3.24%</div>
+                <div class="stat-change up">+0.8%</div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <div class="col-name">Name</div>
+                <div class="col-status">Status</div>
+                <div class="col-value">Value</div>
+                <div class="col-change">Change</div>
+            </div>
+            <div id="table-body"></div>
+        </div>
+    </div>
+</body>
+</html>

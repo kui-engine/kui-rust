@@ -1,0 +1,63 @@
+<div id="result"></div>
+<div id="target" class="foo bar">test</div>
+<script type="text/lua">
+local el = document:getElementById("target")
+local cl = el.classList
+
+-- contains
+assert(cl:contains("foo"), "contains foo")
+assert(cl:contains("bar"), "contains bar")
+assert(not cl:contains("baz"), "not contains baz")
+
+-- length
+assert(cl.length == 2, "length is 2, got " .. cl.length)
+
+-- item
+assert(cl:item(0) == "foo", "item(0) is foo, got " .. cl:item(0))
+assert(cl:item(1) == "bar", "item(1) is bar, got " .. cl:item(1))
+
+-- add (multi-arg)
+cl:add("baz", "qux")
+assert(cl:contains("baz"), "add baz")
+assert(cl:contains("qux"), "add qux")
+assert(cl.length == 4, "length after add is 4")
+
+-- remove
+cl:remove("qux")
+assert(not cl:contains("qux"), "remove qux")
+assert(cl.length == 3, "length after remove is 3")
+
+-- toggle
+local result = cl:toggle("active")
+assert(result == true, "toggle returns true when adding")
+assert(cl:contains("active"), "toggle added active")
+
+result = cl:toggle("active")
+assert(result == false, "toggle returns false when removing")
+assert(not cl:contains("active"), "toggle removed active")
+
+-- toggle with force
+result = cl:toggle("forced", true)
+assert(result == true, "force true returns true")
+assert(cl:contains("forced"), "force true adds class")
+
+result = cl:toggle("forced", false)
+assert(result == false, "force false returns false")
+assert(not cl:contains("forced"), "force false removes class")
+
+-- replace
+cl:add("old")
+local replaced = cl:replace("old", "new")
+assert(replaced == true, "replace returns true")
+assert(not cl:contains("old"), "old removed")
+assert(cl:contains("new"), "new added")
+
+local notReplaced = cl:replace("nonexistent", "whatever")
+assert(notReplaced == false, "replace nonexistent returns false")
+
+-- value
+local v = cl.value
+assert(type(v) == "string", "value is string")
+
+document:getElementById("result").textContent = "PASS"
+</script>

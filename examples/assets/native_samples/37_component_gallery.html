@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+:root {
+    --bg: #0f0f23;
+    --surface: #1a1a2e;
+    --border: #2a2a4a;
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --primary: #3b82f6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+}
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: sans-serif;
+    font-size: 14px;
+    padding: 24px;
+    margin: 0;
+}
+h1 { color: var(--primary); font-size: 22px; margin: 0 0 20px 0; }
+h2 { color: var(--text); font-size: 16px; margin: 20px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.label { color: var(--text-muted); font-size: 12px; margin-bottom: 4px; }
+
+/* Scrollbar demo */
+.scroll-demo {
+    height: 100px;
+    overflow: auto;
+    scrollbar-color: #3b82f6 #1a1a2e;
+    scrollbar-width: thin;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+}
+.scroll-demo-default {
+    height: 100px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px;
+}
+
+/* Text overflow demo */
+.ellipsis-demo {
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: #2a2a4a;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+/* Button styles */
+.btn {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    font-weight: 500;
+}
+.btn-primary { background: var(--primary); }
+.btn-success { background: var(--success); }
+.btn-warning { background: var(--warning); color: #1a1a2e; }
+.btn-danger { background: var(--danger); }
+
+/* Table styles */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.data-table div.header {
+    display: flex;
+    background: #1e1e3a;
+    font-weight: 600;
+    color: #a0a0c0;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+}
+.data-table div.row-data {
+    display: flex;
+    padding: 8px 12px;
+    border-bottom: 1px solid #1a1a3a;
+}
+.data-table div.row-data:nth-child(even) {
+    background: rgba(255,255,255,0.02);
+}
+.data-table .cell { flex: 1; }
+
+/* Tree styles */
+.tree-node {
+    padding: 3px 0 3px 16px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.tree-node:hover { background: rgba(59, 130, 246, 0.1); border-radius: 4px; }
+.tree-selected { background: rgba(59, 130, 246, 0.15); border-radius: 4px; }
+
+/* Menu styles */
+.menu-demo {
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    padding: 4px 0;
+    min-width: 180px;
+    display: inline-block;
+    color: #333;
+    font-size: 13px;
+}
+.menu-item {
+    padding: 6px 12px;
+    cursor: pointer;
+}
+.menu-item:hover { background: rgba(33, 150, 243, 0.1); }
+.menu-sep { height: 1px; background: #e0e0e0; margin: 4px 8px; }
+.menu-disabled { color: #aaa; cursor: default; }
+</style>
+</head>
+<body>
+
+<h1>KUI Component Gallery</h1>
+
+<!-- Badges -->
+<h2>Badges</h2>
+<div class="section">
+    <div class="row">
+        <kui-badge>Default</kui-badge>
+        <kui-badge type="success">Success</kui-badge>
+        <kui-badge type="warning">Warning</kui-badge>
+        <kui-badge type="danger">Danger</kui-badge>
+    </div>
+</div>
+
+<!-- Buttons -->
+<h2>Buttons</h2>
+<div class="section">
+    <div class="row">
+        <button class="btn btn-primary">Primary</button>
+        <button class="btn btn-success">Success</button>
+        <button class="btn btn-warning">Warning</button>
+        <button class="btn btn-danger">Danger</button>
+        <button class="btn btn-primary" disabled>Disabled</button>
+    </div>
+</div>
+
+<!-- Form Controls -->
+<h2>Form Controls</h2>
+<div class="section">
+    <div class="row">
+        <div>
+            <div class="label">Text Input</div>
+            <input type="text" placeholder="Type here..." />
+        </div>
+        <div>
+            <div class="label">Password</div>
+            <input type="password" placeholder="Password" />
+        </div>
+        <div>
+            <div class="label">Number</div>
+            <input type="number" min="0" max="100" step="5" />
+        </div>
+    </div>
+    <div class="row" style="margin-top: 12px;">
+        <div>
+            <div class="label">Checkbox</div>
+            <label><input type="checkbox" checked /> Option A</label>
+            <label><input type="checkbox" /> Option B</label>
+        </div>
+        <div>
+            <div class="label">Radio</div>
+            <label><input type="radio" name="r1" checked /> Choice 1</label>
+            <label><input type="radio" name="r1" /> Choice 2</label>
+        </div>
+        <div>
+            <div class="label">Select</div>
+            <select>
+                <option>Option 1</option>
+                <option>Option 2</option>
+                <option>Option 3</option>
+            </select>
+        </div>
+    </div>
+    <div style="margin-top: 12px;">
+        <div class="label">Textarea</div>
+        <textarea rows="3" cols="40" placeholder="Multi-line text..."></textarea>
+    </div>
+</div>
+
+<!-- Text Overflow -->
+<h2>Text Overflow: Ellipsis</h2>
+<div class="section">
+    <div class="row">
+        <div class="ellipsis-demo">This is a very long text that should be truncated with ellipsis</div>
+        <div class="ellipsis-demo">Another long piece of content that overflows the container</div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<h2>Tabs</h2>
+<div class="section">
+    <kui-tabs>
+        <kui-tab active>Dashboard</kui-tab>
+        <kui-tab>Settings</kui-tab>
+        <kui-tab>Profile</kui-tab>
+        <kui-tab>Help</kui-tab>
+    </kui-tabs>
+</div>
+
+<!-- Dialog -->
+<h2>Dialog</h2>
+<div class="section">
+    <div style="color: var(--text-muted); font-size: 12px;">
+        Use &lt;kui-dialog open title="..."&gt; to show a modal dialog overlay.
+    </div>
+</div>
+
+<!-- Tooltip -->
+<h2>Tooltip</h2>
+<div class="section">
+    <div class="row">
+        <kui-tooltip text="This is a tooltip!"><button class="btn btn-primary">Hover me</button></kui-tooltip>
+        <kui-tooltip text="Another tooltip"><button class="btn btn-success">And me</button></kui-tooltip>
+    </div>
+</div>
+
+<!-- Tree View -->
+<h2>Tree View</h2>
+<div class="section">
+    <div class="tree-node tree-selected">&#x25BC; src/</div>
+    <div class="tree-node" style="padding-left: 32px;">&#x25B6; css/</div>
+    <div class="tree-node" style="padding-left: 32px;">&#x25BC; dom/</div>
+    <div class="tree-node" style="padding-left: 48px;">document.h</div>
+    <div class="tree-node" style="padding-left: 48px;">element.h</div>
+    <div class="tree-node" style="padding-left: 48px;">node.h</div>
+    <div class="tree-node" style="padding-left: 32px;">&#x25B6; layout/</div>
+    <div class="tree-node" style="padding-left: 32px;">&#x25B6; paint/</div>
+    <div class="tree-node">&#x25B6; tests/</div>
+    <div class="tree-node">&#x25B6; docs/</div>
+</div>
+
+<!-- Data Table -->
+<h2>Data Table</h2>
+<div class="section">
+    <div class="data-table" style="border: 1px solid var(--border); border-radius: 6px; overflow: hidden;">
+        <div class="header">
+            <div class="cell">Name</div>
+            <div class="cell">Type</div>
+            <div class="cell">Size</div>
+            <div class="cell">Modified</div>
+        </div>
+        <div class="row-data">
+            <div class="cell">document.h</div>
+            <div class="cell">C++ Header</div>
+            <div class="cell">4.2 KB</div>
+            <div class="cell">2025-01-15</div>
+        </div>
+        <div class="row-data">
+            <div class="cell">element.cpp</div>
+            <div class="cell">C++ Source</div>
+            <div class="cell">12.8 KB</div>
+            <div class="cell">2025-01-14</div>
+        </div>
+        <div class="row-data">
+            <div class="cell">painter.cpp</div>
+            <div class="cell">C++ Source</div>
+            <div class="cell">28.3 KB</div>
+            <div class="cell">2025-01-16</div>
+        </div>
+        <div class="row-data">
+            <div class="cell">style_resolver.cpp</div>
+            <div class="cell">C++ Source</div>
+            <div class="cell">45.1 KB</div>
+            <div class="cell">2025-01-16</div>
+        </div>
+    </div>
+</div>
+
+<!-- Context Menu -->
+<h2>Context Menu</h2>
+<div class="section">
+    <div class="row">
+        <div class="menu-demo">
+            <div class="menu-item">&#x2702; Cut</div>
+            <div class="menu-item">&#x1F4CB; Copy</div>
+            <div class="menu-item">&#x1F4C4; Paste</div>
+            <div class="menu-sep"></div>
+            <div class="menu-item">&#x1F5D1; Delete</div>
+            <div class="menu-sep"></div>
+            <div class="menu-item menu-disabled">&#x21A9; Undo</div>
+        </div>
+    </div>
+</div>
+
+<!-- Scrollbar Customization -->
+<h2>Scrollbar Customization</h2>
+<div class="section">
+    <div class="row" style="align-items: flex-start;">
+        <div style="flex: 1;">
+            <div class="label">Custom Colors (blue thumb / dark track)</div>
+            <div class="scroll-demo">
+                <div>Line 1 - Custom scrollbar colors</div>
+                <div>Line 2</div><div>Line 3</div><div>Line 4</div>
+                <div>Line 5</div><div>Line 6</div><div>Line 7</div>
+                <div>Line 8</div><div>Line 9</div><div>Line 10</div>
+            </div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Default Scrollbar</div>
+            <div class="scroll-demo-default">
+                <div>Line 1 - Default scrollbar</div>
+                <div>Line 2</div><div>Line 3</div><div>Line 4</div>
+                <div>Line 5</div><div>Line 6</div><div>Line 7</div>
+                <div>Line 8</div><div>Line 9</div><div>Line 10</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

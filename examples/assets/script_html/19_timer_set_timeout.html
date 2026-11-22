@@ -1,0 +1,9 @@
+<html><body>
+<div id="result">WAITING</div>
+<script>
+-- Timer callback writes result directly; tickTimers(100) fires after executeScripts
+setTimeout(function()
+    document:getElementById("result").textContent = "PASS"
+end, 50)
+</script>
+</body></html>

@@ -1,0 +1,18 @@
+<html><body>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test global variable read/write between scripts
+myGlobal = 42
+myString = "KUI"
+myBool = true
+</script>
+<script>
+-- Second script reads globals set by first
+local ok = (myGlobal == 42) and (myString == "KUI") and (myBool == true)
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS"
+else r.textContent = "FAIL"
+end
+</script>
+</body></html>

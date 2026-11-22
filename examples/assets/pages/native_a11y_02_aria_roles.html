@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}.s{background:white;padding:16px;border-radius:8px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}.s h3{font-size:13px;color:#64748b;margin-bottom:8px}
+.tb{display:flex;gap:8px;padding:8px;background:#f1f5f9;border-radius:6px}
+.tb button{padding:6px 12px;border:1px solid #e2e8f0;border-radius:4px;background:white;font-size:12px;cursor:pointer}
+.tb button:focus{outline:2px solid #3b82f6;outline-offset:1px}
+.al{padding:12px 16px;border-radius:6px;margin-bottom:8px;font-size:13px}
+.al-i{background:#dbeafe;color:#1e40af;border-left:4px solid #3b82f6}
+.al-w{background:#fef3c7;color:#92400e;border-left:4px solid #f59e0b}
+.al-e{background:#fee2e2;color:#991b1b;border-left:4px solid #ef4444}
+.tl{display:flex;gap:4px;border-bottom:2px solid #e2e8f0;padding:0 8px}
+.tab{padding:8px 16px;border:none;background:none;font-size:13px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab[aria-selected="true"]{color:#3b82f6;border-bottom-color:#3b82f6;font-weight:600}
+.tp{padding:16px;font-size:13px;color:#475569}
+.pb{height:8px;background:#e2e8f0;border-radius:4px;overflow:hidden}.pf{height:100%;background:#3b82f6;border-radius:4px;width:65%}
+</style></head><body><h2>ARIA Roles</h2>
+<div class="s"><h3>role="toolbar"</h3>
+<div class="tb" role="toolbar" aria-label="Formatting">
+<button aria-label="Bold">B</button><button aria-label="Italic"><em>I</em></button><button aria-label="Underline"><u>U</u></button></div></div>
+<div class="s"><h3>role="alert"</h3>
+<div class="al al-i" role="alert">Info: System update available.</div>
+<div class="al al-w" role="alert">Warning: Disk space low.</div>
+<div class="al al-e" role="alert">Error: Connection timed out.</div></div>
+<div class="s"><h3>role="tablist"</h3>
+<div class="tl" role="tablist"><div class="tab" role="tab" aria-selected="true" tabindex="0">General</div><div class="tab" role="tab" aria-selected="false" tabindex="-1">Security</div><div class="tab" role="tab" aria-selected="false" tabindex="-1">Advanced</div></div>
+<div class="tp" role="tabpanel">General settings panel.</div></div>
+<div class="s"><h3>role="progressbar"</h3>
+<div class="pb" role="progressbar" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"><div class="pf"></div></div>
+<p style="font-size:12px;color:#94a3b8;margin-top:4px">65% complete</p></div>
+</body></html>

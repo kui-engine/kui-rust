@@ -1,0 +1,17 @@
+<html><body>
+<button id="btn">Click Me</button>
+<div id="result"></div>
+<script>
+local clicked = false
+local btn = document:getElementById("btn")
+btn:addEventListener("click", function(e)
+    clicked = true
+end)
+
+-- Simulate a click event
+btn:dispatchEvent("click")
+
+local r = document:getElementById("result")
+if clicked then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

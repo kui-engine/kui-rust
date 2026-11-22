@@ -1,0 +1,138 @@
+<html>
+<head>
+<style>
+body {
+    margin: 0; padding: 24px;
+    background: #0f172a; color: #e2e8f0;
+    font-family: 'Segoe UI', sans-serif;
+}
+h2 { color: #f472b6; margin-bottom: 16px; font-size: 18px; }
+.info { color: #64748b; font-size: 12px; margin-bottom: 20px; }
+
+@keyframes orbit {
+    from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 8px #38bdf8; }
+    50%      { box-shadow: 0 0 24px #38bdf8; }
+}
+@keyframes expandWidth {
+    0%   { width: 40px; }
+    50%  { width: 200px; }
+    100% { width: 40px; }
+}
+@keyframes hueRotate {
+    0%   { background: #ef4444; }
+    25%  { background: #eab308; }
+    50%  { background: #22c55e; }
+    75%  { background: #3b82f6; }
+    100% { background: #ef4444; }
+}
+
+.orbit-container {
+    width: 160px; height: 160px; margin: 20px auto;
+    position: relative;
+}
+.orbit-center {
+    position: absolute;
+    left: 60px; top: 60px;
+    width: 40px; height: 40px;
+    background: #1e293b; border: 2px solid #38bdf8;
+    border-radius: 50%;
+    animation: glow 2s ease-in-out infinite;
+}
+.orbit-planet {
+    position: absolute;
+    left: 68px; top: 68px;
+    width: 24px; height: 24px;
+    background: #f472b6; border-radius: 50%;
+    animation: orbit 4s linear infinite;
+}
+.orbit-planet2 {
+    position: absolute;
+    left: 68px; top: 68px;
+    width: 16px; height: 16px;
+    background: #34d399; border-radius: 50%;
+    animation: orbit 2.5s linear infinite reverse;
+}
+
+.bar-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.bar-label { width: 80px; font-size: 12px; color: #94a3b8; }
+.bar {
+    height: 24px; border-radius: 4px;
+    animation: expandWidth 3s ease-in-out infinite;
+}
+.bar.b1 { background: #ef4444; animation-delay: 0s; }
+.bar.b2 { background: #f59e0b; animation-delay: 0.4s; }
+.bar.b3 { background: #22c55e; animation-delay: 0.8s; }
+.bar.b4 { background: #3b82f6; animation-delay: 1.2s; }
+
+.color-strip {
+    height: 8px; border-radius: 4px; margin-top: 20px;
+    animation: hueRotate 4s linear infinite;
+}
+
+.stats-row {
+    display: flex; gap: 12px; margin-top: 20px;
+}
+.stat-card {
+    flex: 1; padding: 12px;
+    background: #1e293b; border-radius: 8px;
+    border: 1px solid #334155;
+    text-align: center;
+    transition: transform 0.2s ease, border-color 0.3s ease;
+}
+.stat-card:hover {
+    transform: scale(1.05);
+    border-color: #f472b6;
+}
+.stat-value { font-size: 20px; font-weight: 700; color: #f1f5f9; }
+.stat-label { font-size: 11px; color: #64748b; margin-top: 4px; }
+</style>
+</head>
+<body>
+    <h2>Window 3 — Complex Composited Animations</h2>
+    <div class="info">Multi-transform orbit + animated bars + hover transitions</div>
+
+    <div class="orbit-container">
+        <div class="orbit-center"></div>
+        <div class="orbit-planet"></div>
+        <div class="orbit-planet2"></div>
+    </div>
+
+    <div class="bar-row">
+        <div class="bar-label">CPU</div>
+        <div class="bar b1"></div>
+    </div>
+    <div class="bar-row">
+        <div class="bar-label">Memory</div>
+        <div class="bar b2"></div>
+    </div>
+    <div class="bar-row">
+        <div class="bar-label">Network</div>
+        <div class="bar b3"></div>
+    </div>
+    <div class="bar-row">
+        <div class="bar-label">Disk I/O</div>
+        <div class="bar b4"></div>
+    </div>
+
+    <div class="color-strip"></div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-value">60</div>
+            <div class="stat-label">Target FPS</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Windows</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">12</div>
+            <div class="stat-label">Animations</div>
+        </div>
+    </div>
+</body>
+</html>

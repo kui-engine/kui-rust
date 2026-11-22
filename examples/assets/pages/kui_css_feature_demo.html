@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* ============================================================
+   CSS Feature Demo — Comprehensive CSS Test Suite
+   ============================================================ */
+
+@keyframes pulse {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(1.08); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes slideRight {
+  from { transform: translateX(-30px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (min-width: 200px) {
+  .media-active { border-left: 3px solid #2ecc71 !important; }
+}
+@supports (display: grid) {
+  .supports-active { border-left: 3px solid #3498db !important; }
+}
+
+:root {
+  --c-bg: #0a0a1a;
+  --c-surface: #12122a;
+  --c-card: #1a1a3e;
+  --c-border: #2a2a5e;
+  --c-primary: #6c5ce7;
+  --c-secondary: #a29bfe;
+  --c-accent: #fd79a8;
+  --c-success: #00b894;
+  --c-warning: #fdcb6e;
+  --c-danger: #e17055;
+  --c-text: #dfe6e9;
+  --c-dim: #636e72;
+  --radius: 8px;
+  --font: "Segoe UI", system-ui, sans-serif;
+  --mono: "Consolas", "Courier New", monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Layout: sidebar + main */
+.app {
+  display: flex;
+  height: 100vh;
+}
+.sidebar {
+  width: 220px;
+  background: var(--c-surface);
+  border-right: 1px solid var(--c-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-primary) var(--c-surface);
+}
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--c-border);
+}
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+  -webkit-background-clip: text;
+  color: var(--c-primary);
+}
+.sidebar-sub {
+  font-size: 11px;
+  color: var(--c-dim);
+  margin-top: 2px;
+}
+.nav-section {
+  padding: 8px 0;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  font-size: 12px;
+  color: var(--c-dim);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover {
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--c-text);
+}
+.nav-item.active {
+  color: var(--c-primary);
+  border-left-color: var(--c-primary);
+  background: rgba(108, 92, 231, 0.08);
+}
+.nav-icon { font-size: 14px; min-width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--c-primary);
+  color: white;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  overflow-y: scroll;
+  padding: 20px;
+  padding-bottom: 40px;
+}
+.section {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::before {
+  content: "";
+  width: 4px;
+  height: 16px;
+  background: var(--c-primary);
+  border-radius: 2px;
+  display: inline-block;
+}
+h3 {
+  font-size: 12px;
+  color: var(--c-dim);
+  margin: 10px 0 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+.col { display: flex; flex-direction: column; gap: 4px; }
+.box {
+  background: var(--c-card);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--c-dim);
+  text-align: center;
+  border: 1px solid transparent;
+}
+.tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: var(--mono);
+  background: rgba(108,92,231,0.15);
+  color: var(--c-secondary);
+}
+
+/* Status bar */
+.status-bar {
+  padding: 8px 16px;
+  background: var(--c-surface);
+  border-top: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--c-dim);
+}
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--c-success);
+  display: inline-block;
+}
+
+/* ============================================================
+   1. SELECTORS
+   ============================================================ */
+#sel-id { color: var(--c-accent); font-weight: 700; }
+.sel-class { color: var(--c-success); }
+[data-sel] { border-left: 2px solid var(--c-warning); padding-left: 4px; }
+[data-sel="exact"] { background: rgba(253,203,110,0.1); }
+[data-sel^="pre"] { font-style: italic; }
+[data-sel$="suf"] { text-decoration: underline; }
+[data-sel*="mid"] { letter-spacing: 1px; }
+.sel-parent > .sel-child { color: var(--c-danger); }
+.sel-parent .sel-desc { color: var(--c-success); }
+.sel-adj + .sel-adj-next { color: var(--c-primary); }
+.nth-row > div:first-child { background: var(--c-danger); color: white; }
+.nth-row > div:last-child { background: var(--c-primary); color: white; }
+.nth-row > div:nth-child(2) { background: var(--c-success); color: white; }
+.nth-row > div:nth-child(odd) { border: 1px solid rgba(255,255,255,0.2); }
+.logic-row > div:not(.skip) { background: var(--c-card); }
+.logic-row > div:is(.hl) { border: 2px solid var(--c-accent); }
+.has-box:has(> .trigger) { background: rgba(253,121,168,0.1); border-radius: 4px; padding: 4px; }
+.empty-box:empty { width: 40px; height: 18px; background: var(--c-danger); border-radius: 3px; }
+.empty-box:not(:empty) { background: var(--c-success); padding: 2px 6px; border-radius: 3px; }
+.pseudo-el::before { content: ">> "; color: var(--c-accent); }
+.pseudo-el::after { content: " <<"; color: var(--c-secondary); }
+
+/* ============================================================
+   2. BOX MODEL
+   ============================================================ */
+.bm-content { box-sizing: content-box; width: 80px; padding: 6px; border: 2px solid var(--c-danger); }
+.bm-border  { box-sizing: border-box;  width: 80px; padding: 6px; border: 2px solid var(--c-success); }
+.bm-auto    { width: 140px; margin: 0 auto; background: var(--c-card); padding: 4px; text-align: center; border-radius: 4px; }
+.bm-minmax  { min-width: 50px; max-width: 120px; min-height: 16px; max-height: 40px; overflow: hidden; background: var(--c-card); padding: 4px; border-radius: 4px; }
+
+/* ============================================================
+   3. POSITIONING
+   ============================================================ */
+.pos-box { position: relative; height: 70px; background: var(--c-card); border-radius: 6px; overflow: hidden; }
+.pos-rel { position: relative; top: 4px; left: 8px; background: var(--c-danger); padding: 2px 6px; border-radius: 3px; display: inline-block; font-size: 10px; color: white; }
+.pos-abs { position: absolute; top: 4px; right: 4px; background: var(--c-success); padding: 2px 6px; border-radius: 3px; font-size: 10px; color: white; }
+.pos-inset { position: absolute; inset: auto 4px 4px auto; background: var(--c-warning); padding: 2px 6px; border-radius: 3px; font-size: 10px; }
+.pos-sticky-wrap { height: 50px; overflow: auto; background: var(--c-card); border-radius: 4px; }
+.pos-sticky { position: sticky; top: 0; background: var(--c-primary); padding: 2px 8px; font-size: 10px; color: white; z-index: 1; }
+
+/* ============================================================
+   4. TYPOGRAPHY
+   ============================================================ */
+.t-sz-10 { font-size: 10px; } .t-sz-16 { font-size: 16px; } .t-sz-20 { font-size: 20px; }
+.t-w300 { font-weight: 300; } .t-w700 { font-weight: 700; } .t-w900 { font-weight: 900; }
+.t-italic { font-style: italic; }
+.t-under { text-decoration: underline; }
+.t-over { text-decoration: overline; }
+.t-through { text-decoration: line-through; }
+.t-deco-color { text-decoration: underline; text-decoration-color: var(--c-accent); }
+.t-deco-wavy { text-decoration: underline; text-decoration-style: wavy; text-decoration-color: var(--c-success); }
+.t-upper { text-transform: uppercase; }
+.t-lower { text-transform: lowercase; }
+.t-cap { text-transform: capitalize; }
+.t-ls { letter-spacing: 3px; }
+.t-ws { word-spacing: 8px; }
+.t-indent { text-indent: 20px; }
+.t-center { text-align: center; }
+.t-right { text-align: right; }
+.t-nowrap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+.t-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.6), 0 0 8px var(--c-primary); }
+.t-lh2 { line-height: 2.0; }
+.t-rtl { direction: rtl; }
+
+/* ============================================================
+   5. BACKGROUNDS & BORDERS
+   ============================================================ */
+.bg-solid { background: #2d3436; }
+.bg-linear { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; }
+.bg-radial { background: radial-gradient(circle, #fd79a8, #e17055); color: white; }
+.bg-conic { background: conic-gradient(from 0deg, #e17055, #fdcb6e, #00b894, #0984e3, #6c5ce7, #e17055); border-radius: 50%; width: 50px; height: 50px; }
+.bg-repeat { background: repeating-linear-gradient(45deg, #1a1a3e 0px, #1a1a3e 8px, #2a2a5e 8px, #2a2a5e 16px); }
+.bg-clip { background: var(--c-accent); background-clip: content-box; padding: 6px; border: 2px dashed var(--c-border); }
+
+.b-solid { border: 2px solid var(--c-danger); }
+.b-dashed { border: 2px dashed var(--c-success); }
+.b-dotted { border: 2px dotted var(--c-primary); }
+.b-double { border: 4px double var(--c-warning); }
+.b-groove { border: 3px groove var(--c-secondary); }
+.b-ridge { border: 3px ridge var(--c-accent); }
+.b-mixed { border-top: 3px solid var(--c-danger); border-right: 3px dashed var(--c-success); border-bottom: 3px dotted var(--c-primary); border-left: 3px double var(--c-warning); }
+.b-r12 { border-radius: 12px; background: var(--c-card); }
+.b-r50 { border-radius: 50%; width: 40px; height: 40px; background: var(--c-accent); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; }
+.b-shadow { box-shadow: 4px 4px 12px rgba(0,0,0,0.5); background: var(--c-card); }
+.b-shadow-in { box-shadow: inset 0 0 10px rgba(0,0,0,0.5); background: var(--c-card); }
+.b-shadow-m { box-shadow: 2px 2px 0 var(--c-danger), 4px 4px 0 var(--c-warning), 6px 6px 0 var(--c-success); background: var(--c-card); }
+.b-outline { outline: 2px solid var(--c-accent); outline-offset: 3px; background: var(--c-card); }
+
+/* ============================================================
+   6. FLEXBOX
+   ============================================================ */
+.fx-row { display: flex; gap: 4px; }
+.fx-col { display: flex; flex-direction: column; gap: 4px; }
+.fx-rev { display: flex; flex-direction: row-reverse; gap: 4px; }
+.fx-wrap { display: flex; flex-wrap: wrap; gap: 4px; width: 160px; }
+.fx-jc-between { display: flex; justify-content: space-between; }
+.fx-jc-around { display: flex; justify-content: space-around; }
+.fx-jc-evenly { display: flex; justify-content: space-evenly; }
+.fx-ai-center { display: flex; align-items: center; min-height: 50px; }
+.fx-grow { display: flex; gap: 4px; }
+.fx-grow > .g1 { flex-grow: 1; } .fx-grow > .g2 { flex-grow: 2; } .fx-grow > .g3 { flex-grow: 3; }
+.fx-order > :nth-child(1) { order: 3; }
+.fx-order > :nth-child(2) { order: 1; }
+.fx-order > :nth-child(3) { order: 2; }
+.fi { background: var(--c-card); padding: 3px 8px; border-radius: 3px; font-size: 10px; color: var(--c-dim); text-align: center; }
+
+/* ============================================================
+   7. GRID
+   ============================================================ */
+.gr-basic { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+.gr-fr { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 4px; }
+.gr-repeat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.gr-span { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.gr-span > .sp2 { grid-column: span 2; }
+.gr-areas {
+  display: grid;
+  grid-template-areas: "hd hd hd" "sb mn mn" "ft ft ft";
+  grid-template-columns: 70px 1fr 1fr;
+  grid-template-rows: 25px 40px 20px;
+  gap: 3px;
+}
+.gr-areas > .a-hd { grid-area: hd; } .gr-areas > .a-sb { grid-area: sb; }
+.gr-areas > .a-mn { grid-area: mn; } .gr-areas > .a-ft { grid-area: ft; }
+.gi { background: var(--c-card); padding: 3px; border-radius: 3px; font-size: 10px; text-align: center; color: var(--c-dim); }
+
+/* ============================================================
+   8. VISUAL EFFECTS
+   ============================================================ */
+.ve-o50 { opacity: 0.5; } .ve-o25 { opacity: 0.25; }
+.ve-blur { filter: blur(2px); }
+.ve-gray { filter: grayscale(100%); }
+.ve-sepia { filter: sepia(100%); }
+.ve-bright { filter: brightness(1.5); }
+.ve-contrast { filter: contrast(2); }
+.ve-hue { filter: hue-rotate(90deg); }
+.ve-invert { filter: invert(100%); }
+.ve-saturate { filter: saturate(3); }
+.ve-dropshadow { filter: drop-shadow(3px 3px 4px rgba(0,0,0,0.7)); }
+.ve-backdrop { backdrop-filter: blur(4px); background: rgba(255,255,255,0.08); }
+.ve-clip { clip-path: circle(50%); }
+.ve-blend { mix-blend-mode: screen; }
+
+/* ============================================================
+   9. TRANSFORMS
+   ============================================================ */
+.tf-translate { transform: translate(8px, 4px); }
+.tf-scale { transform: scale(1.15); }
+.tf-rotate { transform: rotate(12deg); }
+.tf-skew { transform: skewX(8deg); }
+.tf-matrix { transform: matrix(1, 0.05, -0.05, 1, 0, 0); }
+.tf-origin { transform: rotate(15deg); transform-origin: top left; }
+.tf-multi { transform: translateX(4px) rotate(8deg) scale(0.95); }
+.tf-3d-rx { transform: perspective(200px) rotateX(15deg); }
+.tf-3d-ry { transform: perspective(200px) rotateY(20deg); }
+
+/* ============================================================
+   10. TRANSITIONS & ANIMATIONS
+   ============================================================ */
+.tr-color { transition: background-color 0.3s ease, color 0.3s; background: var(--c-card); cursor: pointer; }
+.tr-color:hover { background: var(--c-primary); color: white; }
+.tr-scale { transition: transform 0.3s ease; cursor: pointer; display: inline-block; }
+.tr-scale:hover { transform: scale(1.2); }
+.tr-multi { transition: all 0.3s ease; background: var(--c-card); cursor: pointer; }
+.tr-multi:hover { background: var(--c-success); transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,184,148,0.3); }
+.an-pulse { animation: pulse 2s ease-in-out infinite; }
+.an-slide { animation: slideRight 0.8s ease-out forwards; }
+.an-spin { animation: spin 3s linear infinite; display: inline-block; }
+.an-bounce { animation: bounce 1s ease-in-out infinite; display: inline-block; }
+.an-paused { animation: pulse 2s infinite; animation-play-state: paused; }
+
+/* ============================================================
+   11. MULTI-COLUMN
+   ============================================================ */
+.mc-2 { column-count: 2; column-gap: 16px; font-size: 11px; }
+.mc-3 { column-count: 3; column-gap: 12px; column-rule: 1px solid var(--c-border); font-size: 11px; }
+
+/* ============================================================
+   12. COLORS
+   ============================================================ */
+.c-hex3 { color: #f00; } .c-hex6 { color: #ff6600; } .c-hex8 { color: #6c5ce7cc; }
+.c-rgb { color: rgb(0, 184, 148); } .c-rgba { color: rgba(253, 121, 168, 0.8); }
+.c-hsl { color: hsl(200, 80%, 60%); } .c-hsla { color: hsla(340, 80%, 60%, 0.9); }
+.c-named { color: coral; } .c-current { color: var(--c-accent); border-bottom: 2px solid currentColor; }
+.c-hwb { color: hwb(120 10% 20%); }
+.c-oklch { color: oklch(0.7 0.15 200); }
+.c-mix { color: color-mix(in srgb, #e17055 50%, #0984e3); }
+
+/* ============================================================
+   13. MISC
+   ============================================================ */
+.ar-16-9 { aspect-ratio: 16/9; width: 80px; background: var(--c-card); display: flex; align-items: center; justify-content: center; font-size: 10px; border-radius: 4px; }
+.ar-1-1 { aspect-ratio: 1/1; width: 40px; background: var(--c-card); display: flex; align-items: center; justify-content: center; font-size: 10px; border-radius: 4px; }
+.calc-w { width: calc(100% - 40px); background: var(--c-card); padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+.clamp-w { width: clamp(60px, 50%, 180px); background: var(--c-card); padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+.vw-u { width: 15vw; background: var(--c-card); padding: 3px; border-radius: 4px; font-size: 10px; text-align: center; }
+.counter-list { counter-reset: item; list-style: none; padding: 0; font-size: 12px; }
+.counter-list li { counter-increment: item; padding: 2px 0; }
+.counter-list li::before { content: counter(item) ". "; color: var(--c-accent); font-weight: 700; }
+
+/* Lists */
+.list-disc { list-style-type: disc; padding-left: 20px; font-size: 11px; }
+.list-decimal { list-style-type: decimal; padding-left: 20px; font-size: 11px; }
+
+/* Table */
+.tbl { display: table; width: 100%; font-size: 11px; }
+.tbl-r { display: table-row; }
+.tbl-c { display: table-cell; padding: 4px 8px; border: 1px solid var(--c-border); }
+.tbl-h { background: var(--c-card); font-weight: 700; color: var(--c-secondary); }
+
+/* Dynamic section placeholder */
+#dynamic-section { }
+
+/* ============================================================
+   17. SCROLL SNAP
+   ============================================================ */
+.snap-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 0;
+  width: 100%;
+  height: 80px;
+  border-radius: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-primary) var(--c-card);
+}
+.snap-item {
+  flex: 0 0 120px;
+  height: 80px;
+  scroll-snap-align: start;
+  scroll-margin-left: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  border-radius: 6px;
+  margin-right: 4px;
+}
+.snap-item:nth-child(1) { background: var(--c-danger); }
+.snap-item:nth-child(2) { background: var(--c-primary); }
+.snap-item:nth-child(3) { background: var(--c-success); }
+.snap-item:nth-child(4) { background: var(--c-accent); }
+.snap-item:nth-child(5) { background: var(--c-warning); color: #333; }
+.snap-item:nth-child(6) { background: var(--c-secondary); }
+
+.snap-y-container {
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  height: 80px;
+  width: 120px;
+  border-radius: 6px;
+  scrollbar-width: thin;
+}
+.snap-y-item {
+  height: 80px;
+  scroll-snap-align: center;
+  scroll-padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+}
+.snap-y-item:nth-child(1) { background: var(--c-primary); }
+.snap-y-item:nth-child(2) { background: var(--c-danger); }
+.snap-y-item:nth-child(3) { background: var(--c-success); }
+.snap-y-item:nth-child(4) { background: var(--c-accent); }
+
+/* ============================================================
+   18. CSS MASKING
+   ============================================================ */
+.mask-grad {
+  width: 120px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--c-danger), var(--c-primary));
+  mask-image: linear-gradient(to right, transparent, black 30%, black 70%, transparent);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+}
+.mask-radial {
+  width: 80px;
+  height: 80px;
+  background: var(--c-accent);
+  mask-image: radial-gradient(circle, black 40%, transparent 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+}
+.mask-repeat-demo {
+  width: 140px;
+  height: 60px;
+  background: linear-gradient(45deg, var(--c-success), var(--c-primary));
+  mask-image: linear-gradient(to right, black 50%, transparent 50%);
+  mask-size: 20px 100%;
+  mask-repeat: repeat-x;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+}
+
+/* ============================================================
+   19. GRID SUBGRID
+   ============================================================ */
+.subgrid-parent {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px;
+  gap: 4px;
+}
+.subgrid-child {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  gap: 4px;
+}
+.subgrid-cell {
+  background: var(--c-card);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  text-align: center;
+  color: var(--c-dim);
+}
+
+/* ============================================================
+   20. :target / :lang() PSEUDO-CLASSES
+   ============================================================ */
+.target-demo:target {
+  background: rgba(108, 92, 231, 0.2);
+  border: 2px solid var(--c-primary);
+  border-radius: 4px;
+}
+.lang-demo:lang(en) {
+  border-left: 3px solid var(--c-success);
+  padding-left: 6px;
+}
+.lang-demo:lang(zh) {
+  border-left: 3px solid var(--c-danger);
+  padding-left: 6px;
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ======== SIDEBAR ======== -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">KUI CSS Demo</div>
+      <div class="sidebar-sub">Chromium vs KUI Feature Test</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-item active" id="nav-1"><span class="nav-icon">1</span>Selectors<span class="nav-badge">52</span></div>
+      <div class="nav-item" id="nav-2"><span class="nav-icon">2</span>Box Model<span class="nav-badge">20</span></div>
+      <div class="nav-item" id="nav-3"><span class="nav-icon">3</span>Positioning<span class="nav-badge">12</span></div>
+      <div class="nav-item" id="nav-4"><span class="nav-icon">4</span>Typography<span class="nav-badge">31</span></div>
+      <div class="nav-item" id="nav-5"><span class="nav-icon">5</span>BG &amp; Borders<span class="nav-badge">36</span></div>
+      <div class="nav-item" id="nav-7"><span class="nav-icon">7</span>Flexbox<span class="nav-badge">14</span></div>
+      <div class="nav-item" id="nav-8"><span class="nav-icon">8</span>Grid<span class="nav-badge">22</span></div>
+      <div class="nav-item" id="nav-9"><span class="nav-icon">9</span>Effects<span class="nav-badge">13</span></div>
+      <div class="nav-item" id="nav-10"><span class="nav-icon">10</span>Transforms<span class="nav-badge">23</span></div>
+      <div class="nav-item" id="nav-11"><span class="nav-icon">11</span>Trans &amp; Anim<span class="nav-badge">16</span></div>
+      <div class="nav-item" id="nav-13"><span class="nav-icon">13</span>Colors<span class="nav-badge">15</span></div>
+      <div class="nav-item" id="nav-14"><span class="nav-icon">14</span>Multi-Column<span class="nav-badge">10</span></div>
+      <div class="nav-item" id="nav-15"><span class="nav-icon">15</span>Lists &amp; Tables</div>
+      <div class="nav-item" id="nav-16"><span class="nav-icon">16</span>Misc / Units</div>
+      <div class="nav-item" id="nav-17"><span class="nav-icon">17</span>Scroll Snap</div>
+      <div class="nav-item" id="nav-18"><span class="nav-icon">18</span>CSS Masking</div>
+      <div class="nav-item" id="nav-19"><span class="nav-icon">19</span>Grid Subgrid</div>
+      <div class="nav-item" id="nav-20"><span class="nav-icon">20</span>:target / :lang()</div>
+      <div class="nav-item" id="nav-cpp" style="color:var(--c-accent);"><span class="nav-icon">C++</span>Dynamic DOM</div>
+    </div>
+  </div>
+
+  <!-- ======== MAIN CONTENT ======== -->
+  <div class="main" id="main-content">
+
+    <!-- 1. Selectors -->
+    <div class="section" id="sec-1">
+      <div class="section-title">Selectors</div>
+      <h3>Type / Class / ID / Attribute</h3>
+      <div class="row" style="gap:6px; margin-bottom:8px;">
+        <span id="sel-id">#id</span>
+        <span class="sel-class">.class</span>
+        <span data-sel>[attr]</span>
+        <span data-sel="exact">[=exact]</span>
+        <span data-sel="prefix">[^=pre]</span>
+        <span data-sel="has-mid-dle">[*=mid]</span>
+        <span data-sel="endsuf">[$=suf]</span>
+      </div>
+      <h3>Combinators</h3>
+      <div class="row" style="gap:6px; margin-bottom:8px;">
+        <div class="sel-parent"><span class="sel-child">child&gt;</span> <span><span class="sel-desc">desc</span></span></div>
+        <span class="sel-adj">adj</span><span class="sel-adj-next">+next</span>
+      </div>
+      <h3>Structural Pseudo-classes</h3>
+      <div class="nth-row row" style="gap:4px; margin-bottom:8px;">
+        <div class="box">1st</div><div class="box">2nd</div><div class="box">3rd</div><div class="box">last</div>
+      </div>
+      <h3>:not / :is / :has / :empty / ::before / ::after</h3>
+      <div class="row" style="gap:6px;">
+        <div class="logic-row row" style="gap:4px;">
+          <div style="padding:2px 6px;">A</div>
+          <div class="skip" style="padding:2px 6px; background:var(--c-border);">skip</div>
+          <div class="hl" style="padding:2px 6px;">:is</div>
+        </div>
+        <div class="has-box"><span class="trigger">:has</span></div>
+        <div class="empty-box"></div>
+        <div class="empty-box">ok</div>
+        <span class="pseudo-el">pseudo</span>
+      </div>
+    </div>
+
+    <!-- 2. Box Model -->
+    <div class="section" id="sec-2">
+      <div class="section-title">Box Model</div>
+      <div class="row" style="gap:8px; margin-bottom:8px;">
+        <div class="bm-content box">content-box</div>
+        <div class="bm-border box">border-box</div>
+        <div style="padding:4px 8px; margin:6px; background:var(--c-primary); border-radius:4px; color:white; font-size:11px;">margin:6px</div>
+      </div>
+      <div class="bm-auto">margin: 0 auto</div>
+      <div class="bm-minmax" style="margin-top:6px;">min-w:50 max-w:120 overflow text clipped here</div>
+    </div>
+
+    <!-- 3. Positioning -->
+    <div class="section" id="sec-3">
+      <div class="section-title">Positioning</div>
+      <div class="pos-box">
+        <div class="pos-rel">relative</div>
+        <div class="pos-abs">absolute</div>
+        <div class="pos-inset">inset</div>
+      </div>
+      <div class="pos-sticky-wrap" style="margin-top:6px;">
+        <div class="pos-sticky">sticky top:0</div>
+        <div style="height:80px; font-size:10px; color:var(--c-dim); padding:4px;">scroll content...</div>
+      </div>
+    </div>
+
+    <!-- 4. Typography -->
+    <div class="section" id="sec-4">
+      <div class="section-title">Typography</div>
+      <h3>Size &amp; Weight</h3>
+      <div class="row" style="gap:6px; align-items:baseline; margin-bottom:6px;">
+        <span class="t-sz-10">10px</span><span class="t-sz-16">16px</span><span class="t-sz-20">20px</span>
+        <span class="t-w300">w300</span><span class="t-w700">w700</span><span class="t-w900">w900</span>
+        <span class="t-italic">italic</span>
+      </div>
+      <h3>Decoration</h3>
+      <div class="row" style="gap:6px; margin-bottom:6px;">
+        <span class="t-under">under</span><span class="t-over">over</span><span class="t-through">through</span>
+        <span class="t-deco-color">color</span><span class="t-deco-wavy">wavy</span>
+      </div>
+      <h3>Transform &amp; Spacing</h3>
+      <div class="row" style="gap:6px; margin-bottom:6px;">
+        <span class="t-upper">upper</span><span class="t-lower">LOWER</span><span class="t-cap">capitalize me</span>
+        <span class="t-ls">spacing</span><span class="t-ws">word sp</span>
+      </div>
+      <h3>Align / Wrap / Shadow</h3>
+      <div class="row" style="gap:4px;">
+        <div class="box t-center" style="width:70px;">center</div>
+        <div class="box t-right" style="width:70px;">right</div>
+        <div class="box t-nowrap">very long text ellipsis</div>
+        <div class="box t-shadow">shadow</div>
+        <div class="box t-lh2" style="width:80px;">line-height 2.0</div>
+        <div class="box t-rtl" style="width:70px;">RTL</div>
+      </div>
+    </div>
+
+    <!-- 5+6. Backgrounds & Borders -->
+    <div class="section" id="sec-5">
+      <div class="section-title">Backgrounds &amp; Borders</div>
+      <h3>Backgrounds</h3>
+      <div class="row" style="gap:4px; margin-bottom:8px;">
+        <div class="box bg-solid" style="padding:8px;">solid</div>
+        <div class="box bg-linear" style="padding:8px;">linear</div>
+        <div class="box bg-radial" style="padding:8px;">radial</div>
+        <div class="bg-conic"></div>
+        <div class="box bg-repeat" style="padding:8px;">repeat</div>
+        <div class="box bg-clip" style="padding:8px;">clip</div>
+      </div>
+      <h3>Border Styles</h3>
+      <div class="row" style="gap:4px; margin-bottom:8px;">
+        <div class="box b-solid" style="padding:4px 8px;">solid</div>
+        <div class="box b-dashed" style="padding:4px 8px;">dashed</div>
+        <div class="box b-dotted" style="padding:4px 8px;">dotted</div>
+        <div class="box b-double" style="padding:4px 8px;">double</div>
+        <div class="box b-groove" style="padding:4px 8px;">groove</div>
+        <div class="box b-ridge" style="padding:4px 8px;">ridge</div>
+        <div class="box b-mixed" style="padding:4px 8px;">mixed</div>
+      </div>
+      <h3>Radius &amp; Shadows</h3>
+      <div class="row" style="gap:6px;">
+        <div class="box b-r12" style="padding:6px;">12px</div>
+        <div class="b-r50">50%</div>
+        <div class="box b-shadow" style="padding:6px;">shadow</div>
+        <div class="box b-shadow-in" style="padding:6px;">inset</div>
+        <div class="box b-shadow-m" style="padding:6px;">multi</div>
+        <div class="box b-outline" style="padding:6px;">outline</div>
+      </div>
+    </div>
+
+    <!-- 7. Flexbox -->
+    <div class="section" id="sec-7">
+      <div class="section-title">Flexbox</div>
+      <h3>Direction &amp; Wrap</h3>
+      <div class="row" style="gap:8px; margin-bottom:8px;">
+        <div style="width:120px;"><div class="fx-row"><div class="fi">A</div><div class="fi">B</div><div class="fi">C</div></div><div style="font-size:10px;color:var(--c-dim);">row</div></div>
+        <div style="width:40px;"><div class="fx-col"><div class="fi">A</div><div class="fi">B</div></div><div style="font-size:10px;color:var(--c-dim);">col</div></div>
+        <div style="width:120px;"><div class="fx-rev"><div class="fi">A</div><div class="fi">B</div><div class="fi">C</div></div><div style="font-size:10px;color:var(--c-dim);">reverse</div></div>
+        <div><div class="fx-wrap"><div class="fi">1</div><div class="fi">2</div><div class="fi">3</div><div class="fi">4</div><div class="fi">5</div></div><div style="font-size:10px;color:var(--c-dim);">wrap</div></div>
+      </div>
+      <h3>Justify &amp; Grow &amp; Order</h3>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div class="fx-jc-between" style="background:var(--c-card); padding:4px; border-radius:4px;"><div class="fi">A</div><div class="fi">B</div><div class="fi">C</div></div>
+        <div class="fx-jc-evenly" style="background:var(--c-card); padding:4px; border-radius:4px;"><div class="fi">A</div><div class="fi">B</div><div class="fi">C</div></div>
+        <div class="fx-grow" style="background:var(--c-card); padding:4px; border-radius:4px;"><div class="fi g1">1x</div><div class="fi g2">2x</div><div class="fi g3">3x</div></div>
+        <div class="fx-order row" style="gap:4px; background:var(--c-card); padding:4px; border-radius:4px;"><div class="fi">A-&gt;3</div><div class="fi">B-&gt;1</div><div class="fi">C-&gt;2</div></div>
+      </div>
+    </div>
+
+    <!-- 8. Grid -->
+    <div class="section" id="sec-8">
+      <div class="section-title">Grid</div>
+      <div class="row" style="gap:8px; margin-bottom:8px;">
+        <div style="width:160px;"><div class="gr-basic"><div class="gi">1</div><div class="gi">2</div><div class="gi">3</div></div><div style="font-size:10px;color:var(--c-dim);">1fr 1fr 1fr</div></div>
+        <div style="width:160px;"><div class="gr-fr"><div class="gi">1fr</div><div class="gi">2fr</div><div class="gi">1fr</div></div><div style="font-size:10px;color:var(--c-dim);">1fr 2fr 1fr</div></div>
+        <div style="width:180px;"><div class="gr-repeat"><div class="gi">1</div><div class="gi">2</div><div class="gi">3</div><div class="gi">4</div></div><div style="font-size:10px;color:var(--c-dim);">repeat(4,1fr)</div></div>
+      </div>
+      <h3>Span &amp; Areas</h3>
+      <div class="row" style="gap:8px;">
+        <div style="width:160px;"><div class="gr-span"><div class="gi sp2">span 2</div><div class="gi">3</div><div class="gi">4</div><div class="gi">5</div></div></div>
+        <div style="flex:1;"><div class="gr-areas">
+          <div class="gi a-hd" style="background:var(--c-danger);">header</div>
+          <div class="gi a-sb" style="background:var(--c-primary);">side</div>
+          <div class="gi a-mn" style="background:var(--c-success);">main</div>
+          <div class="gi a-ft" style="background:var(--c-secondary);">footer</div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 9. Visual Effects -->
+    <div class="section" id="sec-9">
+      <div class="section-title">Visual Effects</div>
+      <h3>Opacity &amp; Filters</h3>
+      <div class="row" style="gap:4px; margin-bottom:8px;">
+        <div class="box" style="background:var(--c-accent);color:white;">orig</div>
+        <div class="box ve-o50" style="background:var(--c-accent);color:white;">50%</div>
+        <div class="box ve-o25" style="background:var(--c-accent);color:white;">25%</div>
+        <div class="box ve-blur" style="background:var(--c-accent);color:white;">blur</div>
+        <div class="box ve-gray" style="background:var(--c-accent);color:white;">gray</div>
+        <div class="box ve-sepia" style="background:var(--c-accent);color:white;">sepia</div>
+        <div class="box ve-bright" style="background:var(--c-accent);color:white;">bright</div>
+        <div class="box ve-hue" style="background:var(--c-accent);color:white;">hue</div>
+        <div class="box ve-invert" style="background:var(--c-accent);color:white;">invert</div>
+        <div class="box ve-dropshadow" style="background:var(--c-accent);color:white;">drop</div>
+      </div>
+      <h3>Backdrop / Clip / Blend</h3>
+      <div class="row" style="gap:6px;">
+        <div style="background:linear-gradient(var(--c-danger),var(--c-primary)); padding:4px; border-radius:4px; width:90px; height:36px; position:relative;">
+          <div class="ve-backdrop" style="padding:4px; border-radius:4px; font-size:10px;">backdrop</div>
+        </div>
+        <div class="box ve-clip" style="background:var(--c-success); width:40px; height:40px; color:white;">clip</div>
+      </div>
+    </div>
+
+    <!-- 10. Transforms -->
+    <div class="section" id="sec-10">
+      <div class="section-title">Transforms</div>
+      <div class="row" style="gap:10px;">
+        <div class="box tf-translate">translate</div>
+        <div class="box tf-scale">scale</div>
+        <div class="box tf-rotate">rotate</div>
+        <div class="box tf-skew">skew</div>
+        <div class="box tf-matrix">matrix</div>
+        <div class="box tf-origin">origin</div>
+        <div class="box tf-multi">multi</div>
+        <div class="box tf-3d-rx">rotX</div>
+        <div class="box tf-3d-ry">rotY</div>
+      </div>
+    </div>
+
+    <!-- 11+12. Transitions & Animations -->
+    <div class="section" id="sec-11">
+      <div class="section-title">Transitions &amp; Animations</div>
+      <h3>Transitions (hover)</h3>
+      <div class="row" style="gap:6px; margin-bottom:8px;">
+        <div class="box tr-color" style="padding:6px 10px;">color</div>
+        <div class="box tr-scale">scale</div>
+        <div class="box tr-multi" style="padding:6px 10px;">multi</div>
+      </div>
+      <h3>Animations</h3>
+      <div class="row" style="gap:8px;">
+        <div class="box an-pulse">pulse</div>
+        <div class="box an-slide">slideIn</div>
+        <div class="an-spin" style="width:24px;height:24px;background:var(--c-card);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px;">+</div>
+        <div class="box an-bounce">bounce</div>
+        <div class="box an-paused">paused</div>
+      </div>
+    </div>
+
+    <!-- 13. Colors -->
+    <div class="section" id="sec-13">
+      <div class="section-title">Colors</div>
+      <div class="row" style="gap:4px; flex-wrap:wrap;">
+        <span class="box c-hex3">#f00</span>
+        <span class="box c-hex6">#ff6600</span>
+        <span class="box c-hex8">#..cc</span>
+        <span class="box c-rgb">rgb()</span>
+        <span class="box c-rgba">rgba()</span>
+        <span class="box c-hsl">hsl()</span>
+        <span class="box c-hsla">hsla()</span>
+        <span class="box c-named">coral</span>
+        <span class="box c-current">current</span>
+        <span class="box c-hwb">hwb()</span>
+        <span class="box c-oklch">oklch()</span>
+        <span class="box c-mix">mix()</span>
+      </div>
+    </div>
+
+    <!-- 14. Multi-Column -->
+    <div class="section" id="sec-14">
+      <div class="section-title">Multi-Column Layout</div>
+      <div class="row" style="gap:12px;">
+        <div style="flex:1;"><div class="mc-2" style="background:var(--c-card);padding:8px;border-radius:4px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</div><div style="font-size:10px;color:var(--c-dim);">2 columns</div></div>
+        <div style="flex:1;"><div class="mc-3" style="background:var(--c-card);padding:8px;border-radius:4px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</div><div style="font-size:10px;color:var(--c-dim);">3 columns + rule</div></div>
+      </div>
+    </div>
+
+    <!-- 15. Lists & Tables -->
+    <div class="section" id="sec-15">
+      <div class="section-title">Lists &amp; Tables</div>
+      <div class="row" style="gap:16px; margin-bottom:8px;">
+        <ul class="list-disc"><li>disc A</li><li>disc B</li></ul>
+        <ol class="list-decimal"><li>one</li><li>two</li></ol>
+        <ul class="counter-list"><li>counter</li><li>items</li><li>here</li></ul>
+      </div>
+      <div class="tbl">
+        <div class="tbl-r"><div class="tbl-c tbl-h">Feature</div><div class="tbl-c tbl-h">Chromium</div><div class="tbl-c tbl-h">KUI</div></div>
+        <div class="tbl-r"><div class="tbl-c">Flexbox</div><div class="tbl-c" style="color:var(--c-success);">100%</div><div class="tbl-c" style="color:var(--c-success);">100%</div></div>
+        <div class="tbl-r"><div class="tbl-c">Grid</div><div class="tbl-c" style="color:var(--c-success);">100%</div><div class="tbl-c" style="color:var(--c-success);">95%</div></div>
+        <div class="tbl-r"><div class="tbl-c">Animations</div><div class="tbl-c" style="color:var(--c-success);">100%</div><div class="tbl-c" style="color:var(--c-success);">100%</div></div>
+        <div class="tbl-r"><div class="tbl-c">Transforms</div><div class="tbl-c" style="color:var(--c-success);">100%</div><div class="tbl-c" style="color:var(--c-success);">100%</div></div>
+      </div>
+    </div>
+
+    <!-- 16. Misc -->
+    <div class="section" id="sec-16">
+      <div class="section-title">Misc: Units, calc(), aspect-ratio</div>
+      <div class="row" style="gap:6px; margin-bottom:6px;">
+        <div class="ar-16-9">16:9</div>
+        <div class="ar-1-1">1:1</div>
+        <div class="vw-u">15vw</div>
+      </div>
+      <div class="calc-w">calc(100% - 40px)</div>
+      <div class="clamp-w" style="margin-top:4px;">clamp(60px, 50%, 180px)</div>
+      <div class="row" style="gap:6px; margin-top:6px;">
+        <div class="box media-active">@media</div>
+        <div class="box supports-active">@supports</div>
+        <span style="color:var(--c-accent);">var(--accent)</span>
+        <span class="tag">!important</span>
+      </div>
+    </div>
+
+    <!-- 17. Scroll Snap -->
+    <div class="section" id="sec-17">
+      <div class="section-title">Scroll Snap</div>
+      <h3>scroll-snap-type: x mandatory</h3>
+      <div class="snap-container" style="margin-bottom:8px;">
+        <div class="snap-item">Snap 1</div>
+        <div class="snap-item">Snap 2</div>
+        <div class="snap-item">Snap 3</div>
+        <div class="snap-item">Snap 4</div>
+        <div class="snap-item">Snap 5</div>
+        <div class="snap-item">Snap 6</div>
+      </div>
+      <h3>scroll-snap-type: y mandatory</h3>
+      <div class="row" style="gap:12px;">
+        <div class="snap-y-container">
+          <div class="snap-y-item">Page 1</div>
+          <div class="snap-y-item">Page 2</div>
+          <div class="snap-y-item">Page 3</div>
+          <div class="snap-y-item">Page 4</div>
+        </div>
+        <div class="col" style="font-size:11px;color:var(--c-dim);">
+          <div><span class="tag">scroll-snap-align: center</span></div>
+          <div><span class="tag">scroll-snap-stop: normal</span></div>
+          <div><span class="tag">scroll-padding: 4px</span></div>
+          <div><span class="tag">scroll-margin-left: 4px</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 18. CSS Masking -->
+    <div class="section" id="sec-18">
+      <div class="section-title">CSS Masking</div>
+      <h3>mask-image: linear-gradient / radial-gradient</h3>
+      <div class="row" style="gap:8px; margin-bottom:8px;">
+        <div class="mask-grad">linear mask</div>
+        <div class="mask-radial">radial</div>
+        <div class="mask-repeat-demo">repeat-x</div>
+      </div>
+      <h3>Properties</h3>
+      <div class="row" style="gap:6px; flex-wrap:wrap;">
+        <span class="tag">mask-image</span>
+        <span class="tag">mask-size</span>
+        <span class="tag">mask-position</span>
+        <span class="tag">mask-repeat</span>
+        <span class="tag">mask-origin</span>
+        <span class="tag">mask-clip</span>
+        <span class="tag">mask-mode</span>
+        <span class="tag">mask-composite</span>
+      </div>
+    </div>
+
+    <!-- 19. Grid Subgrid -->
+    <div class="section" id="sec-19">
+      <div class="section-title">Grid Subgrid</div>
+      <h3>Parent: 100px 1fr 80px — Child: subgrid (inherits tracks)</h3>
+      <div class="subgrid-parent" style="margin-bottom:8px;">
+        <div class="subgrid-cell" style="background:var(--c-danger);color:white;">100px</div>
+        <div class="subgrid-cell" style="background:var(--c-primary);color:white;">1fr</div>
+        <div class="subgrid-cell" style="background:var(--c-success);color:white;">80px</div>
+        <div class="subgrid-child">
+          <div class="subgrid-cell">sub-1</div>
+          <div class="subgrid-cell">sub-2</div>
+          <div class="subgrid-cell">sub-3</div>
+        </div>
+      </div>
+      <div class="row" style="gap:6px;">
+        <span class="tag">grid-template-columns: subgrid</span>
+        <span class="tag">grid-template-rows: subgrid</span>
+      </div>
+    </div>
+
+    <!-- 20. :target / :lang() -->
+    <div class="section" id="sec-20">
+      <div class="section-title">Pseudo-classes: :target / :lang() / :scope</div>
+      <h3>:target (click link to activate)</h3>
+      <div class="row" style="gap:8px; margin-bottom:8px;">
+        <a href="#target-box" style="color:var(--c-primary); font-size:12px;">#target-box</a>
+        <div class="box target-demo" id="target-box" style="padding:6px 10px;">:target styled</div>
+      </div>
+      <h3>:lang()</h3>
+      <div class="row" style="gap:8px; margin-bottom:8px;">
+        <div class="box lang-demo" lang="en" style="padding:4px 8px;">English :lang(en)</div>
+        <div class="box lang-demo" lang="zh" style="padding:4px 8px;">中文 :lang(zh)</div>
+        <div class="box lang-demo" lang="en-US" style="padding:4px 8px;">en-US (matches :lang(en))</div>
+      </div>
+      <h3>:has() / :nth-child(of) / :any-link / :scope</h3>
+      <div class="row" style="gap:6px; flex-wrap:wrap;">
+        <span class="tag">:has(> .child)</span>
+        <span class="tag">:nth-child(2n of .cls)</span>
+        <span class="tag">:any-link</span>
+        <span class="tag">:scope</span>
+        <span class="tag">:target</span>
+        <span class="tag">:lang()</span>
+      </div>
+    </div>
+
+    <!-- C++ Dynamic DOM Section (populated by C++ code) -->
+    <div id="dynamic-section"></div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- Status bar -->
+<div class="status-bar" style="position:fixed; bottom:0; left:0; right:0; z-index:100;">
+  <span class="status-dot"></span>
+  <span>KUI CSS Feature Demo</span>
+  <span style="margin-left:auto;" id="status-text">Ready</span>
+</div>
+
+<script>
+// Navigation click → scroll to section (browser-only; KUI uses C++ event binding)
+document.querySelectorAll('.nav-item').forEach(nav => {
+  nav.addEventListener('click', () => {
+    const id = nav.id;
+    let secId = id.replace('nav-', 'sec-');
+    if (id === 'nav-cpp') secId = 'dynamic-section';
+    const sec = document.getElementById(secId);
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Update active state
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    nav.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; }
+    .col { flex: 1; }
+    .box { padding: 8px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+
+    /* Position demos */
+    .pos-container {
+        position: relative;
+        background: #0f172a;
+        border: 1px dashed #475569;
+        border-radius: 8px;
+        height: 200px;
+        padding: 12px;
+    }
+    .pos-static   { position: static; background: #3b82f6; }
+    .pos-relative { position: relative; background: #8b5cf6; top: 20px; left: 30px; }
+    .pos-absolute { position: absolute; background: #ef4444; top: 10px; right: 10px; }
+    .pos-abs-bl   { position: absolute; background: #f59e0b; bottom: 10px; left: 10px; }
+
+    /* Z-index */
+    .z-container { position: relative; height: 150px; }
+    .z1 { position: absolute; width: 120px; height: 80px; background: #ef4444; top: 0; left: 0; z-index: 1; }
+    .z2 { position: absolute; width: 120px; height: 80px; background: #3b82f6; top: 20px; left: 40px; z-index: 2; }
+    .z3 { position: absolute; width: 120px; height: 80px; background: #22c55e; top: 40px; left: 80px; z-index: 3; }
+
+    /* Centering with absolute */
+    .center-parent { position: relative; height: 160px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; }
+    .center-child {
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 120px; height: 50px;
+        background: #8b5cf6;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; font-weight: 600;
+    }
+</style>
+</head>
+<body>
+    <h2>Positioning</h2>
+
+    <h3>Position: static / relative / absolute</h3>
+    <div class="section">
+        <div class="pos-container">
+            <div class="box pos-static">static (normal flow)</div>
+            <div class="box pos-relative">relative (top:20, left:30)</div>
+            <div class="box pos-absolute">absolute (top:10, right:10)</div>
+            <div class="box pos-abs-bl">absolute (bottom:10, left:10)</div>
+        </div>
+    </div>
+
+    <h3>Z-Index Stacking (1 → 2 → 3)</h3>
+    <div class="section">
+        <div class="z-container">
+            <div class="z1 box">z:1 (red)</div>
+            <div class="z2 box">z:2 (blue)</div>
+            <div class="z3 box">z:3 (green)</div>
+        </div>
+    </div>
+
+    <h3>Absolute Centering (top:50% left:50%)</h3>
+    <div class="section">
+        <div class="center-parent">
+            <div class="center-child">Centered</div>
+        </div>
+    </div>
+
+    <h3>Relative Offset Comparison</h3>
+    <div class="section">
+        <div style="display: flex; gap: 12px;">
+            <div style="flex:1;">
+                <div class="label">No offset</div>
+                <div class="box" style="background:#3b82f6; position: relative;">Original</div>
+            </div>
+            <div style="flex:1;">
+                <div class="label">top: 10px</div>
+                <div class="box" style="background:#8b5cf6; position: relative; top: 10px;">Shifted down</div>
+            </div>
+            <div style="flex:1;">
+                <div class="label">left: 20px</div>
+                <div class="box" style="background:#ec4899; position: relative; left: 20px;">Shifted right</div>
+            </div>
+            <div style="flex:1;">
+                <div class="label">top: -5px; left: -10px</div>
+                <div class="box" style="background:#f59e0b; position: relative; top: -5px; left: -10px;">Negative</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Absolute Corners</h3>
+    <div class="section">
+        <div style="position: relative; height: 180px; background: #0f172a; border: 1px solid #334155; border-radius: 8px;">
+            <div class="box" style="position:absolute; top:8px; left:8px; background:#ef4444;">Top Left</div>
+            <div class="box" style="position:absolute; top:8px; right:8px; background:#3b82f6;">Top Right</div>
+            <div class="box" style="position:absolute; bottom:8px; left:8px; background:#22c55e;">Bottom Left</div>
+            <div class="box" style="position:absolute; bottom:8px; right:8px; background:#f59e0b;">Bottom Right</div>
+            <div class="box" style="position:absolute; top:50%; left:50%; background:#8b5cf6;">Center</div>
+        </div>
+    </div>
+</body>
+</html>

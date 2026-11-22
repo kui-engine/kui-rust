@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+:root {
+    --bg: #0f0f23;
+    --surface: #1a1a2e;
+    --surface-2: #16213e;
+    --border: #2a2a4a;
+    --text: #e0e0e0;
+    --text-muted: #888;
+    --primary: #3b82f6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 8px;
+}
+* { box-sizing: border-box; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    margin: 0;
+    /* column flex 让 KUI HTML Loader 注入的 toolbar(body 首个子元素)
+       自然贴在顶部, .app 占剩余高度 (不依赖 loader 是否注入). */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.app {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Sidebar -------------------------------------------------------------- */
+.sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+    flex-shrink: 0;
+}
+.sidebar-header {
+    padding: 0 16px 16px 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+}
+.sidebar-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-left: 3px solid transparent;
+}
+.sidebar-item:hover { background: rgba(59, 130, 246, 0.08); color: var(--text); }
+.sidebar-item.active {
+    color: var(--primary);
+    background: rgba(59, 130, 246, 0.12);
+    font-weight: 600;
+    border-left-color: var(--primary);
+}
+.sidebar-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    display: inline-block;
+    border-radius: 3px;
+}
+.icon-all      { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+.icon-today    { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+.icon-upcoming { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.icon-done     { background: linear-gradient(135deg, #10b981, #34d399); }
+.sidebar-label { flex: 1; }
+.sidebar-count {
+    background: var(--border);
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+.sidebar-spacer { flex: 1; }
+.sidebar-section {
+    padding: 12px 16px 0 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+}
+.sidebar-section-title {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.project-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+.project-item:hover { color: var(--text); }
+.project-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Main column ---------------------------------------------------------- */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+}
+.header {
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+}
+.header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+    color: var(--text);
+}
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    font-weight: 500;
+    font-family: inherit;
+    line-height: 1;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: #2563eb; }
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-outline.active { border-color: var(--primary); color: var(--primary); }
+.search-wrap { position: relative; }
+.search-box {
+    padding: 8px 12px 8px 32px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    width: 240px;
+    font-family: inherit;
+    outline: none;
+}
+.search-box:focus { border-color: var(--primary); }
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--text-muted);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.search-icon::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 6px;
+    background: var(--text-muted);
+    bottom: -6px;
+    right: -2px;
+    transform: rotate(-45deg);
+}
+
+/* Filter dropdown ------------------------------------------------------ */
+.filter-wrap { position: relative; }
+.filter-menu {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    padding: 8px;
+    min-width: 180px;
+    z-index: 200;
+}
+.filter-menu.open { display: block; }
+.filter-section-title {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding: 4px 8px;
+    font-weight: 600;
+}
+.filter-item {
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.filter-item:hover { background: rgba(59, 130, 246, 0.1); }
+.filter-item.active { background: rgba(59, 130, 246, 0.2); color: var(--primary); }
+.filter-check {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+.filter-item.active .filter-check {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Task list ------------------------------------------------------------ */
+.task-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 24px;
+    scrollbar-color: rgba(59,130,246,0.4) transparent;
+    scrollbar-width: thin;
+}
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+}
+.empty-state-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    border: 2px dashed var(--border);
+    border-radius: 50%;
+}
+.empty-state-title {
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+.empty-state-desc { font-size: 13px; }
+
+/* Task card ------------------------------------------------------------ */
+.task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.task-card:hover { border-color: var(--primary); }
+.task-card.done { opacity: 0.65; }
+.task-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+}
+.task-check:hover { border-color: var(--primary); }
+.task-check.checked {
+    background: var(--success);
+    border-color: var(--success);
+}
+.task-check.checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.task-body { flex: 1; min-width: 0; }
+.task-title {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--text);
+}
+.task-title.done {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+.task-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
+}
+.task-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+.tag-high   { background: rgba(239, 68, 68, 0.15);  color: var(--danger); }
+.tag-medium { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.tag-low    { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+.tag-feature { background: rgba(59, 130, 246, 0.15);  color: var(--primary); }
+.tag-bug     { background: rgba(239, 68, 68, 0.15);   color: var(--danger); }
+.tag-docs    { background: rgba(168, 85, 247, 0.15);  color: #a855f7; }
+.due-date {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+.task-delete {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+.task-delete:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+/* Stats bar ------------------------------------------------------------ */
+.stats-bar {
+    display: flex;
+    gap: 24px;
+    padding: 12px 24px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    align-items: center;
+    flex-shrink: 0;
+}
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.stat-value { font-weight: 600; color: var(--text); }
+.progress-bar {
+    width: 120px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: var(--success);
+    border-radius: 3px;
+    width: 0%;
+}
+
+/* Modal ---------------------------------------------------------------- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 460px;
+    max-width: calc(100vw - 32px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+}
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    flex: 1;
+}
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    line-height: 1;
+}
+.modal-close:hover { color: var(--text); background: var(--border); }
+.modal-body { padding: 16px 20px; }
+.field { margin-bottom: 14px; }
+.field-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+.field-input,
+.field-textarea,
+.field-select {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+}
+.field-input:focus,
+.field-textarea:focus,
+.field-select:focus { border-color: var(--primary); }
+.field-textarea { resize: vertical; min-height: 60px; }
+.field-row {
+    display: flex;
+    gap: 10px;
+}
+.field-row .field { flex: 1; }
+.modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">TaskFlow</div>
+
+    <div class="sidebar-item active" id="sb-all" data-view="all">
+        <span class="sidebar-icon icon-all"></span>
+        <span class="sidebar-label">All Tasks</span>
+        <span class="sidebar-count" id="cnt-all">0</span>
+    </div>
+    <div class="sidebar-item" id="sb-today" data-view="today">
+        <span class="sidebar-icon icon-today"></span>
+        <span class="sidebar-label">Today</span>
+        <span class="sidebar-count" id="cnt-today">0</span>
+    </div>
+    <div class="sidebar-item" id="sb-upcoming" data-view="upcoming">
+        <span class="sidebar-icon icon-upcoming"></span>
+        <span class="sidebar-label">Upcoming</span>
+        <span class="sidebar-count" id="cnt-upcoming">0</span>
+    </div>
+    <div class="sidebar-item" id="sb-completed" data-view="completed">
+        <span class="sidebar-icon icon-done"></span>
+        <span class="sidebar-label">Completed</span>
+        <span class="sidebar-count" id="cnt-completed">0</span>
+    </div>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-title">Projects</div>
+        <div class="project-item">
+            <span class="project-dot" style="background: var(--primary);"></span>
+            <span>KUI Framework</span>
+        </div>
+        <div class="project-item">
+            <span class="project-dot" style="background: var(--success);"></span>
+            <span>Documentation</span>
+        </div>
+        <div class="project-item">
+            <span class="project-dot" style="background: var(--warning);"></span>
+            <span>Testing</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+    <div class="header">
+        <h1 id="page-title">All Tasks</h1>
+        <div class="search-wrap">
+            <span class="search-icon"></span>
+            <input type="text" class="search-box" id="search-input" placeholder="Search tasks..." />
+        </div>
+        <div class="filter-wrap">
+            <button class="btn btn-outline" id="filter-btn">Filter</button>
+            <div class="filter-menu" id="filter-menu">
+                <div class="filter-section-title">Priority</div>
+                <div class="filter-item" data-filter="prio:high">
+                    <span class="filter-check"></span><span>High</span>
+                </div>
+                <div class="filter-item" data-filter="prio:medium">
+                    <span class="filter-check"></span><span>Medium</span>
+                </div>
+                <div class="filter-item" data-filter="prio:low">
+                    <span class="filter-check"></span><span>Low</span>
+                </div>
+                <div class="filter-section-title" style="margin-top:6px;">Type</div>
+                <div class="filter-item" data-filter="type:feature">
+                    <span class="filter-check"></span><span>Feature</span>
+                </div>
+                <div class="filter-item" data-filter="type:bug">
+                    <span class="filter-check"></span><span>Bug</span>
+                </div>
+                <div class="filter-item" data-filter="type:docs">
+                    <span class="filter-check"></span><span>Docs</span>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary" id="new-task-btn">+ New Task</button>
+    </div>
+
+    <div class="task-list" id="task-list"></div>
+
+    <div class="stats-bar">
+        <div class="stat">Total: <span class="stat-value" id="stat-total">0</span></div>
+        <div class="stat">Done: <span class="stat-value" id="stat-done">0</span></div>
+        <div class="stat">In Progress: <span class="stat-value" id="stat-progress">0</span></div>
+        <div class="stat">
+            Progress:
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            <span class="stat-value" id="stat-percent">0%</span>
+        </div>
+    </div>
+</div>
+</div><!-- /.app -->
+
+<!-- New Task Modal -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">New Task</span>
+            <button class="modal-close" id="modal-close">x</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label class="field-label">Title</label>
+                <input type="text" class="field-input" id="m-title" placeholder="What needs to be done?" />
+            </div>
+            <div class="field">
+                <label class="field-label">Description</label>
+                <textarea class="field-textarea" id="m-desc" placeholder="Optional details"></textarea>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label class="field-label">Priority</label>
+                    <select class="field-select" id="m-prio">
+                        <option value="high">High</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label class="field-label">Type</label>
+                    <select class="field-select" id="m-type">
+                        <option value="feature" selected>Feature</option>
+                        <option value="bug">Bug</option>
+                        <option value="docs">Docs</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label class="field-label">Bucket</label>
+                    <select class="field-select" id="m-view">
+                        <option value="today">Today</option>
+                        <option value="upcoming" selected>Upcoming</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label class="field-label">Due (free text, e.g. Jan 20)</label>
+                <input type="text" class="field-input" id="m-due" placeholder="Jan 20" />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" id="modal-cancel">Cancel</button>
+            <button class="btn btn-primary" id="modal-save">Create</button>
+        </div>
+    </div>
+</div>
+
+<script>
+-- ============================================================================
+-- 38_task_manager_demo.html — KUI 任务管理器 demo
+--
+-- 架构: data-driven model-view-render
+--   model:  tasks 数组 + 视图状态 (currentView / searchText / activeFilters)
+--   view:   通过 createElement 渲染到 #task-list,sidebar count / stats 同步刷新
+--   events: sidebar 切换、search input、filter 弹层、checkbox toggle、
+--           new-task modal、删除按钮均挂在对应元素或事件冒泡到容器
+-- ============================================================================
+
+-- ---- 数据模型 -----------------------------------------------------------
+local nextId = 100
+local tasks = {
+    { id=1,  title="Implement compositing layer system",
+             desc="Add CompositingManager to track elements with will-change, transform, opacity for independent layer rendering",
+             prio="high",   type="feature", due="Jan 20", done=false, view="upcoming" },
+    { id=2,  title="Add scrollbar-color CSS property",
+             desc="Support CSS Scrollbars Styling Module Level 1 for custom scrollbar colors",
+             prio="medium", type="feature", due="Jan 18", done=false, view="today" },
+    { id=3,  title="Fix flex align-items enum cast bug",
+             desc="AlignItems to AlignSelf static_cast offset by 1 due to Auto=0",
+             prio="high",   type="bug",     due="Completed", done=true,  view="upcoming" },
+    { id=4,  title="Build kui-tree component",
+             desc="Collapsible tree view with expand/collapse, icons, and selection support",
+             prio="medium", type="feature", due="Jan 22", done=false, view="upcoming" },
+    { id=5,  title="Implement text-overflow: ellipsis in layout",
+             desc='applyTextOverflow truncates line items and reserves space for "..."',
+             prio="high",   type="feature", due="Completed", done=true,  view="upcoming" },
+    { id=6,  title="Write component gallery documentation",
+             desc="Create comprehensive examples for all built-in KUI components with usage patterns",
+             prio="low",    type="docs",    due="Jan 25", done=false, view="upcoming" },
+    { id=7,  title="DevTools element highlight overlay",
+             desc="Box model overlay with margin/border/padding/content areas and size tooltip",
+             prio="medium", type="feature", due="Completed", done=true,  view="upcoming" },
+    { id=8,  title="Scoped styles integration in StyleResolver",
+             desc="Match scoped stylesheet rules only within the scope root's subtree during cascade",
+             prio="medium", type="feature", due="Jan 24", done=false, view="today" },
+    { id=9,  title="Fix viewport height for root element",
+             desc="Ensure html/body height is at least viewport height like browsers do",
+             prio="high",   type="bug",     due="Completed", done=true,  view="upcoming" },
+    { id=10, title="Add kui-table virtual scrolling",
+             desc="Render only visible rows with overscan buffer for large datasets",
+             prio="medium", type="feature", due="Jan 28", done=false, view="upcoming" },
+    { id=11, title="Performance benchmark: 10k elements",
+             desc="Measure style/layout/paint time with 10,000 DOM elements and optimize bottlenecks",
+             prio="low",    type="feature", due="Feb 1",  done=false, view="upcoming" },
+    { id=12, title="Cross-platform CI pipeline",
+             desc="Set up GitHub Actions for Windows, macOS, and Linux builds with automated testing",
+             prio="low",    type="docs",    due="Feb 5",  done=false, view="today" },
+}
+
+-- ---- 视图状态 -----------------------------------------------------------
+local state = {
+    currentView   = "all",          -- all | today | upcoming | completed
+    searchText    = "",
+    activeFilters = {},             -- set: {["prio:high"]=true, ...}
+}
+
+-- ---- DOM 引用 -----------------------------------------------------------
+local listEl       = document:getElementById("task-list")
+local titleEl      = document:getElementById("page-title")
+local searchInput  = document:getElementById("search-input")
+local filterBtn    = document:getElementById("filter-btn")
+local filterMenu   = document:getElementById("filter-menu")
+local newTaskBtn   = document:getElementById("new-task-btn")
+local modalOverlay = document:getElementById("modal-overlay")
+local modalClose   = document:getElementById("modal-close")
+local modalCancel  = document:getElementById("modal-cancel")
+local modalSave    = document:getElementById("modal-save")
+
+local viewTitles = {
+    all       = "All Tasks",
+    today     = "Today",
+    upcoming  = "Upcoming",
+    completed = "Completed",
+}
+
+-- ---- 工具 ---------------------------------------------------------------
+local function lower(s) return string.lower(s or "") end
+local function escAttr(s)
+    -- 只用于拼 plain text;textContent 自身会做 escape,这里仅 fallback
+    return s or ""
+end
+
+local function matchView(t, view)
+    if view == "all"       then return true end
+    if view == "completed" then return t.done end
+    if t.done              then return false end       -- today/upcoming 默认排除已完成
+    if view == "today"     then return t.view == "today"    end
+    if view == "upcoming"  then return t.view == "upcoming" or t.view == "today" end
+    return false
+end
+
+local function matchSearch(t, q)
+    if q == "" then return true end
+    return string.find(lower(t.title), q, 1, true) ~= nil
+        or string.find(lower(t.desc),  q, 1, true) ~= nil
+end
+
+local function matchFilters(t, filters)
+    -- 收集激活的 prio / type 维度
+    local hasPrio, hasType = false, false
+    local prioOk, typeOk   = false, false
+    for k,_ in pairs(filters) do
+        local kind, val = string.match(k, "^([^:]+):(.+)$")
+        if kind == "prio" then
+            hasPrio = true
+            if t.prio == val then prioOk = true end
+        elseif kind == "type" then
+            hasType = true
+            if t.type == val then typeOk = true end
+        end
+    end
+    if hasPrio and not prioOk then return false end
+    if hasType and not typeOk then return false end
+    return true
+end
+
+local function visibleTasks()
+    local q = lower(state.searchText)
+    local out = {}
+    for _, t in ipairs(tasks) do
+        if matchView(t, state.currentView)
+           and matchSearch(t, q)
+           and matchFilters(t, state.activeFilters) then
+            out[#out+1] = t
+        end
+    end
+    return out
+end
+
+-- ---- 渲染 task-card ----------------------------------------------------
+local function makeEl(tag, className)
+    local e = document:createElement(tag)
+    if className then e:setAttribute("class", className) end
+    return e
+end
+
+local function renderTaskCard(t)
+    local card = makeEl("div", t.done and "task-card done" or "task-card")
+    card:setAttribute("data-id", tostring(t.id))
+
+    -- checkbox
+    local check = makeEl("div", t.done and "task-check checked" or "task-check")
+    check:addEventListener("click", function(e)
+        t.done = not t.done
+        if t.done then t.due = "Completed" end
+        render()
+    end)
+    card:appendChild(check)
+
+    -- body
+    local body = makeEl("div", "task-body")
+
+    local titleEl2 = makeEl("div", t.done and "task-title done" or "task-title")
+    titleEl2.textContent = t.title
+    body:appendChild(titleEl2)
+
+    if t.desc and t.desc ~= "" then
+        local descEl = makeEl("div", "task-desc")
+        descEl.textContent = t.desc
+        body:appendChild(descEl)
+    end
+
+    local meta = makeEl("div", "task-meta")
+    local prioTag = makeEl("span", "tag tag-" .. t.prio)
+    local prioText = ({high="High", medium="Medium", low="Low"})[t.prio] or t.prio
+    prioTag.textContent = prioText
+    meta:appendChild(prioTag)
+
+    local typeTag = makeEl("span", "tag tag-" .. t.type)
+    local typeText = ({feature="Feature", bug="Bug", docs="Docs"})[t.type] or t.type
+    typeTag.textContent = typeText
+    meta:appendChild(typeTag)
+
+    local due = makeEl("span", "due-date")
+    due.textContent = t.done and "Completed" or ("Due: " .. (t.due or "—"))
+    meta:appendChild(due)
+
+    body:appendChild(meta)
+    card:appendChild(body)
+
+    -- delete button
+    local del = makeEl("button", "task-delete")
+    del.textContent = "x"
+    del:setAttribute("title", "Delete task")
+    del:addEventListener("click", function(e)
+        for i, x in ipairs(tasks) do
+            if x.id == t.id then table.remove(tasks, i); break end
+        end
+        render()
+    end)
+    card:appendChild(del)
+
+    return card
+end
+
+local function renderEmpty(reason)
+    local wrap = makeEl("div", "empty-state")
+    wrap:appendChild(makeEl("div", "empty-state-icon"))
+    local title = makeEl("div", "empty-state-title")
+    title.textContent = "No tasks"
+    wrap:appendChild(title)
+    local desc = makeEl("div", "empty-state-desc")
+    desc.textContent = reason or "Nothing matches the current filters."
+    wrap:appendChild(desc)
+    return wrap
+end
+
+-- ---- Sidebar count + stats 更新 ----------------------------------------
+local function updateCounts()
+    local cAll, cToday, cUp, cDone = 0, 0, 0, 0
+    for _, t in ipairs(tasks) do
+        cAll = cAll + 1
+        if t.done then
+            cDone = cDone + 1
+        else
+            if t.view == "today"    then cToday = cToday + 1 end
+            if t.view == "upcoming" or t.view == "today" then cUp = cUp + 1 end
+        end
+    end
+    document:getElementById("cnt-all").textContent       = tostring(cAll)
+    document:getElementById("cnt-today").textContent     = tostring(cToday)
+    document:getElementById("cnt-upcoming").textContent  = tostring(cUp)
+    document:getElementById("cnt-completed").textContent = tostring(cDone)
+
+    document:getElementById("stat-total").textContent    = tostring(cAll)
+    document:getElementById("stat-done").textContent     = tostring(cDone)
+    document:getElementById("stat-progress").textContent = tostring(cAll - cDone)
+    local pct = (cAll == 0) and 0 or math.floor(cDone * 100 / cAll + 0.5)
+    document:getElementById("stat-percent").textContent  = tostring(pct) .. "%"
+    document:getElementById("progress-fill").style:setProperty("width", tostring(pct) .. "%")
+end
+
+-- ---- 主 render ----------------------------------------------------------
+function render()
+    -- 1. 标题
+    titleEl.textContent = viewTitles[state.currentView] or "Tasks"
+
+    -- 2. 清空 list (innerHTML 路径覆盖所有节点类型, 含可能的空白 text)
+    listEl.innerHTML = ""
+
+    -- 3. 渲染 task cards
+    local list = visibleTasks()
+    if #list == 0 then
+        local reason = "Try clearing search or filters."
+        if state.searchText == "" and next(state.activeFilters) == nil then
+            reason = "This bucket is empty."
+        end
+        listEl:appendChild(renderEmpty(reason))
+    else
+        for _, t in ipairs(list) do
+            listEl:appendChild(renderTaskCard(t))
+        end
+    end
+
+    -- 4. counts + stats
+    updateCounts()
+
+    -- 5. filter button active 状态
+    if next(state.activeFilters) ~= nil then
+        filterBtn:addClass("active")
+    else
+        filterBtn:removeClass("active")
+    end
+end
+
+-- ---- Sidebar 切换 -------------------------------------------------------
+local sidebarItems = { "sb-all", "sb-today", "sb-upcoming", "sb-completed" }
+for _, id in ipairs(sidebarItems) do
+    local el = document:getElementById(id)
+    el:addEventListener("click", function(e)
+        for _, sid in ipairs(sidebarItems) do
+            document:getElementById(sid):removeClass("active")
+        end
+        el:addClass("active")
+        state.currentView = el:getAttribute("data-view")
+        render()
+    end)
+end
+
+-- ---- 搜索 ---------------------------------------------------------------
+searchInput:addEventListener("input", function(e)
+    state.searchText = searchInput.value or ""
+    render()
+end)
+
+-- ---- Filter 弹层 --------------------------------------------------------
+local function refreshFilterUI()
+    local items = filterMenu:querySelectorAll(".filter-item")
+    items:forEach(function(it)
+        local key = it:getAttribute("data-filter")
+        if state.activeFilters[key] then it:addClass("active")
+        else it:removeClass("active") end
+    end)
+end
+
+filterBtn:addEventListener("click", function(e)
+    if filterMenu:hasClass("open") then
+        filterMenu:removeClass("open")
+    else
+        filterMenu:addClass("open")
+        refreshFilterUI()
+    end
+    e:stopPropagation()
+end)
+
+-- 点击外部关闭 filter 菜单
+local docRoot = document:documentElement()
+docRoot:addEventListener("mousedown", function(e)
+    if not filterMenu:hasClass("open") then return end
+    local n = e.target
+    while n do
+        if n == filterMenu or n == filterBtn then return end
+        n = n.parentNode
+    end
+    filterMenu:removeClass("open")
+end)
+
+-- 选中 filter item
+filterMenu:querySelectorAll(".filter-item"):forEach(function(it)
+    it:addEventListener("click", function(e)
+        local key = it:getAttribute("data-filter")
+        if state.activeFilters[key] then
+            state.activeFilters[key] = nil
+        else
+            state.activeFilters[key] = true
+        end
+        refreshFilterUI()
+        render()
+    end)
+end)
+
+-- ---- New Task Modal ----------------------------------------------------
+local function openModal()
+    document:getElementById("m-title").value = ""
+    document:getElementById("m-desc").value  = ""
+    document:getElementById("m-due").value   = ""
+    modalOverlay:addClass("open")
+end
+local function closeModal()
+    modalOverlay:removeClass("open")
+end
+
+newTaskBtn:addEventListener("click", openModal)
+modalClose:addEventListener("click", closeModal)
+modalCancel:addEventListener("click", closeModal)
+
+-- 点击 overlay 背景(modal 之外)关闭
+modalOverlay:addEventListener("mousedown", function(e)
+    if e.target == modalOverlay then closeModal() end
+end)
+
+-- Esc 关闭 modal / filter
+docRoot:addEventListener("keydown", function(e)
+    if e.key == "Escape" then
+        if modalOverlay:hasClass("open") then closeModal() end
+        if filterMenu:hasClass("open")   then filterMenu:removeClass("open") end
+    end
+end)
+
+modalSave:addEventListener("click", function(e)
+    local title = document:getElementById("m-title").value or ""
+    if title == "" then
+        document:getElementById("m-title"):focus()
+        return
+    end
+    nextId = nextId + 1
+    local newT = {
+        id    = nextId,
+        title = title,
+        desc  = document:getElementById("m-desc").value or "",
+        prio  = document:getElementById("m-prio").value or "medium",
+        type  = document:getElementById("m-type").value or "feature",
+        view  = document:getElementById("m-view").value or "upcoming",
+        due   = document:getElementById("m-due").value or "—",
+        done  = false,
+    }
+    if newT.due == "" then newT.due = "—" end
+    table.insert(tasks, 1, newT)
+    closeModal()
+    -- 切到对应 bucket 让用户立刻看到新任务
+    if state.currentView ~= "all" and state.currentView ~= newT.view then
+        state.currentView = newT.view
+        for _, sid in ipairs(sidebarItems) do
+            document:getElementById(sid):removeClass("active")
+        end
+        document:getElementById("sb-" .. newT.view):addClass("active")
+    end
+    render()
+end)
+
+-- ---- 启动 ---------------------------------------------------------------
+render()
+</script>
+
+</body>
+</html>

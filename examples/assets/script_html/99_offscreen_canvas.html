@@ -1,0 +1,135 @@
+<html>
+<div id="result">WAITING</div>
+<div id="detail"></div>
+<script>
+local ok, err = pcall(function()
+    local results = {}
+
+    -- Test 1: OffscreenCanvas constructor
+    local oc = OffscreenCanvas.new(100, 80)
+    if oc then
+        results[#results+1] = "ctor:PASS"
+    else
+        results[#results+1] = "ctor:FAIL"
+    end
+
+    -- Test 2: width/height properties
+    if oc.width == 100 and oc.height == 80 then
+        results[#results+1] = "size:PASS"
+    else
+        results[#results+1] = "size:FAIL(" .. oc.width .. "x" .. oc.height .. ")"
+    end
+
+    -- Test 3: width/height are writable
+    oc.width = 200
+    oc.height = 150
+    if oc.width == 200 and oc.height == 150 then
+        results[#results+1] = "resize:PASS"
+    else
+        results[#results+1] = "resize:FAIL"
+    end
+
+    -- Test 4: getContext("2d") returns a context
+    local ctx = oc:getContext("2d")
+    if ctx then
+        results[#results+1] = "ctx2d:PASS"
+    else
+        results[#results+1] = "ctx2d:FAIL"
+    end
+
+    -- Test 5: getContext("invalid") returns nil
+    local bad = oc:getContext("invalid")
+    if bad == nil then
+        results[#results+1] = "ctx_bad:PASS"
+    else
+        results[#results+1] = "ctx_bad:FAIL"
+    end
+
+    -- Test 6: Drawing on offscreen canvas
+    ctx.fillStyle = "red"
+    ctx:fillRect(0, 0, 200, 150)
+    results[#results+1] = "fill:PASS"
+
+    -- Test 7: getImageData from offscreen canvas
+    local imgData = ctx:getImageData(10, 10, 1, 1)
+    if imgData then
+        local r = imgData:get(1)
+        local g = imgData:get(2)
+        local b = imgData:get(3)
+        local a = imgData:get(4)
+        if r > 200 and g < 50 and b < 50 and a > 200 then
+            results[#results+1] = "pixel:PASS"
+        else
+            results[#results+1] = "pixel:FAIL(r=" .. r .. ",g=" .. g .. ",b=" .. b .. ",a=" .. a .. ")"
+        end
+    else
+        results[#results+1] = "pixel:FAIL(nil)"
+    end
+
+    -- Test 8: transferToImageBitmap
+    local bmp = oc:transferToImageBitmap()
+    if bmp and bmp.width == 200 and bmp.height == 150 then
+        results[#results+1] = "transfer:PASS"
+    else
+        results[#results+1] = "transfer:FAIL"
+    end
+
+    -- Test 9: After transfer, canvas should be cleared
+    local imgData2 = ctx:getImageData(10, 10, 1, 1)
+    if imgData2 then
+        local a2 = imgData2:get(4)
+        if a2 == 0 then
+            results[#results+1] = "cleared:PASS"
+        else
+            results[#results+1] = "cleared:FAIL(a=" .. a2 .. ")"
+        end
+    else
+        results[#results+1] = "cleared:FAIL(nil)"
+    end
+
+    -- Test 10: Multiple contexts share the same surface
+    local ctx2 = oc:getContext("2d")
+    ctx2.fillStyle = "blue"
+    ctx2:fillRect(0, 0, 50, 50)
+    local imgData3 = ctx2:getImageData(5, 5, 1, 1)
+    if imgData3 then
+        local b3 = imgData3:get(3)
+        if b3 > 200 then
+            results[#results+1] = "multi_ctx:PASS"
+        else
+            results[#results+1] = "multi_ctx:FAIL(b=" .. b3 .. ")"
+        end
+    else
+        results[#results+1] = "multi_ctx:FAIL(nil)"
+    end
+
+    -- Test 11: Path operations on offscreen
+    ctx:beginPath()
+    ctx:arc(50, 50, 30, 0, 6.28)
+    ctx.fillStyle = "green"
+    ctx:fill()
+    results[#results+1] = "path:PASS"
+
+    -- Test 12: Text on offscreen
+    ctx.font = "16px sans-serif"
+    ctx:fillText("Hello", 10, 30)
+    results[#results+1] = "text:PASS"
+
+    local allPass = true
+    for i = 1, #results do
+        if not results[i]:find("PASS") then
+            allPass = false
+            break
+        end
+    end
+
+    document:getElementById("result").textContent = allPass and "PASS" or table.concat(results, ",")
+    document:getElementById("detail").textContent = table.concat(results, " | ")
+end)
+
+if not ok then
+    document:getElementById("result").textContent = "ERROR"
+    document:getElementById("detail").textContent = tostring(err)
+end
+</script>
+</html>

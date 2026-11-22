@@ -1,0 +1,28 @@
+# 由 KUI 导出脚本生成：文本按 LF 存放，shell 脚本检出时保持 LF。
+* text=auto
+*.sh text eol=lf
+# Go 源码检出时也保持 LF：Git for Windows 默认 core.autocrlf=true 会检出成 CRLF，gofmt -l 随即把全部文件列为未格式化。
+*.go text eol=lf
+# 运行库（runtime/<平台>/ 下的全部文件，含 LICENSE.FFmpeg*.txt）按字节存放：不做换行转换、不做文本 diff，
+# 与 Release 上 SDK 包里的那份逐字节相同。
+runtime/*/** binary
+*.dll binary
+*.lib binary
+*.so binary
+*.so.* binary
+*.dylib binary
+*.filamat binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.glb binary
+*.mp3 binary
+*.mp4 binary
+*.wav binary

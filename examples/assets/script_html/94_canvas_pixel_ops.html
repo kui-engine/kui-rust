@@ -1,0 +1,114 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="100" height="100"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: createImageData returns correct dimensions
+local img = ctx:createImageData(10, 10)
+if img == nil then fail("T1: nil")
+else
+    if img.width ~= 10 then fail("T1: width="..tostring(img.width)) end
+    if img.height ~= 10 then fail("T1: height="..tostring(img.height)) end
+    if img.length ~= 400 then fail("T1: length="..tostring(img.length)) end
+end
+
+-- T2: ImageData get/set round-trip
+if img ~= nil then
+    img:set(1, 255)
+    img:set(2, 128)
+    img:set(3, 64)
+    img:set(4, 200)
+    local v1 = img:get(1); local v2 = img:get(2); local v3 = img:get(3); local v4 = img:get(4)
+    if v1 ~= 255 then fail("T2: r="..tostring(v1)) end
+    if v2 ~= 128 then fail("T2: g="..tostring(v2)) end
+    if v3 ~= 64  then fail("T2: b="..tostring(v3)) end
+    if v4 ~= 200 then fail("T2: a="..tostring(v4)) end
+end
+
+-- T3: putImageData + getImageData round-trip
+ctx:clearRect(0, 0, 100, 100)
+local put = ctx:createImageData(2, 2)
+if put ~= nil then
+    -- Fill with known pattern: pixel(0,0)=red, pixel(1,0)=green, pixel(0,1)=blue, pixel(1,1)=white
+    put:set(1, 255); put:set(2, 0);   put:set(3, 0);   put:set(4, 255) -- red
+    put:set(5, 0);   put:set(6, 255); put:set(7, 0);   put:set(8, 255) -- green
+    put:set(9, 0);   put:set(10, 0);  put:set(11, 255); put:set(12, 255) -- blue
+    put:set(13, 255); put:set(14, 255); put:set(15, 255); put:set(16, 255) -- white
+    ctx:putImageData(put, 0, 0)
+
+    local got = ctx:getImageData(0, 0, 2, 2)
+    if got == nil then fail("T3: getImageData nil")
+    else
+        -- Check pixel (0,0) = red
+        local r0 = got:get(1); local g0 = got:get(2); local b0 = got:get(3)
+        if r0 < 200 or g0 > 50 or b0 > 50 then
+            fail("T3: px(0,0) r="..tostring(r0).." g="..tostring(g0).." b="..tostring(b0))
+        end
+        -- Check pixel (1,0) = green
+        local r1 = got:get(5); local g1 = got:get(6); local b1 = got:get(7)
+        if r1 > 50 or g1 < 200 or b1 > 50 then
+            fail("T3: px(1,0) r="..tostring(r1).." g="..tostring(g1).." b="..tostring(b1))
+        end
+        -- Check pixel (0,1) = blue
+        local r2 = got:get(9); local g2 = got:get(10); local b2 = got:get(11)
+        if r2 > 50 or g2 > 50 or b2 < 200 then
+            fail("T3: px(0,1) r="..tostring(r2).." g="..tostring(g2).." b="..tostring(b2))
+        end
+        -- Check pixel (1,1) = white
+        local r3 = got:get(13); local g3 = got:get(14); local b3 = got:get(15)
+        if r3 < 200 or g3 < 200 or b3 < 200 then
+            fail("T3: px(1,1) r="..tostring(r3).." g="..tostring(g3).." b="..tostring(b3))
+        end
+    end
+end
+
+-- T4: getImageData at offset
+ctx:clearRect(0, 0, 100, 100)
+ctx.fillStyle = "#ff8000"
+ctx:fillRect(10, 10, 5, 5)
+local got4 = ctx:getImageData(12, 12, 1, 1)
+if got4 == nil then fail("T4: nil")
+else
+    local r = got4:get(1); local g = got4:get(2); local a = got4:get(4)
+    if r < 200 then fail("T4: offset red="..tostring(r)) end
+    if g < 80 or g > 160 then fail("T4: offset green="..tostring(g)) end
+    if a < 200 then fail("T4: offset alpha="..tostring(a)) end
+end
+
+-- T5: large ImageData
+local big = ctx:createImageData(50, 50)
+if big == nil then fail("T5: nil")
+else
+    if big.length ~= 10000 then fail("T5: length="..tostring(big.length)) end
+    -- Set last pixel
+    big:set(10000, 255)
+    local v = big:get(10000)
+    if v ~= 255 then fail("T5: last pixel="..tostring(v)) end
+end
+
+-- T6: canvasWidth / canvasHeight attributes
+local cw = el.canvasWidth
+local ch = el.canvasHeight
+if cw ~= 100 then fail("T6: canvasWidth="..tostring(cw)) end
+if ch ~= 100 then fail("T6: canvasHeight="..tostring(ch)) end
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "pixel ops ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

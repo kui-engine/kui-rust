@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="target">target</div>
+<script>
+-- E4: dispatchEvent with detail data (CustomEvent-like)
+local captured = nil
+local el = document:getElementById("target")
+el:addEventListener("custom", function(e)
+    captured = e.detail
+end)
+
+el:dispatchEvent("custom", {detail = {x = 42, msg = "hello"}})
+
+if captured and captured.x == 42 and captured.msg == "hello" then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = "detail not received or wrong"
+end
+</script>
+</body>
+</html>

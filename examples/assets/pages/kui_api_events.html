@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — events</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 14px 18px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 8px; }
+#tour-result { padding: 6px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 10px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.panel { background: white; border-radius: 10px; padding: 10px 12px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 3px; }
+.note { color: #64748b; margin-bottom: 6px; font-size: 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+button { padding: 4px 9px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 11px; background: #f1f5f9; padding: 5px 7px;
+       border-radius: 5px; color: #334155; min-height: 24px; }
+
+/* Propagation: three nested layers; a layer the event reached turns amber. */
+.layer { border: 2px solid #cbd5e1; border-radius: 6px; padding: 4px 8px 8px; font-size: 11px; color: #64748b; }
+#ev-outer { background: #f8fafc; }
+#ev-middle { background: #f1f5f9; margin-top: 2px; }
+#ev-inner { background: #e2e8f0; margin-top: 2px; height: 30px; }
+.layer.hit { border-color: #f59e0b; }
+
+/* Listener management. */
+#lm-target { height: 34px; line-height: 30px; text-align: center; border: 2px dashed #cbd5e1;
+             border-radius: 6px; color: #64748b; }
+#lm-target.fired { border-color: #16a34a; color: #166534; }
+
+/* Mouse: the pad has a 4px border and 10px padding (offset coordinates start inside the border). */
+#mouse-pad { height: 70px; border: 4px solid #a5b4fc; padding: 10px; border-radius: 6px;
+             background: #eef2ff; color: #4338ca; font-size: 12px; }
+.hover-row { display: flex; gap: 6px; margin-top: 6px; }
+#hover-a, #hover-b { flex: 1; height: 28px; line-height: 28px; text-align: center; border-radius: 6px;
+                     background: #f1f5f9; font-size: 12px; }
+#hover-a.in, #hover-b.in { background: #fde68a; }
+
+/* Keyboard and focus. */
+#key-pad, #key-other { height: 32px; line-height: 28px; text-align: center; border: 2px solid #cbd5e1;
+                       border-radius: 6px; font-size: 12px; color: #64748b; }
+#key-other { margin-top: 6px; }
+#key-pad:focus, #key-other:focus { border-color: #3b82f6; background: #eff6ff; }
+
+/* Drag and drop. */
+.dnd-row { display: flex; gap: 8px; align-items: stretch; }
+#drag-src { width: 90px; height: 54px; line-height: 50px; text-align: center; border-radius: 8px;
+            background: #c7d2fe; color: #3730a3; border: 2px solid #818cf8; font-size: 12px; }
+#drop-zone { flex: 1; height: 54px; line-height: 50px; text-align: center; border-radius: 8px;
+             border: 2px dashed #94a3b8; color: #64748b; font-size: 12px; }
+#drop-zone.over { border-color: #16a34a; background: #f0fdf4; }
+#drop-zone.dropped { border-style: solid; border-color: #16a34a; background: #dcfce7; color: #166534; }
+
+/* Event object. */
+#probe { height: 30px; line-height: 26px; text-align: center; border: 2px solid #e2e8f0; border-radius: 6px;
+         font-size: 12px; color: #64748b; }
+
+.log-title { margin: 10px 0 4px; font-size: 14px; }
+#log-box { height: 150px; overflow: auto; background: white; border-radius: 6px; }
+#tour-log { border-collapse: collapse; width: 100%; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 2px 8px; font-family: Consolas, monospace;
+               font-size: 11px; }
+#tour-log tr.bad td { color: #b91c1c; }
+</style></head><body>
+<h1>KUI API — events</h1>
+<p class="lead">Listening to and dispatching DOM events from the host through the C ABI (and the Go /
+Rust wrappers): propagation, cancelation, listener management, and reading mouse, keyboard, focus and
+drag-and-drop details off the event object. On start the host dispatches synthetic events and injects
+real input to check every accessor; the panels then react to your own mouse and keyboard.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-prop">
+    <h2>Propagation &amp; cancelation</h2>
+    <div class="api">dispatch_event · get_current_target · stop_propagation · prevent_default · get_flags</div>
+    <p class="note">Listeners on all three layers. A bubbling event travels inner → middle → outer;
+      the "halt" listener on the middle layer stops it there. (The C ABI registers bubble-phase
+      listeners only.)</p>
+    <div id="ev-outer" class="layer">outer
+      <div id="ev-middle" class="layer">middle
+        <div id="ev-inner" class="layer">inner</div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-prop-bubble">Bubbling</button>
+      <button id="btn-prop-flat">Non-bubbling</button>
+      <button id="btn-prop-stop">Stop at middle</button>
+      <button id="btn-prop-cancel">Cancel</button>
+    </div>
+    <div class="out" id="prop-out">—</div>
+  </section>
+
+  <section class="panel" id="p-lm">
+    <h2>Listener management</h2>
+    <div class="api">add_event_listener · remove_event_listener · remove_event_listeners</div>
+    <p class="note">Add counting listeners for "tick", remove the newest by id or all at once, then
+      fire the event to see how many still run.</p>
+    <div id="lm-target">tick target</div>
+    <div class="toolbar">
+      <button id="btn-lm-add">Add listener</button>
+      <button id="btn-lm-remove">Remove newest</button>
+      <button id="btn-lm-clear">Remove all</button>
+      <button id="btn-lm-fire">Fire "tick"</button>
+    </div>
+    <div class="out" id="lm-out">listeners=0</div>
+  </section>
+
+  <section class="panel" id="p-probe">
+    <h2>Event object</h2>
+    <div class="api">get_type · get_type_tag · get_flags · get_related_target (+ accessors on the wrong kind)</div>
+    <p class="note">A synthetic event is a plain base event: the mouse, keyboard and drag accessors
+      report "not supported" and it has no related target.</p>
+    <div id="probe">probe target</div>
+    <div class="toolbar">
+      <button id="btn-probe">Inspect synthetic event</button>
+    </div>
+    <div class="out" id="probe-out">—</div>
+  </section>
+
+  <section class="panel" id="p-mouse">
+    <h2>Mouse</h2>
+    <div class="api">mouse_get_button · mouse_get_client_xy · mouse_get_offset_xy · mouse_get_page_xy · get_related_target</div>
+    <p class="note">Click, double-click or right-click the pad; move between the two boxes below.</p>
+    <div id="mouse-pad">click me (left / double / right)</div>
+    <div class="out" id="mouse-last">—</div>
+    <div class="hover-row"><div id="hover-a">A</div><div id="hover-b">B</div></div>
+    <div class="out" id="hover-out" style="margin-top: 6px">enter: — | leave: —</div>
+  </section>
+
+  <section class="panel" id="p-key">
+    <h2>Keyboard &amp; focus</h2>
+    <div class="api">key_get_key · key_get_code · key_get_modifiers · get_related_target (focus / blur)</div>
+    <p class="note">Click the first box, then press keys (try Ctrl / Shift). Clicking the second box
+      moves the focus; the blur event names where it went.</p>
+    <div id="key-pad" tabindex="0">key pad (click, then type)</div>
+    <div class="out" id="key-out" style="margin-top: 6px">—</div>
+    <div id="key-other" tabindex="0">second box</div>
+    <div class="out" id="focus-out" style="margin-top: 6px">—</div>
+  </section>
+
+  <section class="panel" id="p-dnd">
+    <h2>Drag &amp; drop data</h2>
+    <div class="api">drag_set/get/clear_data · drag_get_type(_count) · drag_get_file(_count) ·
+      drag_set/get_drop_effect · drag_set/get_effect_allowed</div>
+    <p class="note">Drag the chip onto the zone (or let the button inject the same mouse moves).
+      Files dropped from the desktop are listed too.</p>
+    <div class="dnd-row"><div id="drag-src" draggable="true">drag me</div><div id="drop-zone">drop here</div></div>
+    <div class="toolbar">
+      <button id="btn-dnd-simulate">Simulate drag</button>
+    </div>
+    <div class="out" id="drag-seq">—</div>
+    <div class="out" id="drop-out" style="margin-top: 4px">—</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<div id="log-box"><table id="tour-log"></table></div>
+</body></html>

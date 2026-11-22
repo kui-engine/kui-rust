@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — Platform services</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 16px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 10px; }
+#tour-result { padding: 8px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 12px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.panel { background: white; border-radius: 10px; padding: 12px 14px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 8px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+button { padding: 5px 10px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+button.manual { background: #64748b; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 6px 8px;
+       border-radius: 5px; color: #334155; min-height: 26px; margin-bottom: 4px; }
+.log-title { margin: 16px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+</style></head><body>
+<h1>KUI API — Platform services</h1>
+<p class="lead">Process-wide services through the C ABI (and the Go / Rust wrappers): the monotonic
+clock, timers, idle and cross-thread tasks, pumping the event loop by hand, the clipboard, monitors,
+system dialogs and the shell. On start the host runs every call once and checks the result; the
+clipboard is put back as it was. Grey buttons open modal dialogs or the browser, so the self-check
+never presses them.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-time">
+    <h2>Clock and timers</h2>
+    <div class="api">platform_now · set_timeout · set_interval · clear_timer · request_idle ·
+      post_to_main_thread</div>
+    <p class="note">Timers, idle callbacks and posted tasks all run on the UI thread from inside the
+      event loop; the clock is the one the timers use.</p>
+    <div class="toolbar">
+      <button id="btn-timeout">Timeout 100 ms</button>
+      <button id="btn-interval">Interval ×3</button>
+      <button id="btn-cancel">Set + clear</button>
+      <button id="btn-idle">Idle callback</button>
+      <button id="btn-post">Post task</button>
+    </div>
+    <div class="out" id="time-out">—</div>
+  </section>
+
+  <section class="panel" id="p-loop">
+    <h2>Pumping the event loop</h2>
+    <div class="api">platform_poll_events · wait_events</div>
+    <p class="note">For hosts that own their loop: poll handles what is pending and returns, wait
+      blocks until an event arrives or the timeout elapses. A posted task runs inside either.</p>
+    <div class="toolbar">
+      <button id="btn-poll">Post + poll</button>
+      <button id="btn-wait">Wait 50 ms</button>
+    </div>
+    <div class="out" id="loop-out">—</div>
+  </section>
+
+  <section class="panel" id="p-clip">
+    <h2>Clipboard</h2>
+    <div class="api">platform_has_clipboard_text · get_clipboard_text · set_clipboard_text</div>
+    <p class="note">The round trip saves the current text, writes a sample (with non-ASCII text),
+      reads it back and restores the original. Clipboards that hold no text are left alone.</p>
+    <div class="toolbar">
+      <button id="btn-clip-read">Has text?</button>
+      <button id="btn-clip-trip">Round trip</button>
+    </div>
+    <div class="out" id="clip-out">—</div>
+  </section>
+
+  <section class="panel" id="p-mon">
+    <h2>Monitors</h2>
+    <div class="api">platform_get_monitor_count · get_monitor · get_primary_monitor ·
+      get_monitor_from_point · get_monitor_from_window</div>
+    <p class="note">Bounds and work area in virtual-screen pixels, the DPI scale, and which monitor
+      holds a point or this window (looked up by its native handle).</p>
+    <div class="toolbar">
+      <button id="btn-mon-list">List monitors</button>
+      <button id="btn-mon-window">This window's monitor</button>
+    </div>
+    <div class="out" id="mon-out">—</div>
+  </section>
+
+  <section class="panel" id="p-shell">
+    <h2>Dialogs, shell, F12</h2>
+    <div class="api">platform_message_box · open_file_dialog · save_file_dialog ·
+      select_folder_dialog · open_url · set_f12_devtools_enabled</div>
+    <p class="note">The dialogs are modal and the URL opens the system browser, so they are manual.
+      With F12 enabled, pressing F12 starts DevTools and opens it in the browser.</p>
+    <div class="toolbar">
+      <button id="btn-msg" class="manual">Message box</button>
+      <button id="btn-open" class="manual">Open file…</button>
+      <button id="btn-save" class="manual">Save file…</button>
+      <button id="btn-folder" class="manual">Select folder…</button>
+      <button id="btn-url" class="manual">Open URL</button>
+      <button id="btn-f12-on">Enable F12</button>
+      <button id="btn-f12-off">Disable F12</button>
+    </div>
+    <div class="out" id="shell-out">—</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+</body></html>

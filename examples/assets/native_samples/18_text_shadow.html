@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 12px; }
+    .demo { text-align: center; min-width: 160px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 8px; }
+</style>
+</head>
+<body>
+    <h2>Text Shadow</h2>
+
+    <h3>Basic Text Shadows</h3>
+    <div class="section">
+        <div class="row">
+            <div class="demo">
+                <div style="font-size: 28px; text-shadow: 2px 2px 4px #000000;">Shadow</div>
+                <div class="label">2px 2px 4px black</div>
+            </div>
+            <div class="demo">
+                <div style="font-size: 28px; text-shadow: 0 0 10px #3b82f6;">Glow</div>
+                <div class="label">0 0 10px blue</div>
+            </div>
+            <div class="demo">
+                <div style="font-size: 28px; text-shadow: 3px 3px 0 #ef4444;">Hard</div>
+                <div class="label">3px 3px 0 red (no blur)</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Colored Shadows</h3>
+    <div class="section">
+        <div class="row">
+            <div class="demo">
+                <div style="font-size: 32px; color: #f59e0b; text-shadow: 0 0 20px #f59e0b;">Neon Gold</div>
+                <div class="label">neon glow effect</div>
+            </div>
+            <div class="demo">
+                <div style="font-size: 32px; color: #10b981; text-shadow: 0 0 15px #10b981;">Neon Green</div>
+                <div class="label">green glow</div>
+            </div>
+            <div class="demo">
+                <div style="font-size: 32px; color: #ec4899; text-shadow: 0 0 15px #ec4899;">Neon Pink</div>
+                <div class="label">pink glow</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Large Offset / Deep Shadow</h3>
+    <div class="section">
+        <div class="row">
+            <div class="demo">
+                <div style="font-size: 36px; font-weight: bold; text-shadow: 4px 4px 0 #1e293b;">Depth</div>
+                <div class="label">hard offset shadow</div>
+            </div>
+            <div class="demo">
+                <div style="font-size: 36px; font-weight: bold; text-shadow: -2px -2px 6px #8b5cf6;">Lift</div>
+                <div class="label">negative offset</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

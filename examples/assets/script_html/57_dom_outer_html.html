@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="target" class="foo">hello</div>
+<script>
+-- L1: outerHTML read-only property
+local el = document:getElementById("target")
+local html = el.outerHTML
+
+if html and html:find("foo") and html:find("hello") then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = "outerHTML: " .. tostring(html)
+end
+</script>
+</body>
+</html>

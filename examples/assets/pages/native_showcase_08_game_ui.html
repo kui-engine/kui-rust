@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",sans-serif;background:#0a0a0a;color:#f8fafc;height:100vh;position:relative;overflow:hidden}
+.viewport{width:100%;height:100%;background:linear-gradient(180deg,#0c1222 0%,#1a1a2e 50%,#16213e 100%);position:relative}
+.hud-top{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:16px 20px}
+.hp-bar{display:flex;align-items:center;gap:8px}
+.hp-bar .label{font-size:12px;color:#ef4444;font-weight:700}
+.hp-outer{width:200px;height:12px;background:rgba(0,0,0,.5);border-radius:6px;border:1px solid rgba(239,68,68,.3);overflow:hidden}
+.hp-inner{height:100%;background:linear-gradient(90deg,#ef4444,#f87171);border-radius:6px;width:75%}
+.mp-bar .label{font-size:12px;color:#3b82f6;font-weight:700}
+.mp-outer{width:200px;height:12px;background:rgba(0,0,0,.5);border-radius:6px;border:1px solid rgba(59,130,246,.3);overflow:hidden}
+.mp-inner{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:6px;width:60%}
+.score{font-size:14px;font-weight:700;color:#fbbf24;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.minimap{width:120px;height:120px;border-radius:8px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);position:absolute;top:16px;right:20px}
+.minimap .dot{width:6px;height:6px;border-radius:50%;position:absolute}
+.minimap .player{background:#10b981;top:50%;left:50%}
+.minimap .enemy{background:#ef4444}
+.hud-bottom{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:center;padding:16px}
+.hotbar{display:flex;gap:4px;background:rgba(0,0,0,.6);padding:6px;border-radius:12px;border:1px solid rgba(255,255,255,.08)}
+.slot{width:56px;height:56px;border-radius:8px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;cursor:pointer}
+.slot:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1)}
+.slot.active{border-color:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,.3)}
+.slot .key{position:absolute;top:2px;left:4px;font-size:9px;color:#64748b}
+.slot .cd{position:absolute;bottom:2px;right:4px;font-size:9px;color:#ef4444;font-weight:700}
+.quest{position:absolute;top:50%;right:20px;transform:translateY(-50%);background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px;width:200px}
+.quest h4{font-size:12px;color:#fbbf24;margin-bottom:6px}.quest p{font-size:11px;color:#94a3b8;margin-bottom:8px}
+.quest .prog{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.quest .prog .f{height:100%;background:#fbbf24;border-radius:2px;width:60%}
+</style></head><body>
+<div class="viewport">
+<div class="hud-top">
+<div>
+<div class="hp-bar"><span class="label">HP</span><div class="hp-outer"><div class="hp-inner"></div></div><span style="font-size:11px;color:#94a3b8">750/1000</span></div>
+<div class="hp-bar mp-bar" style="margin-top:4px"><span class="label">MP</span><div class="mp-outer"><div class="mp-inner"></div></div><span style="font-size:11px;color:#94a3b8">300/500</span></div>
+</div>
+<div class="score">Score: 12,450</div>
+</div>
+<div class="minimap">
+<div class="dot player" style="top:55%;left:48%"></div>
+<div class="dot enemy" style="top:30%;left:70%"></div>
+<div class="dot enemy" style="top:75%;left:25%"></div>
+</div>
+<div class="quest"><h4>Quest: Dragon's Lair</h4><p>Defeat 3/5 fire elementals</p><div class="prog"><div class="f"></div></div></div>
+<div class="hud-bottom">
+<div class="hotbar">
+<div class="slot active"><span class="key">1</span>⚔</div>
+<div class="slot"><span class="key">2</span>🛡</div>
+<div class="slot"><span class="key">3</span>🧪<span class="cd">3s</span></div>
+<div class="slot"><span class="key">4</span>🔥</div>
+<div class="slot"><span class="key">5</span>❄</div>
+<div class="slot"><span class="key">6</span>⚡</div>
+<div class="slot"><span class="key">7</span>💚</div>
+<div class="slot"><span class="key">8</span>🎯</div>
+</div></div>
+</div>
+</body></html>

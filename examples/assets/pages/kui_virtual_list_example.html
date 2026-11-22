@@ -1,0 +1,73 @@
+<html>
+<head>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif;
+    padding: 16px; overflow: auto; height: 100vh;
+}
+h1 { color: #38bdf8; font-size: 20px; margin-bottom: 4px; }
+h2 { color: #94a3b8; font-size: 14px; margin-top: 16px; margin-bottom: 6px;
+     border-bottom: 1px solid #1e293b; padding-bottom: 3px; }
+.row { display: flex; gap: 16px; }
+.col { flex: 1; min-width: 380px; }
+.card { background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+        padding: 12px; margin-bottom: 10px; }
+button { background: #0ea5e9; color: white; border: none; border-radius: 6px;
+         padding: 6px 14px; cursor: pointer; font-size: 12px; margin: 3px; }
+button:hover { background: #0284c7; }
+.btn-red { background: #ef4444; }
+.btn-red:hover { background: #dc2626; }
+.btn-green { background: #22c55e; }
+.btn-green:hover { background: #16a34a; }
+.btn-purple { background: #8b5cf6; }
+.btn-purple:hover { background: #7c3aed; }
+.note { color: #64748b; font-size: 11px; margin-top: 4px; }
+.stats-box { background: #0f172a; border: 1px solid #334155; border-radius: 4px;
+             padding: 8px; margin-top: 8px; min-height: 60px; }
+#vlist-container { height: 400px; background: #0f172a; border: 1px solid #334155;
+                   border-radius: 4px; }
+#listview-container { height: 350px; background: #0f172a; border: 1px solid #334155;
+                      border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<h1>Virtual List Performance Demo</h1>
+<p style="color:#64748b;font-size:12px;margin-bottom:12px;">
+  100,000 items with DOM recycling, differential updates, and dynamic insert/remove
+</p>
+
+<div class="row">
+  <div class="col">
+    <h2>1. VirtualList (100K items @ 32px)</h2>
+    <div class="card">
+      <div id="vlist-container"></div>
+      <div style="margin-top:8px;">
+        <button id="btn-insert-mid">Insert 1000 (middle)</button>
+        <button id="btn-insert-begin" class="btn-green">Insert 1000 (begin)</button>
+        <button id="btn-insert-end" class="btn-purple">Insert 1000 (end)</button>
+        <button id="btn-remove-mid" class="btn-red">Remove 1000 (middle)</button>
+        <button id="btn-scroll-random">Scroll to random</button>
+      </div>
+      <p class="note">Dynamic insert/remove with scroll compensation. Target: &lt;50ms latency.</p>
+    </div>
+
+    <h2>3. Performance Stats</h2>
+    <div class="card">
+      <button id="btn-refresh-stats">Refresh Stats</button>
+      <div id="stats-content" class="stats-box"></div>
+    </div>
+  </div>
+
+  <div class="col">
+    <h2>2. ListView (50K items, click to select)</h2>
+    <div class="card">
+      <div id="listview-container"></div>
+      <p class="note">Single selection with virtual scrolling. 50,000 items.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

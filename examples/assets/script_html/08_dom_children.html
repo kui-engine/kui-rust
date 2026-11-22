@@ -1,0 +1,17 @@
+<html><body>
+<div id="parent"><span>A</span><em>B</em><strong>C</strong></div>
+<div id="result"></div>
+<script>
+local p = document:getElementById("parent")
+local kids = p:children()
+local ok = (#kids == 3)
+    and (kids[1].tagName == "span")
+    and (kids[2].tagName == "em")
+    and (kids[3].tagName == "strong")
+    and (kids[1].textContent == "A")
+    and (kids[3].textContent == "C")
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

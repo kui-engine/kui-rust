@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.responsive-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.r-box{padding:16px;border-radius:8px;text-align:center;font-size:12px;font-weight:600;color:white}
+@media (max-width:700px){.responsive-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:500px){.responsive-grid{grid-template-columns:1fr}}
+.code{font-family:"Consolas",monospace;background:#1e293b;color:#e2e8f0;padding:12px;border-radius:8px;font-size:12px;line-height:1.6;margin-top:8px}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+</style></head><body>
+<h2>CSS Media Queries</h2>
+<div class="card"><h3>Responsive Grid (resize window)</h3>
+<div class="responsive-grid">
+<div class="r-box" style="background:#3b82f6">Card 1</div>
+<div class="r-box" style="background:#10b981">Card 2</div>
+<div class="r-box" style="background:#f59e0b">Card 3</div>
+<div class="r-box" style="background:#ef4444">Card 4</div>
+</div>
+<div class="info">4 cols at full width, 2 cols below 700px, 1 col below 500px</div></div>
+<div class="card"><h3>Syntax</h3>
+<div class="code">@media (max-width: 700px) {<br>  .grid { grid-template-columns: repeat(2, 1fr); }<br>}</div></div>
+</body></html>

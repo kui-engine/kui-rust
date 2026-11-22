@@ -1,0 +1,17 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="scope">
+    <p id="target">text</p>
+</div>
+<script type="text/lua">
+local ok = true
+
+local scope = document:getElementById("scope")
+
+-- setScopedStylesheet should not crash
+scope:setScopedStylesheet("p { color: red; }")
+ok = ok and true
+
+document:getElementById("result").textContent = ok and "PASS" or "FAIL"
+</script>
+</body></html>

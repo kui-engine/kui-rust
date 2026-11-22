@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; }
+    .col { flex: 1; }
+
+    .overflow-box {
+        width: 200px; height: 120px;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        padding: 12px;
+        font-size: 13px;
+    }
+    .scroll-content {
+        background: #334155;
+        padding: 8px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+
+    .scroll-list {
+        height: 200px;
+        overflow-y: auto;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 8px;
+    }
+    .scroll-item {
+        padding: 10px 12px;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        font-size: 13px;
+        background: #1e293b;
+        border: 1px solid #334155;
+    }
+    .scroll-item:nth-child(odd) { background: #162032; }
+
+    .overlay-box {
+        height: 200px;
+        overflow-y: auto;
+        -kui-scrollbar-overlay: overlay;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 12px;
+    }
+    .reserve-box {
+        height: 200px;
+        overflow-y: auto;
+        -kui-scrollbar-overlay: auto;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 12px;
+    }
+</style>
+</head>
+<body>
+    <h2>Overflow &amp; Scroll</h2>
+
+    <h3>Overflow Modes</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">overflow: visible (default)</div>
+                <div class="overflow-box" style="overflow: visible;">
+                    <div class="scroll-content">This content overflows the box boundaries and remains visible.</div>
+                    <div class="scroll-content">More content here.</div>
+                    <div class="scroll-content">And even more.</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="label">overflow: hidden</div>
+                <div class="overflow-box" style="overflow: hidden;">
+                    <div class="scroll-content">This content is clipped at the box boundary. Hidden parts are not accessible.</div>
+                    <div class="scroll-content">More content here.</div>
+                    <div class="scroll-content">And even more.</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="label">overflow: scroll</div>
+                <div class="overflow-box" style="overflow-y: scroll;">
+                    <div class="scroll-content">This content can be scrolled. A scrollbar is always shown.</div>
+                    <div class="scroll-content">More content here.</div>
+                    <div class="scroll-content">And even more.</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="label">overflow: auto</div>
+                <div class="overflow-box" style="overflow-y: auto;">
+                    <div class="scroll-content">Scrollbar appears only when content overflows.</div>
+                    <div class="scroll-content">More content here.</div>
+                    <div class="scroll-content">And even more.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Scrollable List (overflow-y: auto)</h3>
+    <div class="section">
+        <div class="scroll-list">
+            <div class="scroll-item">Item 1 — First item in the scrollable list</div>
+            <div class="scroll-item">Item 2 — Second item with some text</div>
+            <div class="scroll-item">Item 3 — Third item for scrolling</div>
+            <div class="scroll-item">Item 4 — Fourth item here</div>
+            <div class="scroll-item">Item 5 — Fifth item visible</div>
+            <div class="scroll-item">Item 6 — Sixth item to scroll to</div>
+            <div class="scroll-item">Item 7 — Seventh item below fold</div>
+            <div class="scroll-item">Item 8 — Eighth item way down</div>
+            <div class="scroll-item">Item 9 — Ninth item near bottom</div>
+            <div class="scroll-item">Item 10 — Tenth and final item</div>
+        </div>
+    </div>
+
+    <h3>Scrollbar Mode: Overlay vs Reserve Space (-kui-scrollbar-overlay)</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">-kui-scrollbar-overlay: overlay (scrollbar overlays content)</div>
+                <div class="overlay-box">
+                    <div class="scroll-content">Content goes edge to edge. The scrollbar floats over the content area without reducing available width.</div>
+                    <div class="scroll-content">Item 2</div>
+                    <div class="scroll-content">Item 3</div>
+                    <div class="scroll-content">Item 4</div>
+                    <div class="scroll-content">Item 5</div>
+                    <div class="scroll-content">Item 6</div>
+                    <div class="scroll-content">Item 7</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="label">-kui-scrollbar-overlay: auto (scrollbar reserves 8px space)</div>
+                <div class="reserve-box">
+                    <div class="scroll-content">Content width is reduced by 8px to make room for the scrollbar. No overlap.</div>
+                    <div class="scroll-content">Item 2</div>
+                    <div class="scroll-content">Item 3</div>
+                    <div class="scroll-content">Item 4</div>
+                    <div class="scroll-content">Item 5</div>
+                    <div class="scroll-content">Item 6</div>
+                    <div class="scroll-content">Item 7</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

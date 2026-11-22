@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div class="item">A</div>
+<div class="item">B</div>
+<div class="item">C</div>
+<span class="other">D</span>
+<script>
+-- L1: getElementsByClassName and getElementsByTagName
+local items = document:getElementsByClassName("item")
+local spans = document:getElementsByTagName("span")
+
+local ok = true
+local msg = ""
+
+if items:length() ~= 3 then
+    ok = false
+    msg = msg .. "getElementsByClassName expected 3, got " .. tostring(items:length()) .. "; "
+end
+
+if spans:length() ~= 1 then
+    ok = false
+    msg = msg .. "getElementsByTagName expected 1, got " .. tostring(spans:length()) .. "; "
+end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    background: #0a0a1a;
+    color: #e0e0e0;
+    font-family: "Segoe UI", sans-serif;
+}
+h2 { color: #ffaa00; margin-bottom: 10px; }
+.info { color: #888; font-size: 13px; margin-bottom: 8px; }
+.container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.panel {
+    background: #1a1408;
+    border: 1px solid #3a2a10;
+    border-radius: 8px;
+    padding: 16px;
+}
+canvas {
+    display: block;
+    border: 1px solid #3a2a10;
+    border-radius: 4px;
+}
+.perf {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #aaa;
+    font-family: "Consolas", monospace;
+}
+</style>
+</head>
+<body>
+    <h2>WebGL GPU Particle Galaxy</h2>
+    <p class="info">10,000 particles animated entirely in the vertex shader — spiral galaxy formation with depth and bloom</p>
+
+    <div class="container">
+        <div class="panel">
+            <canvas id="gl-canvas" width="512" height="512"></canvas>
+            <div id="perf-info" class="perf">Initializing...</div>
+        </div>
+        <div class="panel" style="max-width: 320px;">
+            <h3 style="color: #ffaa00; margin-top: 0;">Techniques</h3>
+            <p class="info">&#8226; 10,000 GL_POINTS particles</p>
+            <p class="info">&#8226; Vertex shader animation (no CPU update)</p>
+            <p class="info">&#8226; Spiral galaxy orbit equations</p>
+            <p class="info">&#8226; Additive blending for glow</p>
+            <p class="info">&#8226; Perspective projection + orbiting camera</p>
+            <p class="info">&#8226; Per-particle color from orbit radius</p>
+            <div id="status" class="perf">Status: loading...</div>
+        </div>
+    </div>
+
+<script>
+-- WebGL GPU Particle Galaxy Demo
+-- 10,000 particles with all animation in vertex shader
+
+local canvas = document:getElementById("gl-canvas")
+local perfDiv = document:getElementById("perf-info")
+local statusDiv = document:getElementById("status")
+
+if not canvas then return end
+
+local gl = canvas:getContext("webgl")
+if not gl then
+    statusDiv.textContent = "Status: ERROR - WebGL not available"
+    return
+end
+
+statusDiv.textContent = "Status: WebGL context created"
+
+-- Matrix utilities
+local function mat4_multiply(a, b)
+    local r = {}
+    for col = 0, 3 do
+        for row = 0, 3 do
+            local sum = 0
+            for k = 0, 3 do
+                sum = sum + a[k * 4 + row + 1] * b[col * 4 + k + 1]
+            end
+            r[col * 4 + row + 1] = sum
+        end
+    end
+    return r
+end
+
+local function mat4_perspective(fovY, aspect, near, far)
+    local f = 1.0 / math.tan(fovY / 2.0)
+    local nf = 1.0 / (near - far)
+    return {
+        f / aspect, 0, 0, 0,
+        0, f, 0, 0,
+        0, 0, (far + near) * nf, -1,
+        0, 0, 2 * far * near * nf, 0,
+    }
+end
+
+local function mat4_translate(x, y, z)
+    return {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        x, y, z, 1,
+    }
+end
+
+local function mat4_rotateX(rad)
+    local c = math.cos(rad)
+    local s = math.sin(rad)
+    return {
+        1, 0, 0, 0,
+        0, c, s, 0,
+        0, -s, c, 0,
+        0, 0, 0, 1,
+    }
+end
+
+local function mat4_rotateY(rad)
+    local c = math.cos(rad)
+    local s = math.sin(rad)
+    return {
+        c, 0, -s, 0,
+        0, 1, 0, 0,
+        s, 0, c, 0,
+        0, 0, 0, 1,
+    }
+end
+
+-- Vertex shader: each particle has (radius, angle, height, speed) baked in
+-- Animation is computed purely from these attributes + uTime
+local vsSource = [[
+    attribute float aRadius;
+    attribute float aAngle;
+    attribute float aHeight;
+    attribute float aSpeed;
+
+    uniform mat4 uMVP;
+    uniform float uTime;
+
+    varying vec3 vColor;
+    varying float vAlpha;
+
+    void main() {
+        // Spiral galaxy orbit
+        float t = uTime;
+        float angle = aAngle + t * aSpeed;
+
+        // Spiral arm offset: particles at larger radius lag behind
+        angle += aRadius * 0.8;
+
+        float r = aRadius;
+        float x = r * cos(angle);
+        float z = r * sin(angle);
+
+        // Vertical bobbing
+        float y = aHeight * sin(t * aSpeed * 2.0 + aAngle * 3.0) * 0.3;
+        // Flatten: inner particles are more planar
+        y *= (r / 5.0);
+
+        vec4 pos = uMVP * vec4(x, y, z, 1.0);
+        gl_Position = pos;
+
+        // Point size: larger when closer, smaller when far
+        float dist = length(pos.xyz);
+        gl_PointSize = clamp(200.0 / dist, 2.0, 24.0);
+
+        // Color based on radius: core is hot (white/yellow), outer is cool (blue/purple)
+        float t_color = clamp(r / 5.0, 0.0, 1.0);
+        vec3 hotColor = vec3(1.0, 0.9, 0.6);
+        vec3 midColor = vec3(0.8, 0.4, 0.1);
+        vec3 coolColor = vec3(0.3, 0.2, 0.8);
+
+        if (t_color < 0.5) {
+            vColor = mix(hotColor, midColor, t_color * 2.0);
+        } else {
+            vColor = mix(midColor, coolColor, (t_color - 0.5) * 2.0);
+        }
+
+        // Fade outer particles (boosted for visibility)
+        vAlpha = 1.0 - t_color * 0.3;
+    }
+]]
+
+local fsSource = [[
+    precision mediump float;
+    varying vec3 vColor;
+    varying float vAlpha;
+
+    void main() {
+        // Soft circular point
+        vec2 cxy = gl_PointCoord * 2.0 - 1.0;
+        float r = dot(cxy, cxy);
+        if (r > 1.0) discard;
+
+        float alpha = vAlpha * (1.0 - r * 0.7);
+        gl_FragColor = vec4(vColor * alpha, alpha);
+    }
+]]
+
+local function compileShader(type, source)
+    local shader = gl:createShader(type)
+    gl:shaderSource(shader, source)
+    gl:compileShader(shader)
+    if gl:getShaderParameter(shader, gl.COMPILE_STATUS) == 0 then
+        print("Shader error: " .. gl:getShaderInfoLog(shader))
+        gl:deleteShader(shader)
+        return nil
+    end
+    return shader
+end
+
+local vs = compileShader(gl.VERTEX_SHADER, vsSource)
+local fs = compileShader(gl.FRAGMENT_SHADER, fsSource)
+if not vs or not fs then
+    statusDiv.textContent = "Status: ERROR - shader compile failed"
+    return
+end
+
+local program = gl:createProgram()
+gl:attachShader(program, vs)
+gl:attachShader(program, fs)
+gl:linkProgram(program)
+if gl:getProgramParameter(program, gl.LINK_STATUS) == 0 then
+    statusDiv.textContent = "Status: ERROR - link failed: " .. gl:getProgramInfoLog(program)
+    return
+end
+gl:useProgram(program)
+
+-- Generate 10,000 particles
+local NUM_PARTICLES = 10000
+local particleData = {} -- interleaved: radius, angle, height, speed
+
+-- Simple pseudo-random (deterministic for reproducibility)
+local seed = 12345
+local function rng()
+    seed = (seed * 1103515245 + 12345) % 2147483648
+    return seed / 2147483648.0
+end
+
+for i = 1, NUM_PARTICLES do
+    -- Radius: concentrated toward center (sqrt distribution for uniform disk area)
+    local radius = math.sqrt(rng()) * 5.0
+    -- Random initial angle
+    local angle = rng() * math.pi * 2.0
+    -- Random height offset
+    local height = (rng() - 0.5) * 2.0
+    -- Speed: inner particles orbit faster (Kepler-like)
+    local speed = 0.3 + 0.7 / (0.5 + radius)
+
+    table.insert(particleData, radius)
+    table.insert(particleData, angle)
+    table.insert(particleData, height)
+    table.insert(particleData, speed)
+end
+
+statusDiv.textContent = string.format("Status: %d particles generated", NUM_PARTICLES)
+
+local vbo = gl:createBuffer()
+gl:bindBuffer(gl.ARRAY_BUFFER, vbo)
+gl:bufferDataFloat(gl.ARRAY_BUFFER, particleData, gl.STATIC_DRAW)
+
+local aRadius = gl:getAttribLocation(program, "aRadius")
+local aAngle = gl:getAttribLocation(program, "aAngle")
+local aHeight = gl:getAttribLocation(program, "aHeight")
+local aSpeed = gl:getAttribLocation(program, "aSpeed")
+local uMVP = gl:getUniformLocation(program, "uMVP")
+local uTime = gl:getUniformLocation(program, "uTime")
+
+-- stride = 4 floats * 4 bytes = 16
+gl:enableVertexAttribArray(aRadius)
+gl:vertexAttribPointer(aRadius, 1, gl.FLOAT, false, 16, 0)
+gl:enableVertexAttribArray(aAngle)
+gl:vertexAttribPointer(aAngle, 1, gl.FLOAT, false, 16, 4)
+gl:enableVertexAttribArray(aHeight)
+gl:vertexAttribPointer(aHeight, 1, gl.FLOAT, false, 16, 8)
+gl:enableVertexAttribArray(aSpeed)
+gl:vertexAttribPointer(aSpeed, 1, gl.FLOAT, false, 16, 12)
+
+-- Enable additive blending for glow effect
+gl:enable(gl.BLEND)
+gl:blendFunc(gl.SRC_ALPHA, gl.ONE)
+gl:disable(gl.DEPTH_TEST)
+
+local projection = mat4_perspective(math.rad(60), 1.0, 0.1, 100.0)
+local startTimeMs = 0
+local frameCount = 0
+
+local function render(nowMs)
+    if startTimeMs == 0 then startTimeMs = nowMs end
+    local t = (nowMs - startTimeMs) / 1000.0
+
+    gl:beginFrame()
+
+    gl:clearColor(0.02, 0.01, 0.05, 1.0)
+    gl:clear(gl.COLOR_BUFFER_BIT)
+
+    -- Orbiting camera
+    local camAngle = t * 0.15
+    local camHeight = math.sin(t * 0.1) * 0.5 + 1.5
+    local camDist = 12.0 + math.sin(t * 0.2) * 2.0
+    local view = mat4_multiply(
+        mat4_translate(0, -camHeight, -camDist),
+        mat4_multiply(mat4_rotateX(0.1 + math.sin(t * 0.1) * 0.05), mat4_rotateY(camAngle))
+    )
+    local mvp = mat4_multiply(projection, view)
+
+    gl:uniformMatrix4fv(uMVP, false, mvp)
+    gl:uniform1f(uTime, t)
+
+    gl:drawArrays(gl.POINTS, 0, NUM_PARTICLES)
+
+    gl:endFrame()
+
+    frameCount = frameCount + 1
+    if frameCount % 60 == 0 then
+        local perf = gl:perfCounters()
+        perfDiv.textContent = string.format(
+            "Particles: %d | Draw: %d | Frame: %d | %.2fms",
+            NUM_PARTICLES, perf.drawCalls, frameCount, perf.frameTimeMs
+        )
+    end
+
+    requestAnimationFrame(render)
+end
+
+requestAnimationFrame(render)
+</script>
+</body>
+</html>

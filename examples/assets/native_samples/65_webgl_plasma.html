@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    background: #0a0a1a;
+    color: #e0e0e0;
+    font-family: "Segoe UI", sans-serif;
+}
+h2 { color: #ff6ec7; margin-bottom: 10px; }
+.info { color: #888; font-size: 13px; margin-bottom: 8px; }
+.container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.panel {
+    background: #12122a;
+    border: 1px solid #2a1a4a;
+    border-radius: 8px;
+    padding: 16px;
+}
+canvas {
+    display: block;
+    border: 1px solid #2a1a4a;
+    border-radius: 4px;
+}
+.perf {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #aaa;
+    font-family: "Consolas", monospace;
+}
+</style>
+</head>
+<body>
+    <h2>WebGL Plasma &amp; Fractal Noise</h2>
+    <p class="info">GPU-computed fractal Brownian motion noise with animated color palette cycling</p>
+
+    <div class="container">
+        <div class="panel">
+            <canvas id="gl-canvas" width="512" height="512"></canvas>
+            <div id="perf-info" class="perf">Initializing...</div>
+        </div>
+        <div class="panel" style="max-width: 320px;">
+            <h3 style="color: #ff6ec7; margin-top: 0;">Techniques</h3>
+            <p class="info">&#8226; Simplex-style noise (GPU)</p>
+            <p class="info">&#8226; Fractal Brownian Motion (5 octaves)</p>
+            <p class="info">&#8226; Domain warping (feedback distortion)</p>
+            <p class="info">&#8226; HSV-to-RGB color palette</p>
+            <p class="info">&#8226; Real-time animation at 60fps</p>
+            <div id="status" class="perf">Status: loading...</div>
+        </div>
+    </div>
+
+<script>
+-- WebGL Plasma + FBM Noise Demo
+local canvas = document:getElementById("gl-canvas")
+local perfDiv = document:getElementById("perf-info")
+local statusDiv = document:getElementById("status")
+
+if not canvas then return end
+
+local gl = canvas:getContext("webgl")
+if not gl then
+    statusDiv.textContent = "Status: ERROR - WebGL not available"
+    return
+end
+
+statusDiv.textContent = "Status: WebGL context created"
+
+local vsSource = [[
+    attribute vec2 aPosition;
+    varying vec2 vUV;
+    void main() {
+        vUV = aPosition * 0.5 + 0.5;
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+    }
+]]
+
+local fsSource = [[
+    precision highp float;
+    varying vec2 vUV;
+    uniform float uTime;
+    uniform vec2 uResolution;
+
+    // Hash function for pseudo-random values
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+    // Simplex 2D noise
+    float snoise(vec2 v) {
+        const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+                           -0.577350269189626, 0.024390243902439);
+        vec2 i  = floor(v + dot(v, C.yy));
+        vec2 x0 = v - i + dot(i, C.xx);
+        vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+        vec4 x12 = x0.xyxy + C.xxzz;
+        x12.xy -= i1;
+        i = mod289(i);
+        vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0))
+                                    + i.x + vec3(0.0, i1.x, 1.0));
+        vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+                                dot(x12.zw,x12.zw)), 0.0);
+        m = m*m; m = m*m;
+        vec3 x = 2.0 * fract(p * C.www) - 1.0;
+        vec3 h = abs(x) - 0.5;
+        vec3 ox = floor(x + 0.5);
+        vec3 a0 = x - ox;
+        m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+        vec3 g;
+        g.x = a0.x * x0.x + h.x * x0.y;
+        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+        return 130.0 * dot(m, g);
+    }
+
+    // Fractal Brownian Motion
+    float fbm(vec2 p) {
+        float f = 0.0;
+        float amp = 0.5;
+        float freq = 1.0;
+        for (int i = 0; i < 5; i++) {
+            f += amp * snoise(p * freq);
+            freq *= 2.0;
+            amp *= 0.5;
+        }
+        return f;
+    }
+
+    // HSV to RGB
+    vec3 hsv2rgb(vec3 c) {
+        vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
+        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+    }
+
+    void main() {
+        vec2 uv = vUV;
+        vec2 p = (uv - 0.5) * 4.0;
+        p.x *= uResolution.x / uResolution.y;
+
+        float t = uTime * 0.3;
+
+        // Domain warping: use one layer of noise to distort the input
+        vec2 q = vec2(
+            fbm(p + vec2(1.7, 9.2) + t * 0.15),
+            fbm(p + vec2(8.3, 2.8) + t * 0.126)
+        );
+
+        vec2 r = vec2(
+            fbm(p + 4.0 * q + vec2(1.7, 9.2) + t * 0.15),
+            fbm(p + 4.0 * q + vec2(8.3, 2.8) + t * 0.126)
+        );
+
+        float f = fbm(p + 4.0 * r);
+
+        // Color based on noise value + palette cycling
+        float hue = fract(f * 0.5 + t * 0.1 + length(q) * 0.3);
+        float sat = 0.7 + 0.3 * sin(f * 3.14159);
+        float val = 0.4 + 0.6 * clamp(f + 0.5, 0.0, 1.0);
+
+        vec3 col = hsv2rgb(vec3(hue, sat, val));
+
+        // Add subtle glow in bright regions
+        col += vec3(0.1, 0.05, 0.15) * clamp(f * 2.0, 0.0, 1.0);
+
+        // Vignette
+        float vig = 1.0 - 0.3 * length(uv - 0.5);
+        col *= vig;
+
+        gl_FragColor = vec4(col, 1.0);
+    }
+]]
+
+local function compileShader(type, source)
+    local shader = gl:createShader(type)
+    gl:shaderSource(shader, source)
+    gl:compileShader(shader)
+    if gl:getShaderParameter(shader, gl.COMPILE_STATUS) == 0 then
+        print("Shader error: " .. gl:getShaderInfoLog(shader))
+        gl:deleteShader(shader)
+        return nil
+    end
+    return shader
+end
+
+local vs = compileShader(gl.VERTEX_SHADER, vsSource)
+local fs = compileShader(gl.FRAGMENT_SHADER, fsSource)
+if not vs or not fs then
+    statusDiv.textContent = "Status: ERROR - shader compile failed"
+    return
+end
+
+local program = gl:createProgram()
+gl:attachShader(program, vs)
+gl:attachShader(program, fs)
+gl:linkProgram(program)
+if gl:getProgramParameter(program, gl.LINK_STATUS) == 0 then
+    statusDiv.textContent = "Status: ERROR - link failed: " .. gl:getProgramInfoLog(program)
+    return
+end
+gl:useProgram(program)
+
+local quadVerts = { -1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1 }
+local vbo = gl:createBuffer()
+gl:bindBuffer(gl.ARRAY_BUFFER, vbo)
+gl:bufferDataFloat(gl.ARRAY_BUFFER, quadVerts, gl.STATIC_DRAW)
+
+local aPos = gl:getAttribLocation(program, "aPosition")
+local uTime = gl:getUniformLocation(program, "uTime")
+local uRes = gl:getUniformLocation(program, "uResolution")
+
+gl:enableVertexAttribArray(aPos)
+gl:vertexAttribPointer(aPos, 2, gl.FLOAT, false, 8, 0)
+
+statusDiv.textContent = "Status: Rendering plasma..."
+
+local startTimeMs = 0
+local frameCount = 0
+
+local function render(nowMs)
+    if startTimeMs == 0 then startTimeMs = nowMs end
+    local t = (nowMs - startTimeMs) / 1000.0
+
+    gl:beginFrame()
+    gl:uniform1f(uTime, t)
+    gl:uniform2f(uRes, 512.0, 512.0)
+    gl:drawArrays(gl.TRIANGLES, 0, 6)
+    gl:endFrame()
+
+    frameCount = frameCount + 1
+    if frameCount % 60 == 0 then
+        local perf = gl:perfCounters()
+        perfDiv.textContent = string.format(
+            "Time: %.1fs | Frame: %d | %.2fms/frame",
+            t, frameCount, perf.frameTimeMs
+        )
+    end
+
+    requestAnimationFrame(render)
+end
+
+requestAnimationFrame(render)
+</script>
+</body>
+</html>

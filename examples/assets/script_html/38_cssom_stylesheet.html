@@ -1,0 +1,53 @@
+<html><body>
+<style>
+.red { color: red; }
+</style>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test document.styleSheets and CSSStyleSheet API
+local sheets = document.styleSheets
+local ok = true
+local detail = ""
+
+detail = detail .. "sheets=#" .. tostring(#sheets) .. "; "
+-- Should have at least 1 stylesheet (the <style> block above + UA stylesheet)
+ok = ok and (#sheets >= 1)
+
+-- Find our author stylesheet
+local authorSheet = nil
+for i = 1, #sheets do
+    local s = sheets[i]
+    if s.ruleCount > 0 then
+        local rules = s:cssRules()
+        for j = 1, #rules do
+            local rule = rules[j]
+            if rule.selectorText:find("red") then
+                authorSheet = s
+                break
+            end
+        end
+    end
+    if authorSheet then break end
+end
+
+if authorSheet then
+    detail = detail .. "found=yes; "
+    detail = detail .. "disabled=" .. tostring(authorSheet.disabled) .. "; "
+    ok = ok and (authorSheet.disabled == false)
+
+    -- Test disabled toggle
+    authorSheet.disabled = true
+    ok = ok and (authorSheet.disabled == true)
+    authorSheet.disabled = false
+else
+    detail = detail .. "found=no; "
+    -- Not finding it is OK if sheets structure differs
+end
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

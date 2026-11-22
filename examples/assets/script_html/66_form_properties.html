@@ -1,0 +1,50 @@
+<html><body>
+<div id="result">FAIL</div>
+<input id="txt" type="text" value="hello" />
+<input id="chk" type="checkbox" checked />
+<input id="dis" type="text" disabled />
+<select><option id="opt" selected>A</option></select>
+<div id="hid" hidden>secret</div>
+<script type="text/lua">
+local ok = true
+
+-- value (read/write)
+local txt = document:getElementById("txt")
+ok = ok and (txt.value == "hello")
+txt.value = "world"
+ok = ok and (txt.value == "world")
+
+-- checked (read/write)
+local chk = document:getElementById("chk")
+ok = ok and (chk.checked == true)
+chk.checked = false
+ok = ok and (chk.checked == false)
+chk.checked = true
+ok = ok and (chk.checked == true)
+
+-- disabled (read/write)
+local dis = document:getElementById("dis")
+ok = ok and (dis.disabled == true)
+dis.disabled = false
+ok = ok and (dis.disabled == false)
+
+-- selected (read/write)
+local opt = document:getElementById("opt")
+ok = ok and (opt.selected == true)
+opt.selected = false
+ok = ok and (opt.selected == false)
+
+-- hidden (read/write)
+local hid = document:getElementById("hid")
+ok = ok and (hid.hidden == true)
+hid.hidden = false
+ok = ok and (hid.hidden == false)
+
+-- inputType (read/write)
+ok = ok and (txt.inputType == "text")
+txt.inputType = "password"
+ok = ok and (txt.inputType == "password")
+
+document:getElementById("result").textContent = ok and "PASS" or "FAIL"
+</script>
+</body></html>

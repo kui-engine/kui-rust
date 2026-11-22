@@ -1,0 +1,67 @@
+[package]
+name = "kui"
+version = "3.1.0"
+edition = "2021"
+authors = ["Alloy"]
+license = "MIT"
+description = "Safe Rust bindings for the KUI Full Profile C ABI (Windows x64, Linux x64, macOS arm64)"
+repository = "https://github.com/kui-engine/kui-rust"
+homepage = "https://github.com/kui-engine/kui"
+keywords = ["ui", "gui", "html", "css", "graphics"]
+categories = ["gui", "graphics", "rendering::engine"]
+readme = "README.md"
+
+# 暂不发布到 crates.io：crates.io 上的 `kui` 已被别人占用（2023 年的 WebGL 图表库），
+# 且 kui-sys 的 build.rs 要在本地找到运行库（SDK 包的 native/、对外仓库的 runtime/<平台>/，或 KUI_C_SDK 指定的目录）。
+# 用法（git 依赖）见 README.md。
+publish = false
+
+[lib]
+name = "kui"
+path = "src/lib.rs"
+
+[dependencies]
+kui-sys = { version = "=3.1.0", path = "kui-sys" }
+
+# 集成测试都在主线程上跑（macOS 只允许在主线程创建窗口，libtest 把测试放在子线程里），
+# 由各文件的 main 调 tests/common/mod.rs 的运行器。
+
+[[test]]
+name = "components"
+harness = false
+
+[[test]]
+name = "custom_paint"
+harness = false
+
+[[test]]
+name = "dom_and_system"
+harness = false
+
+[[test]]
+name = "drag_drop"
+harness = false
+
+[[test]]
+name = "events"
+harness = false
+
+[[test]]
+name = "framework"
+harness = false
+
+[[test]]
+name = "full_profile_smoke"
+harness = false
+
+[[test]]
+name = "main_thread"
+harness = false
+
+[[test]]
+name = "script"
+harness = false
+
+[[test]]
+name = "widgets"
+harness = false

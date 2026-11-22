@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — extensions &amp; host-driven 3D</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 16px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 10px; }
+#tour-result { padding: 8px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 12px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 600px 1fr; gap: 12px; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.panel { background: white; border-radius: 10px; padding: 12px 14px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 8px; }
+#view-host { width: 572px; height: 320px; border-radius: 6px; background: #0b1324;
+             margin-bottom: 8px; }
+#view-host kui-3d-view { display: block; width: 572px; height: 320px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+button { padding: 5px 10px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+button.alt { background: #0f766e; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 6px 8px;
+       border-radius: 5px; color: #334155; min-height: 26px; margin-bottom: 4px; }
+.log-title { margin: 16px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+</style></head><body>
+<h1>KUI API — extensions &amp; host-driven 3D</h1>
+<p class="lead">The host loads, inspects, unloads and reloads the kui_ext_3d extension through the C ABI
+(and the Go / Rust wrappers) and drives its &lt;kui-3d-view&gt; with extension calls: meshes, lights,
+materials, a glTF model and an orbit camera. Drag in the view to orbit (left button), drag with the
+right button to zoom, the wheel zooms in. On start the host runs every call once and checks the result.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <div class="col">
+    <section class="panel" id="p-scene">
+      <h2>Host-driven 3D scene</h2>
+      <div class="api">document_extension_invoke: createBox · createSphere · createCylinder · createPlane ·
+        createDirectionalLight · createPointLight · setMaterialProperties · setEntityTransform ·
+        loadGltf · setCameraLookAt</div>
+      <div id="view-host"></div>
+      <div class="toolbar">
+        <button id="btn-cam-left">Left</button>
+        <button id="btn-cam-right">Right</button>
+        <button id="btn-cam-up">Up</button>
+        <button id="btn-cam-down">Down</button>
+        <button id="btn-cam-in">Zoom in</button>
+        <button id="btn-cam-out">Zoom out</button>
+        <button id="btn-cam-reset">Reset camera</button>
+      </div>
+      <div class="out" id="cam-out">—</div>
+      <div class="toolbar">
+        <button class="alt" id="btn-scene-color">Recolor box</button>
+        <button class="alt" id="btn-scene-spin">Spin on / off</button>
+        <button class="alt" id="btn-scene-tank">Tank on / off</button>
+      </div>
+      <div class="out" id="scene-out">—</div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel" id="p-ext">
+      <h2>Extension manager</h2>
+      <div class="api">extension_is_loaded · get_extension_state · extension_get_perf_stats ·
+        extension_reset_perf_stats · load / unload / reload_extension · unload_all_extensions ·
+        watch_extensions</div>
+      <p class="note">Unloading removes the 3D element first; reloading loads the DLL again and
+        rebuilds the scene in a fresh &lt;kui-3d-view&gt; that renders like the first one (also on the
+        GPU zero-copy path). The self-check runs the cycle before the view exists.</p>
+      <div class="toolbar">
+        <button id="btn-ext-state">State</button>
+        <button id="btn-ext-perf">Perf stats</button>
+        <button id="btn-ext-reset">Reset stats</button>
+        <button id="btn-ext-reload">Unload + reload 3D</button>
+        <button id="btn-ext-watch">Watch on / off</button>
+      </div>
+      <div class="out" id="ext-out">—</div>
+    </section>
+    <section class="panel" id="p-res">
+      <h2>Invoke results</h2>
+      <div class="api">extension_result_get_status · get_count · get_value · get_error · release</div>
+      <p class="note">Status 0 is success, 3 an unknown method, 4 a wrong argument count; the error
+        text explains a failure.</p>
+      <div class="toolbar">
+        <button id="btn-res-ok">getRenderStats</button>
+        <button id="btn-res-unknown">Unknown method</button>
+        <button id="btn-res-args">Wrong arg count</button>
+      </div>
+      <div class="out" id="res-out">—</div>
+    </section>
+  </div>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+</body></html>

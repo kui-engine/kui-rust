@@ -1,0 +1,114 @@
+<html>
+<canvas id="c" width="200" height="200" style="display:none"></canvas>
+<div id="result">WAITING</div>
+<div id="detail"></div>
+<script>
+local ok, err = pcall(function()
+    local canvas = document:getElementById("c")
+    local ctx = canvas:getContext("2d")
+    local results = {}
+
+    -- Test 1: Path2D constructor (empty)
+    local p1 = Path2D.new()
+    p1:rect(10, 10, 50, 50)
+    ctx.fillStyle = "red"
+    ctx:fillPath2D(p1)
+    results[#results+1] = "empty_ctor:PASS"
+
+    -- Test 2: Path2D from SVG path data
+    local p2 = Path2D.new("M 100 10 L 150 60 L 100 60 Z")
+    ctx.fillStyle = "blue"
+    ctx:fillPath2D(p2)
+    results[#results+1] = "svg_ctor:PASS"
+
+    -- Test 3: strokePath2D
+    local p4 = Path2D.new()
+    p4:moveTo(10, 100)
+    p4:lineTo(100, 100)
+    ctx.strokeStyle = "black"
+    ctx.lineWidth = 2
+    ctx:strokePath2D(p4)
+    results[#results+1] = "stroke:PASS"
+
+    -- Test 4: clipPath2D
+    ctx:save()
+    local clipP = Path2D.new()
+    clipP:rect(0, 120, 100, 80)
+    ctx:clipPath2D(clipP)
+    ctx:fillRect(0, 0, 200, 200)
+    ctx:restore()
+    results[#results+1] = "clip:PASS"
+
+    -- Test 5: isPointInPath2D
+    local p6 = Path2D.new()
+    p6:rect(0, 0, 50, 50)
+    local inside = ctx:isPointInPath2D(p6, 25, 25)
+    local outside = ctx:isPointInPath2D(p6, 100, 100)
+    if inside and not outside then
+        results[#results+1] = "point_in_path:PASS"
+    else
+        results[#results+1] = "point_in_path:FAIL"
+    end
+
+    -- Test 6: isPointInStrokePath2D
+    local p7 = Path2D.new()
+    p7:moveTo(0, 0)
+    p7:lineTo(100, 0)
+    ctx.lineWidth = 10
+    local onStroke = ctx:isPointInStrokePath2D(p7, 50, 0)
+    local offStroke = ctx:isPointInStrokePath2D(p7, 50, 20)
+    if onStroke and not offStroke then
+        results[#results+1] = "point_in_stroke:PASS"
+    else
+        results[#results+1] = "point_in_stroke:FAIL"
+    end
+
+    -- Test 7: Path2D arc, bezierCurveTo, quadraticCurveTo
+    local p8 = Path2D.new()
+    p8:arc(50, 50, 20, 0, 6.28)
+    p8:closePath()
+    results[#results+1] = "arc:PASS"
+
+    local p9 = Path2D.new()
+    p9:moveTo(0, 0)
+    p9:bezierCurveTo(10, 50, 90, 50, 100, 0)
+    results[#results+1] = "bezier:PASS"
+
+    local p10 = Path2D.new()
+    p10:moveTo(0, 0)
+    p10:quadraticCurveTo(50, 100, 100, 0)
+    results[#results+1] = "quad:PASS"
+
+    -- Test 8: addPath
+    local pA = Path2D.new()
+    pA:rect(0, 0, 10, 10)
+    local pB = Path2D.new()
+    pB:rect(20, 20, 10, 10)
+    pA:addPath(pB)
+    results[#results+1] = "addPath:PASS"
+
+    -- Test 9: fillPath2D with evenodd fill rule
+    local pEO = Path2D.new()
+    pEO:rect(0, 0, 100, 100)
+    pEO:rect(25, 25, 50, 50)
+    ctx:fillPath2D(pEO, "evenodd")
+    results[#results+1] = "evenodd:PASS"
+
+    local allPass = true
+    for i = 1, #results do
+        if not results[i]:find("PASS") then
+            allPass = false
+            break
+        end
+    end
+
+    document:getElementById("result").textContent = allPass and "PASS" or table.concat(results, ",")
+    document:getElementById("detail").textContent = table.concat(results, " | ")
+end)
+
+if not ok then
+    document:getElementById("result").textContent = "ERROR"
+    document:getElementById("detail").textContent = tostring(err)
+end
+</script>
+</html>

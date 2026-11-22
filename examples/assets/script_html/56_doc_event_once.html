@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script>
+-- E1+E3: Document addEventListener with once option
+local count = 0
+document:addEventListener("ping", function(e)
+    count = count + 1
+end, {once = true})
+
+document:dispatchEvent("ping")
+document:dispatchEvent("ping")
+
+if count == 1 then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = "expected 1, got " .. tostring(count)
+end
+</script>
+</body>
+</html>

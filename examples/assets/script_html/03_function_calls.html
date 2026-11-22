@@ -1,0 +1,22 @@
+<html><body>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test Lua function definitions and calls
+function add(a, b) return a + b end
+function greet(name) return "Hi " .. name end
+function factorial(n)
+    if n <= 1 then return 1 end
+    return n * factorial(n - 1)
+end
+
+local ok = (add(3, 4) == 7)
+         and (greet("KUI") == "Hi KUI")
+         and (factorial(5) == 120)
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS"
+else r.textContent = "FAIL"
+end
+</script>
+</body></html>

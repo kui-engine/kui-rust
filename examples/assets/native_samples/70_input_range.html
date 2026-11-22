@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    padding: 20px;
+}
+h2 {
+    color: #7ec8e3;
+    margin-bottom: 16px;
+    font-size: 18px;
+}
+.section {
+    background: #16213e;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.label {
+    width: 140px;
+    font-size: 13px;
+    color: #a0a0c0;
+}
+.value-display {
+    width: 50px;
+    text-align: right;
+    font-size: 13px;
+    color: #7ec8e3;
+    margin-left: 12px;
+}
+input[type="range"] {
+    width: 200px;
+    height: 20px;
+}
+.wide input[type="range"] {
+    width: 350px;
+}
+.tall input[type="range"] {
+    height: 32px;
+}
+
+/* Other input types showcase */
+.other-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.input-card {
+    background: #0f3460;
+    border-radius: 6px;
+    padding: 10px 14px;
+    min-width: 140px;
+}
+.input-card .type-label {
+    font-size: 11px;
+    color: #7ec8e3;
+    margin-bottom: 4px;
+}
+input[type="search"],
+input[type="email"],
+input[type="tel"],
+input[type="url"] {
+    width: 160px;
+    padding: 4px 8px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-size: 13px;
+}
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+    padding: 6px 16px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background: #0f3460;
+    color: #e0e0e0;
+    font-size: 13px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+    <h2>Range Input Test</h2>
+
+    <div class="section">
+        <div class="row">
+            <span class="label">Default (0-100):</span>
+            <input type="range" id="r1">
+            <span class="value-display" id="v1">50</span>
+        </div>
+        <div class="row">
+            <span class="label">Custom (0-10, step 1):</span>
+            <input type="range" id="r2" min="0" max="10" step="1" value="3">
+            <span class="value-display" id="v2">3</span>
+        </div>
+        <div class="row">
+            <span class="label">Float (-1 to 1, 0.1):</span>
+            <input type="range" id="r3" min="-1" max="1" step="0.1" value="0">
+            <span class="value-display" id="v3">0</span>
+        </div>
+        <div class="row wide">
+            <span class="label">Wide (0-255):</span>
+            <input type="range" id="r4" min="0" max="255" value="128">
+            <span class="value-display" id="v4">128</span>
+        </div>
+        <div class="row tall">
+            <span class="label">Tall height:</span>
+            <input type="range" id="r5" value="75">
+            <span class="value-display" id="v5">75</span>
+        </div>
+        <div class="row">
+            <span class="label">Disabled:</span>
+            <input type="range" id="r6" value="30" disabled>
+            <span class="value-display" id="v6">30</span>
+        </div>
+    </div>
+
+    <h2>Other Input Types</h2>
+    <div class="section other-inputs">
+        <div class="input-card">
+            <div class="type-label">type="search"</div>
+            <input type="search" placeholder="Search...">
+        </div>
+        <div class="input-card">
+            <div class="type-label">type="email"</div>
+            <input type="email" placeholder="user@example.com">
+        </div>
+        <div class="input-card">
+            <div class="type-label">type="tel"</div>
+            <input type="tel" placeholder="+1 234 567">
+        </div>
+        <div class="input-card">
+            <div class="type-label">type="url"</div>
+            <input type="url" placeholder="https://...">
+        </div>
+        <div class="input-card">
+            <div class="type-label">type="button"</div>
+            <input type="button" value="Click Me">
+        </div>
+        <div class="input-card">
+            <div class="type-label">type="submit"</div>
+            <input type="submit" value="Submit">
+        </div>
+        <div class="input-card">
+            <div class="type-label">type="reset"</div>
+            <input type="reset" value="Reset">
+        </div>
+        <div class="input-card">
+            <div class="type-label">type="hidden"</div>
+            <span style="font-size: 11px; color: #666;">(not visible)</span>
+            <input type="hidden" value="secret">
+        </div>
+    </div>
+
+<script>
+local function bindRange(inputId, displayId)
+    local input = document:getElementById(inputId)
+    if input then
+        input:addEventListener("input", function()
+            local display = document:getElementById(displayId)
+            if display then display.textContent = input.value end
+        end)
+    end
+end
+bindRange("r1", "v1")
+bindRange("r2", "v2")
+bindRange("r3", "v3")
+bindRange("r4", "v4")
+bindRange("r5", "v5")
+</script>
+</body>
+</html>

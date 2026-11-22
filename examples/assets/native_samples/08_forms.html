@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 200px; }
+
+    input[type="text"], input[type="password"], input[type="number"] {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 2px solid #334155;
+        border-radius: 6px;
+        margin-bottom: 8px;
+    }
+    input:focus {
+        border-color: #3b82f6;
+        outline: none;
+    }
+    input:disabled {
+        opacity: 0.5;
+        background: #1e293b;
+    }
+    input[type="checkbox"], input[type="radio"] {
+        margin-right: 8px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 2px solid #334155;
+        border-radius: 6px;
+        min-height: 80px;
+    }
+    textarea:focus { border-color: #3b82f6; }
+
+    select {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 14px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 2px solid #334155;
+        border-radius: 6px;
+    }
+
+    button {
+        padding: 8px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-success { background: #22c55e; color: white; }
+    .btn-danger  { background: #ef4444; color: white; }
+    .btn-outline { background: transparent; color: #3b82f6; border: 2px solid #3b82f6; }
+    .btn-ghost   { background: transparent; color: #94a3b8; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-danger:hover  { background: #dc2626; }
+    .btn-outline:hover { background: rgba(59,130,246,0.1); }
+    .btn-ghost:hover { color: #e2e8f0; }
+    button:disabled { opacity: 0.5; }
+
+    .checkbox-group, .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 14px;
+    }
+    .check-item { display: flex; align-items: center; }
+
+    .form-card {
+        background: #162032;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 24px;
+    }
+    .form-card h3 { color: #e2e8f0; font-size: 16px; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+    <h2>Form Controls</h2>
+
+    <h3>Text Inputs</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">Text</div>
+                <input type="text" placeholder="Enter text..." />
+            </div>
+            <div class="col">
+                <div class="label">Password</div>
+                <input type="password" placeholder="Enter password..." />
+            </div>
+            <div class="col">
+                <div class="label">Number (with spinner)</div>
+                <input type="number" value="42" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="label">Disabled</div>
+                <input type="text" value="Cannot edit" disabled />
+            </div>
+            <div class="col">
+                <div class="label">Read-only</div>
+                <input type="text" value="Read only text" readonly />
+            </div>
+        </div>
+    </div>
+
+    <h3>Textarea</h3>
+    <div class="section">
+        <textarea placeholder="Write something here..."></textarea>
+    </div>
+
+    <h3>Select Dropdown</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">Choose an option</div>
+                <select>
+                    <option>Option A</option>
+                    <option>Option B</option>
+                    <option>Option C</option>
+                    <option>Option D</option>
+                </select>
+            </div>
+            <div class="col">
+                <div class="label">With selected</div>
+                <select>
+                    <option>Red</option>
+                    <option selected>Green</option>
+                    <option>Blue</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <h3>Checkboxes &amp; Radios</h3>
+    <div class="section">
+        <div class="row">
+            <div class="col">
+                <div class="label">Checkboxes</div>
+                <div class="checkbox-group">
+                    <div class="check-item"><input type="checkbox" checked /> Feature A (checked)</div>
+                    <div class="check-item"><input type="checkbox" /> Feature B</div>
+                    <div class="check-item"><input type="checkbox" /> Feature C</div>
+                    <div class="check-item"><input type="checkbox" disabled /> Disabled</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="label">Radio Buttons</div>
+                <div class="radio-group">
+                    <div class="check-item"><input type="radio" name="color" checked /> Red</div>
+                    <div class="check-item"><input type="radio" name="color" /> Green</div>
+                    <div class="check-item"><input type="radio" name="color" /> Blue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Buttons</h3>
+    <div class="section">
+        <div class="row">
+            <button class="btn-primary">Primary</button>
+            <button class="btn-success">Success</button>
+            <button class="btn-danger">Danger</button>
+            <button class="btn-outline">Outline</button>
+            <button class="btn-ghost">Ghost</button>
+            <button class="btn-primary" disabled>Disabled</button>
+        </div>
+    </div>
+
+    <h3>Form Card Example</h3>
+    <div class="form-card">
+        <h3>Login Form</h3>
+        <div class="label">Username</div>
+        <input type="text" placeholder="your@email.com" />
+        <div class="label">Password</div>
+        <input type="password" placeholder="••••••••" />
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+            <button class="btn-primary" style="flex: 1;">Sign In</button>
+            <button class="btn-ghost">Forgot?</button>
+        </div>
+    </div>
+</body>
+</html>

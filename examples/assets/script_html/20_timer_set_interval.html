@@ -1,0 +1,9 @@
+<html><body>
+<div id="result">WAITING</div>
+<script>
+-- Interval callback writes result directly; tickTimers fires after executeScripts
+setInterval(function()
+    document:getElementById("result").textContent = "PASS"
+end, 30)
+</script>
+</body></html>

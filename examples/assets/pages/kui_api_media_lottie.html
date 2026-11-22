@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — audio, media elements &amp; Lottie</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 14px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 8px; }
+#tour-result { padding: 7px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 10px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.panel { background: white; border-radius: 10px; padding: 10px 12px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.wide { grid-column: span 2; }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 6px; min-height: 32px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+button { padding: 4px 7px; border: none; border-radius: 4px; background: #3b82f6; color: white;
+         font-size: 11px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 5px 8px;
+       border-radius: 5px; color: #334155; min-height: 24px; margin-bottom: 6px; }
+/* The Lottie player: 200x200 like the animation's own canvas, white behind it, so the pixel
+   checks can sample fixed fractions (the pulsing circle is centred, radius 41..75 px). */
+#lot { display: block; width: 200px; height: 200px; background: #ffffff; margin: 0 auto 6px; }
+#vid { display: block; width: 320px; height: 180px; background: #000000; margin-bottom: 6px; }
+#aud { display: block; width: 300px; height: 40px; margin-bottom: 6px; }
+.log-title { margin: 6px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+#scratch { display: none; }
+</style></head><body>
+<h1>KUI API — audio, media elements &amp; Lottie</h1>
+<p class="lead">The document's game-audio manager, &lt;audio&gt; / &lt;video&gt; elements and
+&lt;lottie-player&gt; driven from the host. Every call is checked against the state read back
+(handles, groups, counts, time, flags, playback state); without an audio device the checks are
+the same, only nothing is heard.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel wide" id="p-audio">
+    <h2>Game audio (document audio manager)</h2>
+    <div class="api">audio_is_available · audio_play · audio_get_info · audio_set_paused /
+      _volume / _pan / _pitch · audio_seek · audio_stop · audio_set_group · audio_get_group ·
+      audio_stop_all · audio_set_all_paused · audio_preload · audio_unload · audio_get_counts</div>
+    <p class="note">Sounds are played by file path into groups (master, music, sfx, ui); each
+      play returns a handle whose state can be read back.</p>
+    <div class="toolbar">
+      <button id="btn-au-play">Play music (loop)</button>
+      <button id="btn-au-pause">Pause / resume</button>
+      <button id="btn-au-volume">Volume 0.3 / 1</button>
+      <button id="btn-au-pan">Pan left / right</button>
+      <button id="btn-au-pitch">Pitch 1.5 / 1</button>
+      <button id="btn-au-seek">Seek 2 s</button>
+      <button id="btn-au-stop">Stop</button>
+      <button id="btn-au-sfx">Play 2 sfx</button>
+      <button id="btn-au-stopsfx">Stop all sfx</button>
+      <button id="btn-au-pauseall">Pause all / resume all</button>
+      <button id="btn-au-mute">Mute music group</button>
+      <button id="btn-au-preload">Preload x3</button>
+      <button id="btn-au-unload">Unload all</button>
+    </div>
+    <div class="out" id="au-avail">available=?</div>
+    <div class="out" id="au-out">-</div>
+    <div class="out" id="au-counts">-</div>
+  </section>
+
+  <section class="panel" id="p-lottie">
+    <h2>Lottie</h2>
+    <div class="api">lottie_get_state · lottie_get_natural_size · lottie_pause · lottie_seek ·
+      lottie_stop · lottie_set_speed · lottie_set_loop</div>
+    <lottie-player id="lot"></lottie-player>
+    <div class="toolbar">
+      <button id="btn-lot-play">Play</button>
+      <button id="btn-lot-pause">Pause</button>
+      <button id="btn-lot-seek0">Seek 0</button>
+      <button id="btn-lot-seek50">Seek 0.5</button>
+      <button id="btn-lot-stop">Stop</button>
+      <button id="btn-lot-speed">Speed 2 / 1</button>
+      <button id="btn-lot-loop">Toggle loop</button>
+    </div>
+    <div class="out" id="lot-out">-</div>
+  </section>
+
+  <section class="panel" id="p-aud">
+    <h2>&lt;audio&gt; element</h2>
+    <div class="api">media_load · media_get_paused · media_get_current_time · media_set_current_time ·
+      media_get_duration · media_set_muted / get_muted · media_set_volume / get_volume ·
+      media_set_loop · media_set_autoplay · media_get_playback_flags · media_get_network_state ·
+      media_get_ready_state · media_is_available</div>
+    <audio id="aud"></audio>
+    <div class="toolbar">
+      <button id="btn-aud-play">Play</button>
+      <button id="btn-aud-pause">Pause</button>
+      <button id="btn-aud-seek">Seek 3 s</button>
+      <button id="btn-aud-mute">Toggle mute</button>
+      <button id="btn-aud-loop">Toggle loop</button>
+      <button id="btn-aud-load">load()</button>
+    </div>
+    <div class="out" id="aud-out">-</div>
+  </section>
+
+  <section class="panel wide" id="p-vid">
+    <h2>&lt;video&gt; element</h2>
+    <div class="api">the same calls on a video element · media_set_controls · media_set_autoplay</div>
+    <video id="vid"></video>
+    <div class="toolbar">
+      <button id="btn-vid-play">Play</button>
+      <button id="btn-vid-pause">Pause</button>
+      <button id="btn-vid-seek">Seek 1 s</button>
+      <button id="btn-vid-controls">Toggle controls</button>
+      <button id="btn-vid-autoplay">Toggle autoplay</button>
+    </div>
+    <div class="out" id="vid-out">-</div>
+  </section>
+</div>
+
+<div id="scratch"><div id="plain">not a media element</div></div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+</body></html>

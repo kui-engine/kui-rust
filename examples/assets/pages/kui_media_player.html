@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: #0f172a; color: #e2e8f0;
+        font-family: "Segoe UI", sans-serif; padding: 24px;
+    }
+    h2 { font-size: 22px; color: #38bdf8; margin-bottom: 20px; }
+    h3 { font-size: 16px; color: #94a3b8; margin: 20px 0 10px; }
+
+    .section {
+        background: #1e293b; border-radius: 10px;
+        padding: 20px; margin-bottom: 20px;
+    }
+
+    .note {
+        font-size: 12px; color: #94a3b8;
+        background: #162032; padding: 12px;
+        border-radius: 6px; border-left: 3px solid #3b82f6;
+        margin-bottom: 16px;
+    }
+
+    .warn {
+        font-size: 12px; color: #fbbf24;
+        background: #1c1917; padding: 12px;
+        border-radius: 6px; border-left: 3px solid #f59e0b;
+        margin-bottom: 16px;
+    }
+
+    .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .col { display: flex; flex-direction: column; gap: 8px; }
+
+    .media-card {
+        background: #0f172a; border-radius: 8px;
+        padding: 16px; flex: 1; min-width: 280px;
+    }
+    .media-card h4 {
+        font-size: 13px; color: #60a5fa;
+        margin-bottom: 10px;
+    }
+
+    .controls {
+        display: flex; gap: 8px; margin-top: 12px;
+        align-items: center; flex-wrap: wrap;
+    }
+
+    button {
+        padding: 6px 14px; font-size: 12px;
+        background: #1e293b; color: #e2e8f0;
+        border: 1px solid #475569; border-radius: 6px;
+        cursor: pointer;
+    }
+    button:hover { background: #334155; border-color: #60a5fa; }
+    button.primary {
+        background: #2563eb; border-color: #3b82f6; color: white;
+    }
+    button.primary:hover { background: #1d4ed8; }
+    button.danger {
+        background: #991b1b; border-color: #ef4444; color: white;
+    }
+
+    .status {
+        font-size: 11px; color: #64748b;
+        margin-top: 8px; font-family: monospace;
+        background: #0c1222; padding: 8px;
+        border-radius: 4px; min-height: 20px;
+    }
+
+    .slider-row {
+        display: flex; align-items: center; gap: 8px;
+        margin-top: 8px;
+    }
+    .slider-row label {
+        font-size: 11px; color: #94a3b8; min-width: 56px;
+    }
+    .slider-row span {
+        font-size: 11px; color: #60a5fa;
+        min-width: 40px; text-align: right;
+    }
+    input[type="range"] {
+        flex: 1; height: 4px;
+    }
+    input[type="text"] {
+        background: #0f172a; color: #e2e8f0;
+        border: 1px solid #475569; border-radius: 4px;
+        padding: 4px 8px; font-size: 12px; flex: 1;
+    }
+
+    .badge {
+        display: inline-block; padding: 2px 8px;
+        font-size: 10px; border-radius: 4px;
+        font-weight: 600;
+    }
+    .badge-ok { background: #064e3b; color: #34d399; }
+    .badge-no { background: #450a0a; color: #fca5a5; }
+    .badge-info { background: #1e3a5f; color: #93c5fd; }
+
+    .prop-grid {
+        display: flex; flex-wrap: wrap; gap: 6px;
+        margin-top: 8px;
+    }
+    .prop-item {
+        background: #0c1222; padding: 4px 10px;
+        border-radius: 4px; font-size: 11px;
+        font-family: monospace;
+    }
+    .prop-key { color: #94a3b8; }
+    .prop-val { color: #60a5fa; }
+</style>
+</head>
+<body>
+
+<h2>Media Elements — Audio &amp; Video</h2>
+
+<div class="note">
+    This demo showcases KUI's HTML5 &lt;audio&gt; and &lt;video&gt; element support via
+    pluggable DLL architecture. Media playback requires <b>kui_media_audio.dll</b> and/or
+    <b>kui_media_video.dll</b> in the executable directory.
+</div>
+
+<!-- ===================================================================== -->
+<!-- 1. DLL Status -->
+<!-- ===================================================================== -->
+
+<h3>1. Plugin Status</h3>
+<div class="section">
+    <div class="row">
+        <div class="media-card">
+            <h4>Audio Plugin</h4>
+            <div id="audio-status">
+                <span class="badge badge-info">Checking...</span>
+            </div>
+        </div>
+        <div class="media-card">
+            <h4>Video Plugin</h4>
+            <div id="video-status">
+                <span class="badge badge-info">Checking...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 2. Audio Element Demo -->
+<!-- ===================================================================== -->
+
+<h3>2. Audio Element</h3>
+<div class="section">
+    <div class="row">
+        <div class="media-card">
+            <h4>Audio Player</h4>
+            <audio id="audio1"></audio>
+
+            <div style="display:flex; gap:8px; align-items:center;">
+                <label style="font-size:11px; color:#94a3b8;">Source:</label>
+                <input type="text" id="audio-src" value="test_audio.mp3" style="flex:1;" />
+                <button id="audio-load-btn">Load</button>
+            </div>
+
+            <div class="controls">
+                <button class="primary" id="audio-play-btn">Play</button>
+                <button id="audio-pause-btn">Pause</button>
+                <button id="audio-stop-btn">Stop</button>
+                <button id="audio-loop-btn">Loop: OFF</button>
+                <button id="audio-mute-btn">Mute: OFF</button>
+            </div>
+
+            <div class="slider-row">
+                <label>Volume</label>
+                <input type="range" id="audio-vol" min="0" max="100" value="100" />
+                <span id="audio-vol-val">100%</span>
+            </div>
+
+            <div class="slider-row">
+                <label>Seek</label>
+                <input type="range" id="audio-seek" min="0" max="100" value="0" />
+                <span id="audio-seek-val">0.0s</span>
+            </div>
+
+            <div class="status" id="audio-info">
+                readyState: 0 | networkState: 0 | paused: true | duration: 0
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 3. Video Element Demo -->
+<!-- ===================================================================== -->
+
+<h3>3. Video Element</h3>
+<div class="section">
+    <div class="row">
+        <div class="media-card">
+            <h4>Video Player</h4>
+            <video id="video1" width="480" height="270" controls style="background:#000; border-radius:6px;"></video>
+
+            <div style="display:flex; gap:8px; align-items:center; margin-top:10px;">
+                <label style="font-size:11px; color:#94a3b8;">Source:</label>
+                <input type="text" id="video-src" value="test_video.mp4" style="flex:1;" />
+                <button id="video-load-btn">Load</button>
+            </div>
+
+            <div class="controls">
+                <button class="primary" id="video-play-btn">Play</button>
+                <button id="video-pause-btn">Pause</button>
+                <button id="video-stop-btn">Stop</button>
+                <button id="video-loop-btn">Loop: OFF</button>
+                <button id="video-mute-btn">Mute: OFF</button>
+            </div>
+
+            <div class="slider-row">
+                <label>Volume</label>
+                <input type="range" id="video-vol" min="0" max="100" value="100" />
+                <span id="video-vol-val">100%</span>
+            </div>
+
+            <div class="slider-row">
+                <label>Seek</label>
+                <input type="range" id="video-seek" min="0" max="100" value="0" />
+                <span id="video-seek-val">0.0s</span>
+            </div>
+
+            <div class="status" id="video-info">
+                readyState: 0 | networkState: 0 | paused: true | 0x0 | duration: 0
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 4. Lua Scripting API Demo -->
+<!-- ===================================================================== -->
+
+<h3>4. Lua Scripting API</h3>
+<div class="section">
+    <div class="note">
+        Demonstrates media element control via Lua scripting bindings.
+        All properties (src, volume, muted, loop, autoplay, currentTime, etc.)
+        are accessible from Lua.
+    </div>
+
+    <div class="row">
+        <div class="media-card">
+            <h4>Dynamic Audio Creation</h4>
+            <button id="lua-create-audio">Create &amp; Configure Audio via Lua</button>
+            <div class="status" id="lua-audio-result">Click button to test</div>
+        </div>
+        <div class="media-card">
+            <h4>Dynamic Video Creation</h4>
+            <button id="lua-create-video">Create &amp; Configure Video via Lua</button>
+            <div class="status" id="lua-video-result">Click button to test</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 5. Property Inspector -->
+<!-- ===================================================================== -->
+
+<h3>5. Property Inspector</h3>
+<div class="section">
+    <div class="row">
+        <div class="media-card" style="flex:1;">
+            <h4>Audio Properties</h4>
+            <div class="prop-grid" id="audio-props">
+                <div class="prop-item"><span class="prop-key">tagName:</span> <span class="prop-val" id="ap-tag">—</span></div>
+                <div class="prop-item"><span class="prop-key">src:</span> <span class="prop-val" id="ap-src">—</span></div>
+                <div class="prop-item"><span class="prop-key">volume:</span> <span class="prop-val" id="ap-vol">—</span></div>
+                <div class="prop-item"><span class="prop-key">muted:</span> <span class="prop-val" id="ap-muted">—</span></div>
+                <div class="prop-item"><span class="prop-key">paused:</span> <span class="prop-val" id="ap-paused">—</span></div>
+                <div class="prop-item"><span class="prop-key">ended:</span> <span class="prop-val" id="ap-ended">—</span></div>
+                <div class="prop-item"><span class="prop-key">loop:</span> <span class="prop-val" id="ap-loop">—</span></div>
+                <div class="prop-item"><span class="prop-key">autoplay:</span> <span class="prop-val" id="ap-auto">—</span></div>
+                <div class="prop-item"><span class="prop-key">readyState:</span> <span class="prop-val" id="ap-ready">—</span></div>
+                <div class="prop-item"><span class="prop-key">networkState:</span> <span class="prop-val" id="ap-net">—</span></div>
+                <div class="prop-item"><span class="prop-key">currentTime:</span> <span class="prop-val" id="ap-time">—</span></div>
+                <div class="prop-item"><span class="prop-key">duration:</span> <span class="prop-val" id="ap-dur">—</span></div>
+            </div>
+        </div>
+        <div class="media-card" style="flex:1;">
+            <h4>Video Properties</h4>
+            <div class="prop-grid" id="video-props">
+                <div class="prop-item"><span class="prop-key">tagName:</span> <span class="prop-val" id="vp-tag">—</span></div>
+                <div class="prop-item"><span class="prop-key">src:</span> <span class="prop-val" id="vp-src">—</span></div>
+                <div class="prop-item"><span class="prop-key">volume:</span> <span class="prop-val" id="vp-vol">—</span></div>
+                <div class="prop-item"><span class="prop-key">muted:</span> <span class="prop-val" id="vp-muted">—</span></div>
+                <div class="prop-item"><span class="prop-key">paused:</span> <span class="prop-val" id="vp-paused">—</span></div>
+                <div class="prop-item"><span class="prop-key">ended:</span> <span class="prop-val" id="vp-ended">—</span></div>
+                <div class="prop-item"><span class="prop-key">loop:</span> <span class="prop-val" id="vp-loop">—</span></div>
+                <div class="prop-item"><span class="prop-key">videoWidth:</span> <span class="prop-val" id="vp-vw">—</span></div>
+                <div class="prop-item"><span class="prop-key">videoHeight:</span> <span class="prop-val" id="vp-vh">—</span></div>
+                <div class="prop-item"><span class="prop-key">mediaWidth:</span> <span class="prop-val" id="vp-mw">—</span></div>
+                <div class="prop-item"><span class="prop-key">mediaHeight:</span> <span class="prop-val" id="vp-mh">—</span></div>
+                <div class="prop-item"><span class="prop-key">poster:</span> <span class="prop-val" id="vp-poster">—</span></div>
+                <div class="prop-item"><span class="prop-key">readyState:</span> <span class="prop-val" id="vp-ready">—</span></div>
+                <div class="prop-item"><span class="prop-key">currentTime:</span> <span class="prop-val" id="vp-time">—</span></div>
+                <div class="prop-item"><span class="prop-key">duration:</span> <span class="prop-val" id="vp-dur">—</span></div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:10px;">
+        <button id="refresh-props">Refresh Properties</button>
+    </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- 6. Non-Media Element Safety Test -->
+<!-- ===================================================================== -->
+
+<h3>6. Non-Media Element Safety</h3>
+<div class="section">
+    <div class="note">
+        Media properties on non-media elements return safe defaults (no errors).
+        This verifies the dynamic_cast safety layer in lua_media_bindings.
+    </div>
+    <button id="test-safety">Run Safety Test</button>
+    <div class="status" id="safety-result">Click to test non-media element media API access</div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- Lua Script -->
+<!-- ===================================================================== -->
+<script type="text/lua">
+-- =========================================================================
+-- Media Elements Demo — Lua Controller
+-- =========================================================================
+
+local audio1 = document:getElementById("audio1")
+local video1 = document:getElementById("video1")
+
+-- ----- Plugin Status -----
+local function updatePluginStatus()
+    local audioStatus = document:getElementById("audio-status")
+    local videoStatus = document:getElementById("video-status")
+
+    -- Check by trying to access media properties
+    if audio1 then
+        local tag = audio1.tagName
+        if tag == "audio" then
+            audioStatus.innerHTML = '<span class="badge badge-ok">kui_media_audio.dll loaded (or element created)</span>'
+        else
+            audioStatus.innerHTML = '<span class="badge badge-no">Element not found</span>'
+        end
+    end
+
+    if video1 then
+        local tag = video1.tagName
+        if tag == "video" then
+            videoStatus.innerHTML = '<span class="badge badge-ok">kui_media_video.dll loaded (or element created)</span>'
+        else
+            videoStatus.innerHTML = '<span class="badge badge-no">Element not found</span>'
+        end
+    end
+end
+updatePluginStatus()
+
+-- ----- Audio Controls -----
+local audioLoadBtn = document:getElementById("audio-load-btn")
+local audioPlayBtn = document:getElementById("audio-play-btn")
+local audioPauseBtn = document:getElementById("audio-pause-btn")
+local audioStopBtn = document:getElementById("audio-stop-btn")
+local audioLoopBtn = document:getElementById("audio-loop-btn")
+local audioMuteBtn = document:getElementById("audio-mute-btn")
+local audioVolSlider = document:getElementById("audio-vol")
+local audioSeekSlider = document:getElementById("audio-seek")
+local audioInfo = document:getElementById("audio-info")
+
+if audioLoadBtn then
+    audioLoadBtn:addEventListener("click", function()
+        local srcInput = document:getElementById("audio-src")
+        if srcInput and audio1 then
+            audio1.src = srcInput.value
+            audioInfo.textContent = "Loading: " .. audio1.src
+        end
+    end)
+end
+
+if audioPlayBtn then
+    audioPlayBtn:addEventListener("click", function()
+        if audio1 then audio1:play() end
+    end)
+end
+
+if audioPauseBtn then
+    audioPauseBtn:addEventListener("click", function()
+        if audio1 then audio1:pause() end
+    end)
+end
+
+if audioStopBtn then
+    audioStopBtn:addEventListener("click", function()
+        if audio1 then
+            audio1:pause()
+            audio1.currentTime = 0
+        end
+    end)
+end
+
+if audioLoopBtn then
+    audioLoopBtn:addEventListener("click", function()
+        if audio1 then
+            audio1.loop = not audio1.loop
+            audioLoopBtn.textContent = "Loop: " .. (audio1.loop and "ON" or "OFF")
+        end
+    end)
+end
+
+if audioMuteBtn then
+    audioMuteBtn:addEventListener("click", function()
+        if audio1 then
+            audio1.muted = not audio1.muted
+            audioMuteBtn.textContent = "Mute: " .. (audio1.muted and "ON" or "OFF")
+        end
+    end)
+end
+
+-- Audio volume slider
+if audioVolSlider then
+    audioVolSlider:addEventListener("input", function()
+        if audio1 then
+            local val = tonumber(audioVolSlider.value) or 100
+            audio1.volume = val / 100.0
+            local label = document:getElementById("audio-vol-val")
+            if label then label.textContent = tostring(math.floor(val)) .. "%" end
+        end
+    end)
+end
+
+-- Audio seek slider
+if audioSeekSlider then
+    audioSeekSlider:addEventListener("input", function()
+        if audio1 then
+            local pct = tonumber(audioSeekSlider.value) or 0
+            local dur = audio1.duration
+            if dur > 0 then
+                audio1.currentTime = (pct / 100.0) * dur
+            end
+            local label = document:getElementById("audio-seek-val")
+            if label then label.textContent = string.format("%.1fs", audio1.currentTime) end
+        end
+    end)
+end
+
+-- ----- Video Controls -----
+local videoLoadBtn = document:getElementById("video-load-btn")
+local videoPlayBtn = document:getElementById("video-play-btn")
+local videoPauseBtn = document:getElementById("video-pause-btn")
+local videoStopBtn = document:getElementById("video-stop-btn")
+local videoLoopBtn = document:getElementById("video-loop-btn")
+local videoMuteBtn = document:getElementById("video-mute-btn")
+local videoInfo = document:getElementById("video-info")
+
+if videoLoadBtn then
+    videoLoadBtn:addEventListener("click", function()
+        local srcInput = document:getElementById("video-src")
+        if srcInput and video1 then
+            video1.src = srcInput.value
+            videoInfo.textContent = "Loading: " .. video1.src
+        end
+    end)
+end
+
+if videoPlayBtn then
+    videoPlayBtn:addEventListener("click", function()
+        if video1 then video1:play() end
+    end)
+end
+
+if videoPauseBtn then
+    videoPauseBtn:addEventListener("click", function()
+        if video1 then video1:pause() end
+    end)
+end
+
+if videoStopBtn then
+    videoStopBtn:addEventListener("click", function()
+        if video1 then
+            video1:pause()
+            video1.currentTime = 0
+        end
+    end)
+end
+
+if videoLoopBtn then
+    videoLoopBtn:addEventListener("click", function()
+        if video1 then
+            video1.loop = not video1.loop
+            videoLoopBtn.textContent = "Loop: " .. (video1.loop and "ON" or "OFF")
+        end
+    end)
+end
+
+if videoMuteBtn then
+    videoMuteBtn:addEventListener("click", function()
+        if video1 then
+            video1.muted = not video1.muted
+            videoMuteBtn.textContent = "Mute: " .. (video1.muted and "ON" or "OFF")
+        end
+    end)
+end
+
+-- Video volume slider
+local videoVolSlider = document:getElementById("video-vol")
+if videoVolSlider then
+    videoVolSlider:addEventListener("input", function()
+        if video1 then
+            local val = tonumber(videoVolSlider.value) or 100
+            video1.volume = val / 100.0
+            local label = document:getElementById("video-vol-val")
+            if label then label.textContent = tostring(math.floor(val)) .. "%" end
+        end
+    end)
+end
+
+-- Sync input range when native controls change volume
+if video1 then
+    video1:addEventListener("volumechange", function()
+        if videoVolSlider then
+            local pct = math.floor(video1.volume * 100 + 0.5)
+            videoVolSlider.value = tostring(pct)
+            local label = document:getElementById("video-vol-val")
+            if label then label.textContent = tostring(pct) .. "%" end
+        end
+        -- Sync mute button text
+        local muteBtn = document:getElementById("video-mute-btn")
+        if muteBtn then
+            muteBtn.textContent = "Mute: " .. (video1.muted and "ON" or "OFF")
+        end
+    end)
+end
+
+-- Video seek slider
+local videoSeekSlider = document:getElementById("video-seek")
+local videoSeeking = false
+if videoSeekSlider then
+    videoSeekSlider:addEventListener("input", function()
+        if video1 then
+            videoSeeking = true
+            local pct = tonumber(videoSeekSlider.value) or 0
+            local dur = video1.duration
+            if dur > 0 then
+                video1.currentTime = (pct / 100.0) * dur
+            end
+            local label = document:getElementById("video-seek-val")
+            if label then label.textContent = string.format("%.1fs", video1.currentTime) end
+            videoSeeking = false
+        end
+    end)
+end
+
+-- ----- Lua Dynamic Creation -----
+local luaCreateAudio = document:getElementById("lua-create-audio")
+local luaCreateVideo = document:getElementById("lua-create-video")
+
+if luaCreateAudio then
+    luaCreateAudio:addEventListener("click", function()
+        local result = document:getElementById("lua-audio-result")
+        local a = document:createElement("audio")
+        a.src = "dynamic_audio.ogg"
+        a.volume = 0.7
+        a.loop = true
+        a.muted = false
+        a.autoplay = false
+
+        local info = "Created <audio>: "
+            .. "src=" .. a.src
+            .. " vol=" .. string.format("%.1f", a.volume)
+            .. " loop=" .. tostring(a.loop)
+            .. " muted=" .. tostring(a.muted)
+            .. " paused=" .. tostring(a.paused)
+            .. " autoplay=" .. tostring(a.autoplay)
+        if result then result.textContent = info end
+    end)
+end
+
+if luaCreateVideo then
+    luaCreateVideo:addEventListener("click", function()
+        local result = document:getElementById("lua-video-result")
+        local v = document:createElement("video")
+        v.src = "dynamic_video.webm"
+        v.volume = 0.5
+        v.muted = true
+        v.poster = "poster.jpg"
+        v.mediaWidth = 1280
+        v.mediaHeight = 720
+
+        local info = "Created <video>: "
+            .. "src=" .. v.src
+            .. " vol=" .. string.format("%.1f", v.volume)
+            .. " muted=" .. tostring(v.muted)
+            .. " poster=" .. v.poster
+            .. " size=" .. tostring(v.mediaWidth) .. "x" .. tostring(v.mediaHeight)
+            .. " videoRes=" .. tostring(v.videoWidth) .. "x" .. tostring(v.videoHeight)
+        if result then result.textContent = info end
+    end)
+end
+
+-- ----- Property Inspector -----
+local refreshBtn = document:getElementById("refresh-props")
+local function refreshProperties()
+    if audio1 then
+        local function setText(id, val)
+            local el = document:getElementById(id)
+            if el then el.textContent = tostring(val) end
+        end
+        setText("ap-tag", audio1.tagName)
+        setText("ap-src", audio1.src)
+        setText("ap-vol", string.format("%.2f", audio1.volume))
+        setText("ap-muted", tostring(audio1.muted))
+        setText("ap-paused", tostring(audio1.paused))
+        setText("ap-ended", tostring(audio1.ended))
+        setText("ap-loop", tostring(audio1.loop))
+        setText("ap-auto", tostring(audio1.autoplay))
+        setText("ap-ready", tostring(audio1.readyState))
+        setText("ap-net", tostring(audio1.networkState))
+        setText("ap-time", string.format("%.2f", audio1.currentTime))
+        setText("ap-dur", string.format("%.2f", audio1.duration))
+    end
+
+    if video1 then
+        local function setText(id, val)
+            local el = document:getElementById(id)
+            if el then el.textContent = tostring(val) end
+        end
+        setText("vp-tag", video1.tagName)
+        setText("vp-src", video1.src)
+        setText("vp-vol", string.format("%.2f", video1.volume))
+        setText("vp-muted", tostring(video1.muted))
+        setText("vp-paused", tostring(video1.paused))
+        setText("vp-ended", tostring(video1.ended))
+        setText("vp-loop", tostring(video1.loop))
+        setText("vp-vw", tostring(video1.videoWidth))
+        setText("vp-vh", tostring(video1.videoHeight))
+        setText("vp-mw", tostring(video1.mediaWidth))
+        setText("vp-mh", tostring(video1.mediaHeight))
+        setText("vp-poster", video1.poster)
+        setText("vp-ready", tostring(video1.readyState))
+        setText("vp-time", string.format("%.2f", video1.currentTime))
+        setText("vp-dur", string.format("%.2f", video1.duration))
+    end
+end
+
+if refreshBtn then
+    refreshBtn:addEventListener("click", function()
+        refreshProperties()
+    end)
+end
+-- Initial refresh
+refreshProperties()
+
+-- ----- Safety Test -----
+local safetyBtn = document:getElementById("test-safety")
+if safetyBtn then
+    safetyBtn:addEventListener("click", function()
+        local result = document:getElementById("safety-result")
+        local div = document:createElement("div")
+        local passed = true
+        local log = ""
+
+        -- Test media properties on non-media element
+        local src = div.src
+        if src ~= "" then passed = false; log = log .. "FAIL:src " end
+
+        local vol = div.volume
+        if vol ~= 1.0 then passed = false; log = log .. "FAIL:volume " end
+
+        local p = div.paused
+        if p ~= true then passed = false; log = log .. "FAIL:paused " end
+
+        local e = div.ended
+        if e ~= false then passed = false; log = log .. "FAIL:ended " end
+
+        local vw = div.videoWidth
+        if vw ~= 0 then passed = false; log = log .. "FAIL:videoWidth " end
+
+        -- Test play/pause on non-media (should not error)
+        div:play()
+        div:pause()
+        div:mediaLoad()
+
+        if passed then
+            log = "ALL PASSED: src='', volume=1.0, paused=true, ended=false, videoWidth=0, play/pause/load=no-op"
+        end
+
+        if result then
+            result.textContent = (passed and "[OK] " or "[FAIL] ") .. log
+        end
+    end)
+end
+
+-- ----- Periodic Status Update -----
+local function updateAudioStatus()
+    if audio1 and audioInfo then
+        audioInfo.textContent = "readyState: " .. tostring(audio1.readyState)
+            .. " | networkState: " .. tostring(audio1.networkState)
+            .. " | paused: " .. tostring(audio1.paused)
+            .. " | time: " .. string.format("%.1f", audio1.currentTime)
+            .. " / " .. string.format("%.1f", audio1.duration)
+    end
+    -- Sync audio seek slider with current playback position
+    if audio1 and audioSeekSlider then
+        local dur = audio1.duration
+        if dur > 0 then
+            local pct = (audio1.currentTime / dur) * 100
+            audioSeekSlider.value = tostring(math.floor(pct))
+            local label = document:getElementById("audio-seek-val")
+            if label then label.textContent = string.format("%.1fs", audio1.currentTime) end
+        end
+    end
+end
+
+local function updateVideoStatus()
+    if video1 and videoInfo then
+        videoInfo.textContent = "readyState: " .. tostring(video1.readyState)
+            .. " | paused: " .. tostring(video1.paused)
+            .. " | " .. tostring(video1.videoWidth) .. "x" .. tostring(video1.videoHeight)
+            .. " | time: " .. string.format("%.1f", video1.currentTime)
+            .. " / " .. string.format("%.1f", video1.duration)
+    end
+    -- Sync seek slider with current playback position
+    if video1 and videoSeekSlider and not videoSeeking then
+        local dur = video1.duration
+        if dur > 0 then
+            local pct = (video1.currentTime / dur) * 100
+            videoSeekSlider.value = tostring(math.floor(pct))
+            local label = document:getElementById("video-seek-val")
+            if label then label.textContent = string.format("%.1fs", video1.currentTime) end
+        end
+    end
+end
+
+-- Update status every 500ms
+setInterval(function()
+    updateAudioStatus()
+    updateVideoStatus()
+end, 500)
+</script>
+
+</body>
+</html>

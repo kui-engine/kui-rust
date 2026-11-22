@@ -1,0 +1,29 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:16px;font-family:"Segoe UI",sans-serif;background:#f1f5f9}
+h2{color:#1e293b;margin-bottom:12px;font-size:18px}
+h3{color:#475569;font-size:13px;margin-bottom:8px}
+.s{background:white;padding:16px;border-radius:8px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.row{display:flex;gap:8px;margin-bottom:12px}
+.box{padding:12px 16px;border-radius:6px;color:white;font-size:12px;font-weight:600;text-align:center}
+.b1{background:#3b82f6}.b2{background:#10b981}.b3{background:#f59e0b}.b4{background:#ef4444}.b5{background:#8b5cf6}
+.jc-start{justify-content:flex-start}.jc-center{justify-content:center}.jc-between{justify-content:space-between}.jc-evenly{justify-content:space-evenly}
+.ai-stretch{align-items:stretch;min-height:80px}.ai-center{align-items:center;min-height:80px}
+.wrap-demo{display:flex;flex-wrap:wrap;gap:8px}.wrap-demo .box{width:120px}
+.grow-demo{display:flex;gap:8px}.grow-demo .g1{flex:1}.grow-demo .g2{flex:2}.grow-demo .g3{flex:1}
+.col{display:flex;flex-direction:column;gap:8px}
+.label{font-size:11px;color:#94a3b8;margin-bottom:4px}
+</style></head><body>
+<h2>Flexbox Layout</h2>
+<div class="s"><h3>justify-content</h3>
+<div class="label">flex-start</div><div class="row jc-start"><div class="box b1">A</div><div class="box b2">B</div><div class="box b3">C</div></div>
+<div class="label">center</div><div class="row jc-center"><div class="box b1">A</div><div class="box b2">B</div><div class="box b3">C</div></div>
+<div class="label">space-between</div><div class="row jc-between"><div class="box b1">A</div><div class="box b2">B</div><div class="box b3">C</div></div>
+<div class="label">space-evenly</div><div class="row jc-evenly"><div class="box b1">A</div><div class="box b2">B</div><div class="box b3">C</div></div></div>
+<div class="s"><h3>align-items</h3>
+<div class="row ai-stretch" style="background:#f1f5f9;border-radius:6px;padding:8px"><div class="box b1">stretch</div><div class="box b2" style="height:40px">short</div><div class="box b3" style="height:60px">tall</div></div>
+<div class="row ai-center" style="background:#f1f5f9;border-radius:6px;padding:8px;margin-top:8px"><div class="box b4">center</div><div class="box b5" style="height:40px">short</div><div class="box b1" style="height:60px">tall</div></div></div>
+<div class="s"><h3>flex-grow</h3><div class="grow-demo"><div class="box b1 g1">flex:1</div><div class="box b2 g2">flex:2</div><div class="box b3 g3">flex:1</div></div></div>
+<div class="s"><h3>flex-wrap</h3><div class="wrap-demo"><div class="box b1">Item 1</div><div class="box b2">Item 2</div><div class="box b3">Item 3</div><div class="box b4">Item 4</div><div class="box b5">Item 5</div><div class="box b1">Item 6</div></div></div>
+<div class="s"><h3>flex-direction: column</h3><div class="col" style="height:120px"><div class="box b1" style="flex:1">Top</div><div class="box b2" style="flex:2">Center (2x)</div><div class="box b3" style="flex:1">Bottom</div></div></div>
+</body></html>

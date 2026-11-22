@@ -1,0 +1,44 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",sans-serif;background:#0f172a;color:#f8fafc;height:100vh;display:flex;flex-direction:column}
+.hdr{padding:16px 24px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:16px}
+.hdr h2{font-size:18px;font-weight:700}.hdr .badge{padding:4px 12px;border-radius:12px;font-size:12px;background:#1e293b;color:#94a3b8}
+.board{flex:1;display:flex;gap:16px;padding:20px;overflow-x:auto}
+.column{min-width:260px;flex:1;display:flex;flex-direction:column}
+.col-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:0 4px}
+.col-hdr h3{font-size:14px;font-weight:600}.col-hdr .cnt{font-size:12px;color:#64748b;background:#1e293b;padding:2px 8px;border-radius:10px}
+.col-hdr .dot{width:8px;height:8px;border-radius:50%}
+.cards{flex:1;display:flex;flex-direction:column;gap:8px}
+.task{background:#1e293b;border-radius:10px;padding:14px;cursor:pointer}
+.task:hover{background:#243047}
+.task h4{font-size:13px;font-weight:600;margin-bottom:6px}
+.task p{font-size:12px;color:#64748b;line-height:1.4;margin-bottom:8px}
+.task-meta{display:flex;align-items:center;gap:8px}
+.tag{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600}
+.t-feat{background:rgba(59,130,246,.15);color:#60a5fa}.t-bug{background:rgba(239,68,68,.15);color:#f87171}.t-docs{background:rgba(16,185,129,.15);color:#34d399}
+.priority{font-size:10px;color:#64748b;margin-left:auto}
+</style></head><body>
+<div class="hdr"><h2>Kanban Board</h2><div class="badge">Sprint 12</div></div>
+<div class="board">
+<div class="column"><div class="col-hdr"><div class="dot" style="background:#94a3b8"></div><h3>Todo</h3><span class="cnt">3</span></div>
+<div class="cards">
+<div class="task"><h4>Implement CSS grid auto-flow</h4><p>Add dense packing algorithm for grid layout.</p><div class="task-meta"><span class="tag t-feat">Feature</span><span class="priority">High</span></div></div>
+<div class="task"><h4>Update API documentation</h4><p>Document new Platform methods and examples.</p><div class="task-meta"><span class="tag t-docs">Docs</span><span class="priority">Medium</span></div></div>
+<div class="task"><h4>Fix scrollbar overlap</h4><p>Scrollbar overlaps content in overflow containers.</p><div class="task-meta"><span class="tag t-bug">Bug</span><span class="priority">High</span></div></div>
+</div></div>
+<div class="column"><div class="col-hdr"><div class="dot" style="background:#3b82f6"></div><h3>In Progress</h3><span class="cnt">2</span></div>
+<div class="cards">
+<div class="task"><h4>Add backdrop-filter support</h4><p>Implement CSS backdrop-filter with Skia.</p><div class="task-meta"><span class="tag t-feat">Feature</span><span class="priority">High</span></div></div>
+<div class="task"><h4>Optimize paint invalidation</h4><p>Reduce unnecessary repaints on DOM changes.</p><div class="task-meta"><span class="tag t-feat">Feature</span><span class="priority">Medium</span></div></div>
+</div></div>
+<div class="column"><div class="col-hdr"><div class="dot" style="background:#f59e0b"></div><h3>Review</h3><span class="cnt">1</span></div>
+<div class="cards">
+<div class="task"><h4>Multi-column layout engine</h4><p>CSS multi-column with column-span support.</p><div class="task-meta"><span class="tag t-feat">Feature</span><span class="priority">Medium</span></div></div>
+</div></div>
+<div class="column"><div class="col-hdr"><div class="dot" style="background:#10b981"></div><h3>Done</h3><span class="cnt">2</span></div>
+<div class="cards">
+<div class="task"><h4>Flexbox gap property</h4><p>Added row-gap and column-gap support.</p><div class="task-meta"><span class="tag t-feat">Feature</span><span class="priority">High</span></div></div>
+<div class="task"><h4>Fix margin collapse bug</h4><p>Adjacent margins now collapse correctly.</p><div class="task-meta"><span class="tag t-bug">Bug</span><span class="priority">High</span></div></div>
+</div></div>
+</div>
+</body></html>

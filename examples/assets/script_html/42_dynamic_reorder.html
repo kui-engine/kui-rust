@@ -1,0 +1,54 @@
+<html><body>
+<div id="container">
+  <div id="a">A</div>
+  <div id="b">B</div>
+  <div id="c">C</div>
+</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test children traversal and dynamic element creation
+local container = document:getElementById("container")
+local ok = true
+local detail = ""
+
+-- Verify initial children (1-indexed Lua table)
+local ch = container:children()
+ok = ok and (#ch == 3)
+ok = ok and (ch[1].id == "a")
+ok = ok and (ch[2].id == "b")
+ok = ok and (ch[3].id == "c")
+detail = detail .. "initial=" .. ch[1].id .. ch[2].id .. ch[3].id .. "; "
+
+-- Add a new child via createElement + appendChild
+local d = document:createElement("div")
+d:setAttribute("id", "d")
+d.textContent = "D"
+container:appendChild(d)
+
+-- Verify 4 children now
+ch = container:children()
+ok = ok and (#ch == 4)
+ok = ok and (ch[4].id == "d")
+detail = detail .. "after_add=" .. tostring(#ch) .. "; "
+
+-- Insert before first child
+local e = document:createElement("div")
+e:setAttribute("id", "e")
+e.textContent = "E"
+local a = document:getElementById("a")
+container:insertBefore(e, a)
+
+-- Verify order: E A B C D
+ch = container:children()
+ok = ok and (#ch == 5)
+ok = ok and (ch[1].id == "e")
+ok = ok and (ch[2].id == "a")
+detail = detail .. "first=" .. ch[1].id .. "; count=" .. tostring(#ch)
+
+local r = document:getElementById("result")
+local dt = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+dt.textContent = detail
+</script>
+</body></html>

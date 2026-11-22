@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CSS Cascade Priority Test</title>
+<style>
+/* Low specificity — should be overridden */
+div { color: red; font-size: 12px; background-color: yellow; }
+
+/* Higher specificity */
+.box { color: blue; font-size: 16px; }
+
+/* Even higher specificity */
+#main { color: green; }
+</style>
+</head>
+<body style="background-color:#1a1a2e; padding:20px;">
+
+<!-- #main matches: div(red,12px,yellow) < .box(blue,16px) < #main(green)
+     Final: color=green, font-size=16px, background-color=yellow -->
+<div id="main" class="box" style="padding:10px; border-radius:6px;">
+  CSS Cascade Test Element
+</div>
+
+<div class="box" style="margin-top:16px; color:purple; padding:8px;">
+  Another element — color: .box(blue) overridden by inline(purple)
+</div>
+
+</body>
+</html>

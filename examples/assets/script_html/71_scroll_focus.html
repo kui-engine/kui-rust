@@ -1,0 +1,46 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="container" style="width:100px;height:100px;overflow:auto">
+    <div id="tall" style="width:200px;height:500px">content</div>
+</div>
+<input id="inp" type="text" value="test" />
+<div id="detail"></div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local container = document:getElementById("container")
+
+-- scrollTop / scrollLeft read (initially 0)
+if container.scrollTop ~= 0 then ok = false; msg = msg .. "scrollTop=" .. tostring(container.scrollTop) .. "; " end
+if container.scrollLeft ~= 0 then ok = false; msg = msg .. "scrollLeft=" .. tostring(container.scrollLeft) .. "; " end
+
+-- scrollWidth / scrollHeight (may be 0 in headless mode without layout)
+-- Just verify they are numbers and don't crash
+if type(container.scrollWidth) ~= "number" then ok = false; msg = msg .. "scrollWidth not number; " end
+if type(container.scrollHeight) ~= "number" then ok = false; msg = msg .. "scrollHeight not number; " end
+
+-- clientTop / clientLeft (border widths, typically 0)
+if container.clientTop < 0 then ok = false; msg = msg .. "clientTop<0; " end
+if container.clientLeft < 0 then ok = false; msg = msg .. "clientLeft<0; " end
+
+-- offsetParent — just check it doesn't crash
+local tall = document:getElementById("tall")
+local op = tall.offsetParent
+
+-- focus / blur / hasFocus — in headless mode focus may not propagate
+-- Just verify the methods exist and don't crash
+local inp = document:getElementById("inp")
+inp:focus()
+inp:blur()
+local hf = inp:hasFocus()
+if type(hf) ~= "boolean" then ok = false; msg = msg .. "hasFocus not bool; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

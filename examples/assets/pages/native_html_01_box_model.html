@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 20px; font-family: "Segoe UI", sans-serif; background: #f0f4f8; }
+h2 { margin-bottom: 16px; color: #1e293b; }
+.demo-row { display: flex; gap: 20px; margin-bottom: 20px; }
+.box { width: 150px; height: 100px; background: #3b82f6; color: white;
+       display: flex; align-items: center; justify-content: center;
+       font-size: 13px; text-align: center; border-radius: 8px; }
+.margin-box { margin: 20px; background: #ef4444; }
+.padding-box { padding: 30px; background: #10b981; }
+.border-box { border: 5px solid #f59e0b; background: #8b5cf6; }
+.content-box { box-sizing: content-box; width: 150px; padding: 20px;
+               border: 3px solid #ec4899; background: #06b6d4; }
+.info { background: white; padding: 16px; border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 16px; color: #475569; }
+</style></head><body>
+<h2>Box Model Demo</h2>
+<div class="info">Demonstrates margin, padding, border, and box-sizing properties.</div>
+<div class="demo-row">
+  <div class="box margin-box">margin: 20px</div>
+  <div class="box padding-box">padding: 30px</div>
+  <div class="box border-box">border: 5px</div>
+  <div class="box content-box">content-box</div>
+</div>
+<div class="demo-row">
+  <div style="background:#e2e8f0;padding:10px;border-radius:8px;">
+    <div class="box" style="margin:10px 20px 30px 40px;">Asymmetric<br>margins</div>
+  </div>
+  <div class="box" style="border:3px dashed #f97316;border-radius:16px;">Dashed border</div>
+  <div class="box" style="border-top:4px solid red;border-bottom:4px solid blue;">Mixed borders</div>
+</div>
+</body></html>

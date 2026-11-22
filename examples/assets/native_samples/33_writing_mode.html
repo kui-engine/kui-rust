@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; text-align: center; }
+    .code { background: #0f172a; padding: 10px 14px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #10b981; margin-bottom: 12px; }
+    .row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+
+    .wm-box {
+        padding: 16px;
+        background: #334155;
+        border-radius: 8px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+</style>
+</head>
+<body>
+    <h2>writing-mode</h2>
+
+    <h3>horizontal-tb (default)</h3>
+    <div class="section">
+        <div class="code">writing-mode: horizontal-tb;</div>
+        <div class="wm-box" style="writing-mode: horizontal-tb; width: 100%;">
+            This is the default writing mode. Text flows horizontally from left to right,
+            and blocks stack from top to bottom. Used by most Latin-based languages.
+        </div>
+    </div>
+
+    <h3>vertical-rl (East Asian traditional)</h3>
+    <div class="section">
+        <div class="code">writing-mode: vertical-rl;</div>
+        <div class="row">
+            <div class="wm-box" style="writing-mode: vertical-rl; height: 200px;">
+                Vertical text flows from top to bottom, columns from right to left.
+                Traditional CJK layout.
+            </div>
+            <div class="wm-box" style="writing-mode: vertical-rl; height: 200px; font-size: 16px;">
+                KUI Engine
+            </div>
+        </div>
+        <div class="label">Columns progress from right to left</div>
+    </div>
+
+    <h3>vertical-lr</h3>
+    <div class="section">
+        <div class="code">writing-mode: vertical-lr;</div>
+        <div class="row">
+            <div class="wm-box" style="writing-mode: vertical-lr; height: 200px;">
+                Vertical text flows from top to bottom, but columns progress from left to right.
+                Used in Mongolian script.
+            </div>
+            <div class="wm-box" style="writing-mode: vertical-lr; height: 200px; font-size: 16px;">
+                Left to Right
+            </div>
+        </div>
+        <div class="label">Columns progress from left to right</div>
+    </div>
+
+    <h3>Mixed Writing Modes</h3>
+    <div class="section">
+        <div class="code">Combining horizontal and vertical text in one layout</div>
+        <div style="display: flex; gap: 16px; align-items: stretch;">
+            <div style="writing-mode: vertical-rl; background: #3b82f6; color: white; padding: 12px 8px; border-radius: 8px; font-size: 14px; font-weight: bold;">
+                SIDEBAR
+            </div>
+            <div style="flex: 1; background: #334155; border-radius: 8px; padding: 16px;">
+                <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">Main Content Area</div>
+                <div style="font-size: 13px; color: #94a3b8; line-height: 1.6;">
+                    The sidebar text uses vertical-rl writing mode while the main content
+                    uses the default horizontal-tb mode. This creates an interesting layout
+                    combining different text directions.
+                </div>
+            </div>
+            <div style="writing-mode: vertical-lr; background: #8b5cf6; color: white; padding: 12px 8px; border-radius: 8px; font-size: 14px; font-weight: bold;">
+                ASIDE
+            </div>
+        </div>
+    </div>
+
+    <h3>Writing Mode Comparison</h3>
+    <div class="section">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 140px;">
+                <div style="background: #3b82f6; color: white; padding: 10px; border-radius: 6px 6px 0 0; font-size: 11px; font-weight: bold; text-align: center;">horizontal-tb</div>
+                <div style="background: #334155; padding: 12px; border-radius: 0 0 6px 6px; font-size: 12px; writing-mode: horizontal-tb; height: 100px;">
+                    Default flow
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 140px;">
+                <div style="background: #10b981; color: white; padding: 10px; border-radius: 6px 6px 0 0; font-size: 11px; font-weight: bold; text-align: center;">vertical-rl</div>
+                <div style="background: #334155; padding: 12px; border-radius: 0 0 6px 6px; font-size: 12px; writing-mode: vertical-rl; height: 100px;">
+                    Right to Left
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 140px;">
+                <div style="background: #f59e0b; color: white; padding: 10px; border-radius: 6px 6px 0 0; font-size: 11px; font-weight: bold; text-align: center;">vertical-lr</div>
+                <div style="background: #334155; padding: 12px; border-radius: 0 0 6px 6px; font-size: 12px; writing-mode: vertical-lr; height: 100px;">
+                    Left to Right
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

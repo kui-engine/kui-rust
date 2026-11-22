@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — script engine &amp; WebGL</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 16px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 8px; }
+#tour-result { padding: 7px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 10px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 360px 1fr 1fr; gap: 12px; }
+.panel { background: white; border-radius: 10px; padding: 10px 14px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 6px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+button { padding: 5px 10px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 6px 8px;
+       border-radius: 5px; color: #334155; min-height: 26px; margin-bottom: 4px; }
+#gl-canvas { display: block; width: 300px; height: 300px; margin-bottom: 8px; }
+#p-gl { grid-row: span 3; }
+.log-title { margin: 14px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+</style></head><body>
+<h1>KUI API — script engine &amp; WebGL</h1>
+<p class="lead">The host drives the page's Lua through the script engine: globals, calls in both
+directions, function values, limits, print and file loading. The WebGL scene on the left is drawn by
+the page's own Lua; the host changes it only through set_global / call_function.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-gl">
+    <h2>Host-driven WebGL scene</h2>
+    <div class="api">set_global · call_function · register_function</div>
+    <p class="note">Lua renders a rotating quad with WebGL. The buttons change the Lua globals
+      <code>tint</code> / <code>scale</code> and call <code>togglePause()</code>,
+      <code>setSpeed(x)</code>, <code>getFrameCount()</code>; Lua calls the host's
+      <code>host_report(frames, fps)</code> every 15 frames.</p>
+    <canvas id="gl-canvas" width="300" height="300"></canvas>
+    <div class="toolbar">
+      <button id="btn-gl-pause">Pause / resume</button>
+      <button id="btn-gl-speed">Speed ×3</button>
+      <button id="btn-gl-tint">Next tint</button>
+      <button id="btn-gl-scale">Toggle scale</button>
+      <button id="btn-gl-frames">Frame count</button>
+    </div>
+    <div class="out" id="gl-out">—</div>
+    <div class="out" id="gl-report">waiting for host_report…</div>
+    <div class="out" id="gl-state">running</div>
+    <div class="out" id="gl-status">starting…</div>
+  </section>
+
+  <section class="panel" id="p-val">
+    <h2>Values across the boundary</h2>
+    <div class="api">set_global · get_global · function_create · function_call · function_retain ·
+      function_release</div>
+    <p class="note">nil / bool / int / float / string / function values both ways, host functions
+      as Lua values and Lua closures held by the host.</p>
+    <div class="toolbar">
+      <button id="btn-val-roundtrip">Round-trip globals</button>
+      <button id="btn-val-kinds">Lua → host kinds</button>
+      <button id="btn-val-double">Call host_double(21)</button>
+      <button id="btn-val-counter">Lua counter++</button>
+    </div>
+    <div class="out" id="val-out">—</div>
+  </section>
+
+  <section class="panel" id="p-lim">
+    <h2>Errors &amp; limits</h2>
+    <div class="api">get_last_error · set_instruction_limit · set_memory_limit · get_resource_usage</div>
+    <p class="note">A runaway loop under a small instruction limit, an allocation over a small memory
+      limit, a call to a missing function; limits are restored right after.</p>
+    <div class="toolbar">
+      <button id="btn-lim-loop">Loop under 10k limit</button>
+      <button id="btn-lim-mem">Allocate over limit</button>
+      <button id="btn-lim-usage">Resource usage</button>
+      <button id="btn-lim-error">Call missing fn</button>
+    </div>
+    <div class="out" id="lim-out">—</div>
+  </section>
+
+  <section class="panel" id="p-io">
+    <h2>Print, files &amp; document binding</h2>
+    <div class="api">set_print_handler · eval_file · unbind_document · bind_document</div>
+    <p class="note">Lua print() goes to the host handler; a Lua file written by the host is run with
+      eval_file; the engine is unbound from the document and bound again.</p>
+    <div class="toolbar">
+      <button id="btn-io-print">Lua print()</button>
+      <button id="btn-io-file">Run Lua file</button>
+      <button id="btn-io-rebind">Unbind / rebind</button>
+    </div>
+    <div class="out" id="print-out">—</div>
+    <div class="out" id="io-out">—</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+
+<script type="text/lua">
+-- Scene state: plain Lua globals, so the host can read and change them (set_global / get_global).
+speed = 1.0          -- radians per second
+scale = 0.5          -- quad half-size in clip space
+tint = "sky"         -- key into the palette below
+paused = false
+frames = 0           -- frames the animation advanced (not counted while paused)
+report_every = 15
+gl_ready = false
+
+local palette = {
+    sky  = {0.2, 0.6, 1.0},
+    rose = {1.0, 0.2, 0.4},
+    lime = {0.4, 0.8, 0.2},
+}
+
+-- Functions the host calls with call_function / get_global + function_call.
+function setSpeed(x) speed = x; return speed end
+function togglePause() paused = not paused; return paused end
+function getFrameCount() return frames end
+function applyTwice(f, x) return f(f(x)) end
+function makeCounter()
+    local n = 0
+    return function() n = n + 1; return n end
+end
+function luaFails() error("raised in Lua") end
+-- host_kind is registered by the host; it names the kind of value it received.
+function hostKinds()
+    return host_kind(nil) .. "," .. host_kind(true) .. "," .. host_kind(7) .. "," ..
+           host_kind(1.5) .. "," .. host_kind("s") .. "," .. host_kind(function() end)
+end
+
+local canvas = document:getElementById("gl-canvas")
+local status = document:getElementById("gl-status")
+local gl = canvas and canvas:getContext("webgl")
+if not gl then
+    if status then status.textContent = "WebGL not available" end
+    return
+end
+
+local vsSource = [[
+    attribute vec2 aPos;
+    uniform float uAngle;
+    uniform float uScale;
+    void main() {
+        float c = cos(uAngle);
+        float s = sin(uAngle);
+        vec2 p = aPos * uScale;
+        gl_Position = vec4(p.x * c - p.y * s, p.x * s + p.y * c, 0.0, 1.0);
+    }
+]]
+local fsSource = [[
+    precision mediump float;
+    uniform vec3 uColor;
+    void main() { gl_FragColor = vec4(uColor, 1.0); }
+]]
+
+local function compile(kind, source)
+    local shader = gl:createShader(kind)
+    gl:shaderSource(shader, source)
+    gl:compileShader(shader)
+    if gl:getShaderParameter(shader, gl.COMPILE_STATUS) == 0 then
+        status.textContent = "shader error: " .. gl:getShaderInfoLog(shader)
+        return nil
+    end
+    return shader
+end
+
+local vs = compile(gl.VERTEX_SHADER, vsSource)
+local fs = compile(gl.FRAGMENT_SHADER, fsSource)
+if not vs or not fs then return end
+local program = gl:createProgram()
+gl:attachShader(program, vs)
+gl:attachShader(program, fs)
+gl:linkProgram(program)
+if gl:getProgramParameter(program, gl.LINK_STATUS) == 0 then
+    status.textContent = "link error: " .. gl:getProgramInfoLog(program)
+    return
+end
+gl:useProgram(program)
+
+local vbo = gl:createBuffer()
+gl:bindBuffer(gl.ARRAY_BUFFER, vbo)
+gl:bufferDataFloat(gl.ARRAY_BUFFER, { -1,-1, 1,-1, -1,1, -1,1, 1,-1, 1,1 }, gl.STATIC_DRAW)
+local aPos = gl:getAttribLocation(program, "aPos")
+gl:enableVertexAttribArray(aPos)
+gl:vertexAttribPointer(aPos, 2, gl.FLOAT, false, 8, 0)
+local uAngle = gl:getUniformLocation(program, "uAngle")
+local uScale = gl:getUniformLocation(program, "uScale")
+local uColor = gl:getUniformLocation(program, "uColor")
+
+local angle = 0
+local last = nil
+local fpsStart = nil
+local drawn = 0
+
+local function render(now)
+    if last == nil then last = now; fpsStart = now end
+    local dt = (now - last) / 1000
+    last = now
+    if not paused then
+        angle = angle + dt * speed
+        frames = frames + 1
+    end
+    local c = palette[tint] or palette.sky
+    gl:beginFrame()
+    gl:clearColor(0.06, 0.09, 0.16, 1.0)
+    gl:clear(gl.COLOR_BUFFER_BIT)
+    gl:uniform1f(uAngle, angle)
+    gl:uniform1f(uScale, scale)
+    gl:uniform3f(uColor, c[1], c[2], c[3])
+    gl:drawArrays(gl.TRIANGLES, 0, 6)
+    gl:endFrame()
+    drawn = drawn + 1
+    if not paused and frames % report_every == 0 and host_report then
+        host_report(frames, drawn * 1000 / math.max(1, now - fpsStart))
+    end
+    requestAnimationFrame(render)
+end
+
+gl_ready = true
+status.textContent = "WebGL running"
+requestAnimationFrame(render)
+</script>
+</body></html>

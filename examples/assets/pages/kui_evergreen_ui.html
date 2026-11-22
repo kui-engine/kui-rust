@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Evergreen UI — Component Showcase</title>
+<link rel="stylesheet" href="../framework/css/evergreen-tokens.css">
+<link rel="stylesheet" href="../framework/css/evergreen-components.css">
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--eg-gray-75);
+    font-family: var(--eg-font-ui);
+    color: var(--eg-color-text-default);
+  }
+  /* Showcase layout */
+  .showcase-header {
+    background: var(--eg-white);
+    border-bottom: 1px solid var(--eg-color-border-default);
+    padding: 24px 32px;
+  }
+  .showcase-container {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 24px 32px;
+  }
+  .showcase-section {
+    background: var(--eg-white);
+    border-radius: var(--eg-radius-lg);
+    box-shadow: var(--eg-shadow-0);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .showcase-section__title {
+    font-family: var(--eg-font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--eg-color-text-dark);
+    margin: 0 0 4px 0;
+  }
+  .showcase-section__desc {
+    font-size: 12px;
+    color: var(--eg-color-text-muted);
+    margin: 0 0 16px 0;
+  }
+  .showcase-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .showcase-row:last-child { margin-bottom: 0; }
+  .showcase-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--eg-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    min-width: 80px;
+    margin-bottom: 8px;
+  }
+  .showcase-group {
+    margin-bottom: 16px;
+  }
+  .showcase-group:last-child { margin-bottom: 0; }
+  /* Color swatch grid */
+  .color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .color-swatch {
+    width: 56px;
+    height: 40px;
+    border-radius: 4px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 2px;
+    box-shadow: 0 0 1px rgba(0,0,0,0.15);
+  }
+  .color-swatch span {
+    font-size: 8px;
+    color: rgba(0,0,0,0.5);
+  }
+  .color-swatch--light span {
+    color: rgba(0,0,0,0.4);
+  }
+  .color-swatch--dark span {
+    color: rgba(255,255,255,0.7);
+  }
+  /* Spacing demo */
+  .spacing-demo {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .spacing-box {
+    background: var(--eg-blue-100);
+    border: 1px solid var(--eg-blue-300);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--eg-blue-700);
+  }
+  /* Elevation demo */
+  .elevation-demo {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .elevation-box {
+    width: 100px;
+    height: 64px;
+    background: var(--eg-white);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--eg-color-text-muted);
+  }
+  /* Form demo grid */
+  .form-grid {
+    display: flex;
+    gap: 24px;
+  }
+  .form-col {
+    flex: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="showcase-header">
+  <div style="max-width:1024px;margin:0 auto;">
+    <h1 class="eg-heading eg-heading--700" style="color:var(--eg-green-500);margin:0;">
+      Evergreen UI
+    </h1>
+    <p class="eg-text eg-text--400 eg-text--muted" style="margin-top:4px;">
+      Component Showcase — HTML + CSS + Lua on KUI Engine
+    </p>
+  </div>
+</div>
+
+<div class="showcase-container">
+
+<!-- ============================================================
+     COLORS
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Colors</h2>
+  <p class="showcase-section__desc">Complete color palette based on Evergreen design tokens.</p>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Gray</div>
+    <div class="color-grid">
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-gray-900)"><span>900</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-gray-800)"><span>800</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-gray-700)"><span>700</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-gray-600)"><span>600</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-gray-500)"><span>500</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-gray-400)"><span>400</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-gray-300)"><span>300</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-gray-200)"><span>200</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-gray-100)"><span>100</span></div>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Blue</div>
+    <div class="color-grid">
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-blue-900)"><span>900</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-blue-800)"><span>800</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-blue-700)"><span>700</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-blue-600)"><span>600</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-blue-500)"><span>500</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-blue-400)"><span>400</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-blue-300)"><span>300</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-blue-200)"><span>200</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-blue-100)"><span>100</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-blue-50)"><span>50</span></div>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Green</div>
+    <div class="color-grid">
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-green-900)"><span>900</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-green-800)"><span>800</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-green-700)"><span>700</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-green-600)"><span>600</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-green-500)"><span>500</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-green-400)"><span>400</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-green-300)"><span>300</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-green-200)"><span>200</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-green-100)"><span>100</span></div>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Red</div>
+    <div class="color-grid">
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-red-700)"><span>700</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-red-600)"><span>600</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-red-500)"><span>500</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-red-300)"><span>300</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-red-100)"><span>100</span></div>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Orange / Purple / Teal</div>
+    <div class="color-grid">
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-orange-700)"><span>Or700</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-orange-500)"><span>Or500</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-orange-100)"><span>Or100</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-purple-600)"><span>Pu600</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-purple-100)"><span>Pu100</span></div>
+      <div class="color-swatch color-swatch--dark" style="background:var(--eg-teal-800)"><span>Te800</span></div>
+      <div class="color-swatch color-swatch--light" style="background:var(--eg-teal-100)"><span>Te100</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TYPOGRAPHY
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Typography</h2>
+  <p class="showcase-section__desc">Heading, Text, Paragraph, Link, Code components.</p>
+
+  <div class="showcase-group">
+    <h1 class="eg-heading eg-heading--900">Heading 900 — 32px Bold</h1>
+    <h2 class="eg-heading eg-heading--800">Heading 800 — 24px Bold</h2>
+    <h3 class="eg-heading eg-heading--700">Heading 700 — 20px Bold</h3>
+    <h4 class="eg-heading eg-heading--600">Heading 600 — 18px Bold</h4>
+    <h5 class="eg-heading eg-heading--500">Heading 500 — 16px Semibold</h5>
+    <h6 class="eg-heading eg-heading--400">Heading 400 — 14px</h6>
+    <h6 class="eg-heading eg-heading--300">Heading 300 — 12px</h6>
+    <h6 class="eg-heading eg-heading--100">Heading 100 — 10px Uppercase</h6>
+  </div>
+
+  <div class="showcase-group" style="margin-top:16px">
+    <p class="eg-text eg-text--500">Text 500 — 16px body text for larger content.</p>
+    <p class="eg-text eg-text--400">Text 400 — 14px default body text for most content.</p>
+    <p class="eg-text eg-text--300">Text 300 — 12px smaller body text for secondary content.</p>
+    <p class="eg-text eg-text--400 eg-text--muted">Muted text — used for less prominent information.</p>
+  </div>
+
+  <div class="showcase-group" style="margin-top:16px">
+    <p class="eg-paragraph eg-paragraph--400">
+      <strong class="eg-strong">Paragraph</strong> — Evergreen uses three font family stacks: <code class="eg-code">ui</code>,
+      <code class="eg-code">display</code>, and <code class="eg-code">mono</code>.
+      <a class="eg-link" href="#">Links</a> are styled with the brand blue color.
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     ELEVATION
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Elevation</h2>
+  <p class="showcase-section__desc">Box shadow levels from 0 (flat) to 4 (dialog).</p>
+
+  <div class="elevation-demo" style="background:var(--eg-gray-100);padding:24px;border-radius:8px;">
+    <div class="elevation-box eg-elevation-0">Elevation 0</div>
+    <div class="elevation-box eg-elevation-1">Elevation 1</div>
+    <div class="elevation-box eg-elevation-2">Elevation 2</div>
+    <div class="elevation-box eg-elevation-3">Elevation 3</div>
+    <div class="elevation-box eg-elevation-4">Elevation 4</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     BUTTONS
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Button</h2>
+  <p class="showcase-section__desc">Three appearances, three intents, three sizes, disabled and loading states.</p>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Appearances</div>
+    <div class="showcase-row">
+      <button class="eg-btn eg-btn--default">Default</button>
+      <button class="eg-btn eg-btn--primary">Primary</button>
+      <button class="eg-btn eg-btn--minimal">Minimal</button>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Intent — Default</div>
+    <div class="showcase-row">
+      <button class="eg-btn eg-btn--default">None</button>
+      <button class="eg-btn eg-btn--default eg-btn--intent-success">Success</button>
+      <button class="eg-btn eg-btn--default eg-btn--intent-warning">Warning</button>
+      <button class="eg-btn eg-btn--default eg-btn--intent-danger">Danger</button>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Intent — Primary</div>
+    <div class="showcase-row">
+      <button class="eg-btn eg-btn--primary">None</button>
+      <button class="eg-btn eg-btn--primary eg-btn--intent-success">Success</button>
+      <button class="eg-btn eg-btn--primary eg-btn--intent-warning">Warning</button>
+      <button class="eg-btn eg-btn--primary eg-btn--intent-danger">Danger</button>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Intent — Minimal</div>
+    <div class="showcase-row">
+      <button class="eg-btn eg-btn--minimal">None</button>
+      <button class="eg-btn eg-btn--minimal eg-btn--intent-success">Success</button>
+      <button class="eg-btn eg-btn--minimal eg-btn--intent-warning">Warning</button>
+      <button class="eg-btn eg-btn--minimal eg-btn--intent-danger">Danger</button>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Sizes</div>
+    <div class="showcase-row">
+      <button class="eg-btn eg-btn--primary eg-btn--size-sm">Small (24px)</button>
+      <button class="eg-btn eg-btn--primary">Medium (32px)</button>
+      <button class="eg-btn eg-btn--primary eg-btn--size-lg">Large (40px)</button>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">States</div>
+    <div class="showcase-row">
+      <button class="eg-btn eg-btn--primary eg-btn--disabled">Disabled</button>
+      <button class="eg-btn eg-btn--primary eg-btn--loading">
+        <span class="eg-spinner eg-spinner--size-sm" style="border-top-color:var(--eg-white);border-color:rgba(255,255,255,0.3);border-top-color:var(--eg-white);"></span>
+        <span class="eg-btn__label">Loading</span>
+      </button>
+      <button class="eg-btn eg-btn--minimal eg-icon-btn">&#x2715;</button>
+      <button class="eg-btn eg-btn--default eg-icon-btn">&#x2699;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FORM INPUTS
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Form Inputs</h2>
+  <p class="showcase-section__desc">Text input, textarea, select, with form field labels and validation.</p>
+
+  <div class="form-grid">
+    <div class="form-col">
+      <div class="eg-form-field">
+        <label class="eg-form-field__label">Full Name</label>
+        <input type="text" class="eg-text-input" placeholder="John Doe">
+      </div>
+
+      <div class="eg-form-field">
+        <label class="eg-form-field__label eg-form-field__label--required">Email Address</label>
+        <input type="text" class="eg-text-input" placeholder="john@example.com">
+        <p class="eg-form-field__hint">We will never share your email.</p>
+      </div>
+
+      <div class="eg-form-field">
+        <label class="eg-form-field__label">Password (Invalid)</label>
+        <input type="text" class="eg-text-input eg-text-input--invalid" value="abc">
+        <p class="eg-form-field__validation eg-form-field__validation--error">Password must be at least 8 characters.</p>
+      </div>
+
+      <div class="eg-form-field">
+        <label class="eg-form-field__label">Disabled Input</label>
+        <input type="text" class="eg-text-input eg-text-input--disabled" value="Cannot edit" disabled>
+      </div>
+    </div>
+
+    <div class="form-col">
+      <div class="eg-form-field">
+        <label class="eg-form-field__label">Select</label>
+        <select class="eg-select">
+          <option>Choose an option...</option>
+          <option>Option 1</option>
+          <option>Option 2</option>
+          <option>Option 3</option>
+        </select>
+      </div>
+
+      <div class="eg-form-field">
+        <label class="eg-form-field__label">Description</label>
+        <textarea class="eg-textarea" placeholder="Enter a description..."></textarea>
+      </div>
+
+      <div class="eg-form-field">
+        <label class="eg-form-field__label">Input Sizes</label>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input type="text" class="eg-text-input eg-text-input--size-sm" placeholder="Small (24px)">
+          <input type="text" class="eg-text-input" placeholder="Medium (32px)">
+          <input type="text" class="eg-text-input eg-text-input--size-lg" placeholder="Large (40px)">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CHECKBOX, RADIO, SWITCH
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Checkbox, Radio, Switch</h2>
+  <p class="showcase-section__desc">Selection controls with labels.</p>
+
+  <div style="display:flex;gap:48px;">
+    <div>
+      <div class="showcase-label">Checkboxes</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label class="eg-checkbox">
+          <input type="checkbox" class="eg-checkbox__input" checked>
+          <span class="eg-checkbox__label">Option A (checked)</span>
+        </label>
+        <label class="eg-checkbox">
+          <input type="checkbox" class="eg-checkbox__input">
+          <span class="eg-checkbox__label">Option B</span>
+        </label>
+        <label class="eg-checkbox">
+          <input type="checkbox" class="eg-checkbox__input">
+          <span class="eg-checkbox__label">Option C</span>
+        </label>
+        <label class="eg-checkbox eg-checkbox--disabled">
+          <input type="checkbox" class="eg-checkbox__input" disabled>
+          <span class="eg-checkbox__label">Disabled</span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="showcase-label">Radio Buttons</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <label class="eg-radio">
+          <input type="radio" name="radio-demo" class="eg-radio__input" checked>
+          <span class="eg-radio__label">Radio 1 (selected)</span>
+        </label>
+        <label class="eg-radio">
+          <input type="radio" name="radio-demo" class="eg-radio__input">
+          <span class="eg-radio__label">Radio 2</span>
+        </label>
+        <label class="eg-radio">
+          <input type="radio" name="radio-demo" class="eg-radio__input">
+          <span class="eg-radio__label">Radio 3</span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="showcase-label">Switch</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <label class="eg-switch eg-switch--checked" id="switch-1" data-eg-switch>
+          <span class="eg-switch__track"><span class="eg-switch__thumb"></span></span>
+          <span class="eg-switch__label">Enabled</span>
+        </label>
+        <label class="eg-switch" id="switch-2" data-eg-switch>
+          <span class="eg-switch__track"><span class="eg-switch__thumb"></span></span>
+          <span class="eg-switch__label">Disabled</span>
+        </label>
+        <label class="eg-switch eg-switch--checked" id="switch-3" data-eg-switch>
+          <span class="eg-switch__track"><span class="eg-switch__thumb"></span></span>
+          <span class="eg-switch__label">Notifications</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     ALERTS
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Alert</h2>
+  <p class="showcase-section__desc">Contextual feedback messages with four intent levels.</p>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="eg-alert eg-alert--intent-none">
+      <div class="eg-alert__icon">&#x2139;</div>
+      <div class="eg-alert__content">
+        <div class="eg-alert__title">There are over 200 integrations available</div>
+      </div>
+      <button class="eg-alert__close">&#x2715;</button>
+    </div>
+
+    <div class="eg-alert eg-alert--intent-success">
+      <div class="eg-alert__icon">&#x2713;</div>
+      <div class="eg-alert__content">
+        <div class="eg-alert__title">Your source is now sending data</div>
+      </div>
+      <button class="eg-alert__close">&#x2715;</button>
+    </div>
+
+    <div class="eg-alert eg-alert--intent-warning">
+      <div class="eg-alert__icon">&#x26A0;</div>
+      <div class="eg-alert__content">
+        <div class="eg-alert__title">Changes will affect all warehouses</div>
+        <div class="eg-alert__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div>
+      </div>
+      <button class="eg-alert__close">&#x2715;</button>
+    </div>
+
+    <div class="eg-alert eg-alert--intent-danger">
+      <div class="eg-alert__icon">&#x2717;</div>
+      <div class="eg-alert__content">
+        <div class="eg-alert__title">We weren't able to save your changes</div>
+        <div class="eg-alert__description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</div>
+      </div>
+      <button class="eg-alert__close">&#x2715;</button>
+    </div>
+  </div>
+
+  <div class="showcase-label" style="margin-top:16px;">Inline Alerts</div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div class="eg-inline-alert eg-inline-alert--intent-none">
+      <span class="eg-inline-alert__icon">&#x2139;</span>
+      <span>There are over 200 integrations available</span>
+    </div>
+    <div class="eg-inline-alert eg-inline-alert--intent-success">
+      <span class="eg-inline-alert__icon">&#x2713;</span>
+      <span>Your source is now sending data</span>
+    </div>
+    <div class="eg-inline-alert eg-inline-alert--intent-warning">
+      <span class="eg-inline-alert__icon">&#x26A0;</span>
+      <span>Changes will affect all warehouses</span>
+    </div>
+    <div class="eg-inline-alert eg-inline-alert--intent-danger">
+      <span class="eg-inline-alert__icon">&#x2717;</span>
+      <span>We weren't able to save your changes</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     BADGE & PILL
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Badge &amp; Pill</h2>
+  <p class="showcase-section__desc">Compact labels for categorization and status.</p>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Badges</div>
+    <div class="showcase-row">
+      <span class="eg-badge eg-badge--neutral">Neutral</span>
+      <span class="eg-badge eg-badge--blue">Blue</span>
+      <span class="eg-badge eg-badge--green">Green</span>
+      <span class="eg-badge eg-badge--red">Red</span>
+      <span class="eg-badge eg-badge--orange">Orange</span>
+      <span class="eg-badge eg-badge--purple">Purple</span>
+      <span class="eg-badge eg-badge--teal">Teal</span>
+      <span class="eg-badge eg-badge--yellow">Yellow</span>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Pills</div>
+    <div class="showcase-row">
+      <span class="eg-pill eg-pill--neutral">Neutral</span>
+      <span class="eg-pill eg-pill--blue">Blue</span>
+      <span class="eg-pill eg-pill--green">Green</span>
+      <span class="eg-pill eg-pill--red">Red</span>
+      <span class="eg-pill eg-pill--orange">Orange</span>
+      <span class="eg-pill eg-pill--purple">Purple</span>
+      <span class="eg-pill eg-pill--teal">Teal</span>
+      <span class="eg-pill eg-pill--yellow">Yellow</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     AVATAR
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Avatar</h2>
+  <p class="showcase-section__desc">Circular user representations with initials and color variants.</p>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Sizes</div>
+    <div class="showcase-row">
+      <div class="eg-avatar eg-avatar--size-sm eg-avatar--blue"><span class="eg-avatar__initials">SM</span></div>
+      <div class="eg-avatar eg-avatar--size-md eg-avatar--green"><span class="eg-avatar__initials">MD</span></div>
+      <div class="eg-avatar eg-avatar--size-lg eg-avatar--orange"><span class="eg-avatar__initials">LG</span></div>
+      <div class="eg-avatar eg-avatar--size-xl eg-avatar--purple"><span class="eg-avatar__initials">XL</span></div>
+    </div>
+  </div>
+
+  <div class="showcase-group">
+    <div class="showcase-label">Colors</div>
+    <div class="showcase-row">
+      <div class="eg-avatar eg-avatar--size-lg eg-avatar--blue"><span class="eg-avatar__initials">AB</span></div>
+      <div class="eg-avatar eg-avatar--size-lg eg-avatar--green"><span class="eg-avatar__initials">CD</span></div>
+      <div class="eg-avatar eg-avatar--size-lg eg-avatar--orange"><span class="eg-avatar__initials">EF</span></div>
+      <div class="eg-avatar eg-avatar--size-lg eg-avatar--red"><span class="eg-avatar__initials">GH</span></div>
+      <div class="eg-avatar eg-avatar--size-lg eg-avatar--purple"><span class="eg-avatar__initials">IJ</span></div>
+      <div class="eg-avatar eg-avatar--size-lg eg-avatar--teal"><span class="eg-avatar__initials">KL</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     STATUS INDICATOR & SPINNER
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Status Indicator &amp; Spinner</h2>
+  <p class="showcase-section__desc">Visual status dots and loading spinners.</p>
+
+  <div style="display:flex;gap:48px;">
+    <div>
+      <div class="showcase-label">Status Indicators</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="eg-status-indicator eg-status-indicator--success">
+          <span class="eg-status-indicator__dot"></span>
+          <span>Active</span>
+        </div>
+        <div class="eg-status-indicator eg-status-indicator--warning">
+          <span class="eg-status-indicator__dot"></span>
+          <span>Pending</span>
+        </div>
+        <div class="eg-status-indicator eg-status-indicator--danger">
+          <span class="eg-status-indicator__dot"></span>
+          <span>Error</span>
+        </div>
+        <div class="eg-status-indicator eg-status-indicator--info">
+          <span class="eg-status-indicator__dot"></span>
+          <span>Processing</span>
+        </div>
+        <div class="eg-status-indicator eg-status-indicator--disabled">
+          <span class="eg-status-indicator__dot"></span>
+          <span>Offline</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="showcase-label">Spinners</div>
+      <div class="showcase-row" style="align-items:center;gap:24px;">
+        <div class="eg-spinner eg-spinner--size-sm"></div>
+        <div class="eg-spinner eg-spinner--size-md"></div>
+        <div class="eg-spinner eg-spinner--size-lg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TABS
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Tab</h2>
+  <p class="showcase-section__desc">Tabbed navigation with panel switching.</p>
+
+  <div data-eg-tab-group id="demo-tabs">
+    <div class="eg-tab-bar">
+      <div class="eg-tab eg-tab--selected" data-eg-tab="tab-overview">Overview</div>
+      <div class="eg-tab" data-eg-tab="tab-settings">Settings</div>
+      <div class="eg-tab" data-eg-tab="tab-billing">Billing</div>
+      <div class="eg-tab" data-eg-tab="tab-notifications">Notifications</div>
+    </div>
+    <div class="eg-tab-panel" id="tab-overview">
+      <p class="eg-paragraph eg-paragraph--400">This is the overview panel. You can see all your data here.</p>
+    </div>
+    <div class="eg-tab-panel" id="tab-settings" style="display:none">
+      <p class="eg-paragraph eg-paragraph--400">Configure your settings in this panel.</p>
+    </div>
+    <div class="eg-tab-panel" id="tab-billing" style="display:none">
+      <p class="eg-paragraph eg-paragraph--400">Billing information and invoices appear here.</p>
+    </div>
+    <div class="eg-tab-panel" id="tab-notifications" style="display:none">
+      <p class="eg-paragraph eg-paragraph--400">Manage your notification preferences.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TABLE
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Table</h2>
+  <p class="showcase-section__desc">Data table with header, rows, and row intents.</p>
+
+  <div class="eg-table">
+    <div class="eg-table__head">
+      <div class="eg-table__row eg-table__row--header">
+        <div class="eg-table__header-cell" style="flex:2">Name</div>
+        <div class="eg-table__header-cell" style="flex:1">Status</div>
+        <div class="eg-table__header-cell" style="flex:1">Role</div>
+        <div class="eg-table__header-cell" style="flex:1">Email</div>
+      </div>
+    </div>
+    <div class="eg-table__body">
+      <div class="eg-table__row">
+        <div class="eg-table__cell" style="flex:2">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="eg-avatar eg-avatar--size-sm eg-avatar--blue"><span class="eg-avatar__initials">KL</span></div>
+            Kevin Liu
+          </div>
+        </div>
+        <div class="eg-table__cell" style="flex:1"><span class="eg-badge eg-badge--green">Active</span></div>
+        <div class="eg-table__cell" style="flex:1">Admin</div>
+        <div class="eg-table__cell" style="flex:1">kevin@example.com</div>
+      </div>
+      <div class="eg-table__row">
+        <div class="eg-table__cell" style="flex:2">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="eg-avatar eg-avatar--size-sm eg-avatar--green"><span class="eg-avatar__initials">SM</span></div>
+            Sarah Miller
+          </div>
+        </div>
+        <div class="eg-table__cell" style="flex:1"><span class="eg-badge eg-badge--green">Active</span></div>
+        <div class="eg-table__cell" style="flex:1">Editor</div>
+        <div class="eg-table__cell" style="flex:1">sarah@example.com</div>
+      </div>
+      <div class="eg-table__row eg-table__row--intent-warning">
+        <div class="eg-table__cell" style="flex:2">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="eg-avatar eg-avatar--size-sm eg-avatar--orange"><span class="eg-avatar__initials">JD</span></div>
+            John Doe
+          </div>
+        </div>
+        <div class="eg-table__cell" style="flex:1"><span class="eg-badge eg-badge--orange">Pending</span></div>
+        <div class="eg-table__cell" style="flex:1">Viewer</div>
+        <div class="eg-table__cell" style="flex:1">john@example.com</div>
+      </div>
+      <div class="eg-table__row eg-table__row--intent-danger">
+        <div class="eg-table__cell" style="flex:2">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="eg-avatar eg-avatar--size-sm eg-avatar--red"><span class="eg-avatar__initials">AW</span></div>
+            Alice Wang
+          </div>
+        </div>
+        <div class="eg-table__cell" style="flex:1"><span class="eg-badge eg-badge--red">Suspended</span></div>
+        <div class="eg-table__cell" style="flex:1">Viewer</div>
+        <div class="eg-table__cell" style="flex:1">alice@example.com</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     DIALOG (static demo)
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Dialog</h2>
+  <p class="showcase-section__desc">Modal dialog — click the button to open (requires Lua).</p>
+
+  <div class="showcase-row">
+    <button class="eg-btn eg-btn--primary" id="btn-open-dialog">Open Dialog</button>
+    <button class="eg-btn eg-btn--default eg-btn--intent-danger" id="btn-open-danger-dialog">Delete Item</button>
+  </div>
+
+  <!-- Static dialog preview (inline, no overlay) -->
+  <div style="margin-top:16px;background:var(--eg-gray-100);padding:24px;border-radius:8px;">
+    <div class="eg-card eg-elevation-4" style="width:480px;margin:0 auto;border-radius:8px;">
+      <div class="eg-dialog__header">
+        <h4 class="eg-heading eg-heading--500">Dialog Title</h4>
+        <button class="eg-btn eg-btn--minimal eg-icon-btn" style="width:28px;height:28px;">&#x2715;</button>
+      </div>
+      <div class="eg-dialog__body">
+        <p class="eg-paragraph eg-paragraph--400">Are you sure you want to proceed? This action cannot be undone.</p>
+      </div>
+      <div class="eg-dialog__footer">
+        <button class="eg-btn eg-btn--default">Cancel</button>
+        <button class="eg-btn eg-btn--primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MENU (static demo)
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Menu</h2>
+  <p class="showcase-section__desc">Dropdown menu component with groups and dividers.</p>
+
+  <div style="display:flex;gap:24px;">
+    <div class="eg-card eg-elevation-2" style="border-radius:6px;">
+      <div class="eg-menu">
+        <div class="eg-menu__group-title">Actions</div>
+        <div class="eg-menu__item">&#x270E; Edit</div>
+        <div class="eg-menu__item">&#x2398; Duplicate</div>
+        <div class="eg-menu__item eg-menu__item--selected">&#x2713; Move to folder</div>
+        <div class="eg-menu__divider"></div>
+        <div class="eg-menu__item" style="color:var(--eg-red-500);">&#x2717; Delete</div>
+      </div>
+    </div>
+
+    <div class="eg-card eg-elevation-2" style="border-radius:6px;">
+      <div class="eg-menu">
+        <div class="eg-menu__group-title">Sort by</div>
+        <div class="eg-menu__item eg-menu__item--selected">Name</div>
+        <div class="eg-menu__item">Date created</div>
+        <div class="eg-menu__item">Date modified</div>
+        <div class="eg-menu__item">Size</div>
+        <div class="eg-menu__divider"></div>
+        <div class="eg-menu__item eg-menu__item--disabled">Custom sort</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PANE & CARD
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Layout Primitives</h2>
+  <p class="showcase-section__desc">Pane and Card with various backgrounds.</p>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+    <div class="eg-pane eg-bg-tint1 eg-border-default eg-p-4" style="border-radius:6px;flex:1;min-width:200px;">
+      <p class="eg-text eg-text--300 eg-text--muted">Pane — tint1</p>
+      <p class="eg-heading eg-heading--500" style="margin-top:4px;">Content Area</p>
+    </div>
+    <div class="eg-pane eg-bg-tint2 eg-border-muted eg-p-4" style="border-radius:6px;flex:1;min-width:200px;">
+      <p class="eg-text eg-text--300 eg-text--muted">Pane — tint2</p>
+      <p class="eg-heading eg-heading--500" style="margin-top:4px;">Content Area</p>
+    </div>
+    <div class="eg-card eg-elevation-1 eg-p-4" style="flex:1;min-width:200px;">
+      <p class="eg-text eg-text--300 eg-text--muted">Card — Elevation 1</p>
+      <p class="eg-heading eg-heading--500" style="margin-top:4px;">Content Area</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOAST (static demo)
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Toaster</h2>
+  <p class="showcase-section__desc">Toast notifications for ephemeral feedback.</p>
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:420px;">
+    <div class="eg-toast eg-toast--intent-success">
+      <div class="eg-toast__icon">&#x2713;</div>
+      <div class="eg-toast__content">
+        <div class="eg-toast__title">Settings saved</div>
+        <div class="eg-toast__description">Your changes have been successfully saved.</div>
+      </div>
+      <button class="eg-toast__close">&#x2715;</button>
+    </div>
+    <div class="eg-toast eg-toast--intent-danger">
+      <div class="eg-toast__icon">&#x2717;</div>
+      <div class="eg-toast__content">
+        <div class="eg-toast__title">Upload failed</div>
+        <div class="eg-toast__description">The file could not be uploaded. Please try again.</div>
+      </div>
+      <button class="eg-toast__close">&#x2715;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SEARCH INPUT
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Search Input</h2>
+  <p class="showcase-section__desc">Text input with a search icon prefix.</p>
+
+  <div style="display:flex;flex-direction:column;gap:12px;max-width:400px;">
+    <div class="eg-search-input-wrapper">
+      <span class="eg-search-input__icon">&#x1F50D;</span>
+      <input type="text" class="eg-search-input" placeholder="Search...">
+    </div>
+    <div class="eg-search-input-wrapper">
+      <span class="eg-search-input__icon">&#x1F50D;</span>
+      <input type="text" class="eg-search-input" placeholder="Filter integrations..." value="Google">
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGINATION
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Pagination</h2>
+  <p class="showcase-section__desc">Navigate through pages of content.</p>
+
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="eg-pagination">
+      <button class="eg-pagination__btn eg-pagination__btn--disabled">&larr; Prev</button>
+      <button class="eg-pagination__btn eg-pagination__btn--active">1</button>
+      <button class="eg-pagination__btn">2</button>
+      <button class="eg-pagination__btn">3</button>
+      <button class="eg-pagination__btn">4</button>
+      <button class="eg-pagination__btn">5</button>
+      <span class="eg-pagination__info">&hellip;</span>
+      <button class="eg-pagination__btn">12</button>
+      <button class="eg-pagination__btn">Next &rarr;</button>
+    </div>
+    <span class="eg-pagination__info">Showing 1-10 of 120 results</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOOLTIP (static demo)
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Tooltip</h2>
+  <p class="showcase-section__desc">Contextual information shown on hover (static preview).</p>
+
+  <div style="display:flex;gap:24px;align-items:center;">
+    <div style="position:relative;display:inline-block;">
+      <button class="eg-btn eg-btn--default">Hover me</button>
+      <div class="eg-tooltip" style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;">
+        This is a tooltip
+      </div>
+    </div>
+    <div style="position:relative;display:inline-block;">
+      <button class="eg-btn eg-btn--primary">Another</button>
+      <div class="eg-tooltip" style="position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;">
+        Tooltip below
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAG INPUT
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Tag Input</h2>
+  <p class="showcase-section__desc">Input field with removable tag pills. Type and press Enter to add.</p>
+
+  <div style="max-width:480px;">
+    <div class="eg-form-field">
+      <label class="eg-form-field__label">Tags</label>
+      <div class="eg-tag-input-wrapper" id="tag-input-demo">
+        <span class="eg-tag">Design<button class="eg-tag__remove" data-eg-tag-remove>&#x2715;</button></span>
+        <span class="eg-tag">Engineering<button class="eg-tag__remove" data-eg-tag-remove>&#x2715;</button></span>
+        <span class="eg-tag">Product<button class="eg-tag__remove" data-eg-tag-remove>&#x2715;</button></span>
+        <input type="text" class="eg-tag-input" placeholder="Add a tag..." id="tag-input-field">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     GROUP / SEGMENTED CONTROL
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Group / Segmented Control</h2>
+  <p class="showcase-section__desc">Toggle between mutually exclusive options.</p>
+
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div>
+      <div class="showcase-label">View Mode</div>
+      <div class="eg-group" data-eg-group>
+        <button class="eg-group__item eg-group__item--selected">Grid</button>
+        <button class="eg-group__item">List</button>
+        <button class="eg-group__item">Table</button>
+      </div>
+    </div>
+    <div>
+      <div class="showcase-label">Time Range</div>
+      <div class="eg-group" data-eg-group>
+        <button class="eg-group__item">1H</button>
+        <button class="eg-group__item eg-group__item--selected">24H</button>
+        <button class="eg-group__item">7D</button>
+        <button class="eg-group__item">30D</button>
+        <button class="eg-group__item">ALL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     POPOVER (static demo)
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Popover</h2>
+  <p class="showcase-section__desc">Floating content panel triggered by a button (static preview).</p>
+
+  <div style="display:flex;gap:32px;align-items:flex-start;">
+    <div class="eg-popover-wrapper">
+      <button class="eg-btn eg-btn--default" id="btn-popover-1">Trigger Popover</button>
+      <div class="eg-popover eg-popover--bottom" style="left:0;transform:none;">
+        <div class="eg-popover__header">Popover Title</div>
+        <div class="eg-popover__body">
+          <p class="eg-text eg-text--300">This is the popover content. It can contain any elements.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="eg-popover-wrapper">
+      <button class="eg-btn eg-btn--primary">With Menu</button>
+      <div class="eg-popover eg-popover--bottom" style="left:0;transform:none;min-width:180px;padding:0;">
+        <div class="eg-menu">
+          <div class="eg-menu__item">&#x270E; Edit</div>
+          <div class="eg-menu__item">&#x2398; Duplicate</div>
+          <div class="eg-menu__divider"></div>
+          <div class="eg-menu__item" style="color:var(--eg-red-500);">&#x2717; Delete</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CORNER DIALOG (static demo)
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Corner Dialog</h2>
+  <p class="showcase-section__desc">Non-modal dialog anchored to the bottom-right corner (static preview).</p>
+
+  <div style="background:var(--eg-gray-100);padding:24px;border-radius:8px;position:relative;min-height:200px;">
+    <div style="position:absolute;bottom:16px;right:16px;">
+      <div class="eg-corner-dialog">
+        <div class="eg-corner-dialog__header">
+          <h5 class="eg-heading eg-heading--400">Enable Notifications?</h5>
+          <button class="eg-btn eg-btn--minimal eg-icon-btn" style="width:24px;height:24px;">&#x2715;</button>
+        </div>
+        <div class="eg-corner-dialog__body">
+          <p class="eg-text eg-text--300 eg-text--muted">We'd like to send you notifications for important updates and announcements.</p>
+        </div>
+        <div class="eg-corner-dialog__footer">
+          <button class="eg-btn eg-btn--default eg-btn--size-sm">Cancel</button>
+          <button class="eg-btn eg-btn--primary eg-btn--size-sm">Enable</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EMPTY STATE
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Empty State</h2>
+  <p class="showcase-section__desc">Placeholder when there is no data to display.</p>
+
+  <div style="background:var(--eg-gray-75);border:1px solid var(--eg-color-border-muted);border-radius:8px;">
+    <div class="eg-empty-state">
+      <div class="eg-empty-state__icon">&#x1F4C2;</div>
+      <div class="eg-empty-state__title">No results found</div>
+      <div class="eg-empty-state__description">
+        There are no items matching your search criteria. Try adjusting your filters or create a new item.
+      </div>
+      <button class="eg-btn eg-btn--primary">Create New Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FILE UPLOADER & FILE CARD
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">File Uploader</h2>
+  <p class="showcase-section__desc">Drag-and-drop area for uploading files, with file cards showing upload results.</p>
+
+  <div style="display:flex;flex-direction:column;gap:16px;max-width:480px;">
+    <div class="eg-file-uploader">
+      <div class="eg-file-uploader__icon">&#x2B06;</div>
+      <div class="eg-file-uploader__title">Drag files here or click to upload</div>
+      <div class="eg-file-uploader__description">Maximum file size: 50MB. Supported formats: PNG, JPG, PDF.</div>
+    </div>
+
+    <div class="showcase-label">Uploaded Files</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="eg-file-card">
+        <div class="eg-file-card__icon">&#x1F4C4;</div>
+        <div class="eg-file-card__info">
+          <div class="eg-file-card__name">report-2024.pdf</div>
+          <div class="eg-file-card__size">2.4 MB</div>
+        </div>
+        <button class="eg-file-card__remove">&#x2715;</button>
+      </div>
+      <div class="eg-file-card">
+        <div class="eg-file-card__icon">&#x1F5BC;</div>
+        <div class="eg-file-card__info">
+          <div class="eg-file-card__name">screenshot.png</div>
+          <div class="eg-file-card__size">845 KB</div>
+        </div>
+        <button class="eg-file-card__remove">&#x2715;</button>
+      </div>
+    </div>
+
+    <div class="showcase-label">File Picker</div>
+    <div class="eg-filepicker">
+      <button class="eg-btn eg-btn--default eg-btn--size-sm">Choose File</button>
+      <span class="eg-filepicker__filename">No file selected</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SIDE SHEET (static demo)
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Side Sheet</h2>
+  <p class="showcase-section__desc">Panel that slides in from the right side — click the button to open (requires Lua).</p>
+
+  <div class="showcase-row">
+    <button class="eg-btn eg-btn--primary" id="btn-open-sidesheet">Open Side Sheet</button>
+  </div>
+
+  <div style="margin-top:16px;background:var(--eg-gray-100);padding:0;border-radius:8px;overflow:hidden;position:relative;height:240px;">
+    <div style="position:absolute;top:0;right:0;bottom:0;width:280px;background:var(--eg-white);box-shadow:var(--eg-shadow-4);display:flex;flex-direction:column;">
+      <div class="eg-side-sheet__header">
+        <h5 class="eg-heading eg-heading--400">Sheet Title</h5>
+        <button class="eg-btn eg-btn--minimal eg-icon-btn" style="width:24px;height:24px;">&#x2715;</button>
+      </div>
+      <div class="eg-side-sheet__body">
+        <p class="eg-text eg-text--300 eg-text--muted">This is the side sheet content. It slides in from the right edge of the viewport.</p>
+        <div style="margin-top:12px;">
+          <div class="eg-form-field">
+            <label class="eg-form-field__label">Name</label>
+            <input type="text" class="eg-text-input" placeholder="Enter name...">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PULSAR
+     ============================================================ -->
+<div class="showcase-section">
+  <h2 class="showcase-section__title">Pulsar</h2>
+  <p class="showcase-section__desc">Pulsating animation to draw attention to a specific element.</p>
+
+  <div style="display:flex;gap:48px;align-items:center;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="eg-pulsar">
+        <div class="eg-pulsar__dot"></div>
+        <div class="eg-pulsar__ring"></div>
+      </div>
+      <span class="eg-text eg-text--300">New feature available</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="eg-btn eg-btn--default" style="position:relative;">
+        Settings
+        <span style="position:absolute;top:-3px;right:-3px;">
+          <div class="eg-pulsar">
+            <div class="eg-pulsar__dot"></div>
+            <div class="eg-pulsar__ring"></div>
+          </div>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+</div> <!-- /showcase-container -->
+
+<!-- ============================================================
+     LUA BEHAVIOR SCRIPT
+     ============================================================ -->
+<script type="text/lua">
+-- =================================================================
+-- Evergreen UI Showcase — Lua Behavior
+-- =================================================================
+
+-- -----------------------------------------------------------------
+-- Switch toggle behavior
+-- -----------------------------------------------------------------
+local function initSwitches()
+  local switches = document:querySelectorAll("[data-eg-switch]")
+  switches:forEach(function(el, i)
+    el:addEventListener("click", function(e)
+      if el:hasClass("eg-switch--checked") then
+        el:removeClass("eg-switch--checked")
+      else
+        el:addClass("eg-switch--checked")
+      end
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Tab group behavior
+-- -----------------------------------------------------------------
+local function initTabs()
+  local tabGroups = document:querySelectorAll("[data-eg-tab-group]")
+  tabGroups:forEach(function(group, gi)
+    local tabs = group:querySelectorAll("[data-eg-tab]")
+    tabs:forEach(function(tab, ti)
+      tab:addEventListener("click", function(e)
+        local targetId = tab:getAttribute("data-eg-tab")
+        if not targetId or targetId == "" then return end
+
+        -- Deselect all tabs in this group
+        tabs:forEach(function(t, idx)
+          t:removeClass("eg-tab--selected")
+        end)
+        -- Select clicked tab
+        tab:addClass("eg-tab--selected")
+
+        -- Hide all panels in this group
+        local panels = group:querySelectorAll(".eg-tab-panel")
+        panels:forEach(function(panel, pi)
+          panel.style:setProperty("display", "none")
+        end)
+
+        -- Show target panel
+        local targetPanel = document:getElementById(targetId)
+        if targetPanel then
+          targetPanel.style:setProperty("display", "block")
+        end
+      end)
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Dialog behavior
+-- -----------------------------------------------------------------
+local dialogWrapper = nil
+
+local function showDialog(title, body, intent, onConfirm)
+  -- Create dialog wrapper
+  dialogWrapper = document:createElement("div")
+  dialogWrapper:setAttribute("class", "eg-dialog-wrapper")
+  dialogWrapper:setAttribute("id", "eg-live-dialog")
+
+  local overlay = document:createElement("div")
+  overlay:setAttribute("class", "eg-dialog__overlay")
+
+  local dialog = document:createElement("div")
+  dialog:setAttribute("class", "eg-dialog eg-elevation-4")
+
+  -- Header
+  local header = document:createElement("div")
+  header:setAttribute("class", "eg-dialog__header")
+
+  local heading = document:createElement("h4")
+  heading:setAttribute("class", "eg-heading eg-heading--500")
+  heading.textContent = title
+
+  local closeBtn = document:createElement("button")
+  closeBtn:setAttribute("class", "eg-btn eg-btn--minimal eg-icon-btn")
+  closeBtn.style:setProperty("width", "28px")
+  closeBtn.style:setProperty("height", "28px")
+  closeBtn.textContent = "\xE2\x9C\x95"
+
+  header:appendChild(heading)
+  header:appendChild(closeBtn)
+
+  -- Body
+  local bodyDiv = document:createElement("div")
+  bodyDiv:setAttribute("class", "eg-dialog__body")
+  local bodyP = document:createElement("p")
+  bodyP:setAttribute("class", "eg-paragraph eg-paragraph--400")
+  bodyP.textContent = body
+  bodyDiv:appendChild(bodyP)
+
+  -- Footer
+  local footer = document:createElement("div")
+  footer:setAttribute("class", "eg-dialog__footer")
+
+  local cancelBtn = document:createElement("button")
+  cancelBtn:setAttribute("class", "eg-btn eg-btn--default")
+  cancelBtn.textContent = "Cancel"
+
+  local confirmClass = "eg-btn eg-btn--primary"
+  if intent == "danger" then
+    confirmClass = "eg-btn eg-btn--primary eg-btn--intent-danger"
+  end
+  local confirmBtn = document:createElement("button")
+  confirmBtn:setAttribute("class", confirmClass)
+  confirmBtn.textContent = intent == "danger" and "Delete" or "Confirm"
+
+  footer:appendChild(cancelBtn)
+  footer:appendChild(confirmBtn)
+
+  dialog:appendChild(header)
+  dialog:appendChild(bodyDiv)
+  dialog:appendChild(footer)
+
+  dialogWrapper:appendChild(overlay)
+  dialogWrapper:appendChild(dialog)
+
+  document:body():appendChild(dialogWrapper)
+
+  -- Close handlers
+  local function closeDialog()
+    if dialogWrapper then
+      dialogWrapper:remove()
+      dialogWrapper = nil
+    end
+  end
+
+  overlay:addEventListener("click", function(e) closeDialog() end)
+  closeBtn:addEventListener("click", function(e) closeDialog() end)
+  cancelBtn:addEventListener("click", function(e) closeDialog() end)
+  confirmBtn:addEventListener("click", function(e)
+    if onConfirm then onConfirm() end
+    closeDialog()
+  end)
+end
+
+local function initDialogs()
+  local openBtn = document:getElementById("btn-open-dialog")
+  if openBtn then
+    openBtn:addEventListener("click", function(e)
+      showDialog(
+        "Confirm Action",
+        "Are you sure you want to proceed? This action cannot be undone.",
+        "none",
+        function() console.log("Dialog confirmed!") end
+      )
+    end)
+  end
+
+  local dangerBtn = document:getElementById("btn-open-danger-dialog")
+  if dangerBtn then
+    dangerBtn:addEventListener("click", function(e)
+      showDialog(
+        "Delete Item",
+        "Are you sure you want to delete this item? This action is permanent and cannot be reversed.",
+        "danger",
+        function() console.log("Item deleted!") end
+      )
+    end)
+  end
+end
+
+-- -----------------------------------------------------------------
+-- Tag Input behavior
+-- -----------------------------------------------------------------
+local function initTagInput()
+  local wrapper = document:getElementById("tag-input-demo")
+  local input = document:getElementById("tag-input-field")
+  if not wrapper or not input then return end
+
+  -- Remove tag on click
+  local function bindRemoveButtons()
+    local removes = wrapper:querySelectorAll("[data-eg-tag-remove]")
+    removes:forEach(function(btn, i)
+      btn:addEventListener("click", function(e)
+        local tag = btn.parentNode
+        if tag then tag:remove() end
+      end)
+    end)
+  end
+
+  bindRemoveButtons()
+
+  -- Add tag on Enter
+  input:addEventListener("keydown", function(e)
+    if e.key == "Enter" then
+      local text = input.value
+      if text and text ~= "" then
+        local tag = document:createElement("span")
+        tag:setAttribute("class", "eg-tag")
+        tag.textContent = text
+
+        local removeBtn = document:createElement("button")
+        removeBtn:setAttribute("class", "eg-tag__remove")
+        removeBtn:setAttribute("data-eg-tag-remove", "")
+        removeBtn.textContent = "\xE2\x9C\x95"
+        removeBtn:addEventListener("click", function(ev)
+          tag:remove()
+        end)
+
+        tag:appendChild(removeBtn)
+        wrapper:insertBefore(tag, input)
+        input.value = ""
+      end
+    end
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Group / Segmented Control behavior
+-- -----------------------------------------------------------------
+local function initGroups()
+  local groups = document:querySelectorAll("[data-eg-group]")
+  groups:forEach(function(group, gi)
+    local items = group:querySelectorAll(".eg-group__item")
+    items:forEach(function(item, ii)
+      item:addEventListener("click", function(e)
+        items:forEach(function(it, idx)
+          it:removeClass("eg-group__item--selected")
+        end)
+        item:addClass("eg-group__item--selected")
+      end)
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Side Sheet behavior
+-- -----------------------------------------------------------------
+local sideSheetWrapper = nil
+
+local function showSideSheet(title, bodyContent)
+  sideSheetWrapper = document:createElement("div")
+  sideSheetWrapper:setAttribute("class", "eg-side-sheet-wrapper")
+
+  local overlay = document:createElement("div")
+  overlay:setAttribute("class", "eg-overlay")
+
+  local sheet = document:createElement("div")
+  sheet:setAttribute("class", "eg-side-sheet")
+
+  -- Header
+  local header = document:createElement("div")
+  header:setAttribute("class", "eg-side-sheet__header")
+
+  local heading = document:createElement("h4")
+  heading:setAttribute("class", "eg-heading eg-heading--500")
+  heading.textContent = title
+
+  local closeBtn = document:createElement("button")
+  closeBtn:setAttribute("class", "eg-btn eg-btn--minimal eg-icon-btn")
+  closeBtn.style:setProperty("width", "28px")
+  closeBtn.style:setProperty("height", "28px")
+  closeBtn.textContent = "\xE2\x9C\x95"
+
+  header:appendChild(heading)
+  header:appendChild(closeBtn)
+
+  -- Body
+  local body = document:createElement("div")
+  body:setAttribute("class", "eg-side-sheet__body")
+  local bodyP = document:createElement("p")
+  bodyP:setAttribute("class", "eg-paragraph eg-paragraph--400")
+  bodyP.textContent = bodyContent
+  body:appendChild(bodyP)
+
+  sheet:appendChild(header)
+  sheet:appendChild(body)
+
+  sideSheetWrapper:appendChild(overlay)
+  sideSheetWrapper:appendChild(sheet)
+  document:body():appendChild(sideSheetWrapper)
+
+  local function closeSideSheet()
+    if sideSheetWrapper then
+      sideSheetWrapper:remove()
+      sideSheetWrapper = nil
+    end
+  end
+
+  overlay:addEventListener("click", function(e) closeSideSheet() end)
+  closeBtn:addEventListener("click", function(e) closeSideSheet() end)
+end
+
+local function initSideSheet()
+  local btn = document:getElementById("btn-open-sidesheet")
+  if btn then
+    btn:addEventListener("click", function(e)
+      showSideSheet(
+        "Side Sheet",
+        "This panel slides in from the right side of the viewport. Click the overlay or the close button to dismiss."
+      )
+    end)
+  end
+end
+
+-- -----------------------------------------------------------------
+-- Pagination behavior
+-- -----------------------------------------------------------------
+local function initPagination()
+  local paginations = document:querySelectorAll(".eg-pagination")
+  paginations:forEach(function(pg, pi)
+    local btns = pg:querySelectorAll(".eg-pagination__btn")
+    btns:forEach(function(btn, bi)
+      btn:addEventListener("click", function(e)
+        if btn:hasClass("eg-pagination__btn--disabled") then return end
+        btns:forEach(function(b, idx)
+          b:removeClass("eg-pagination__btn--active")
+        end)
+        btn:addClass("eg-pagination__btn--active")
+      end)
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Toast close behavior
+-- -----------------------------------------------------------------
+local function initToastClose()
+  local closeBtns = document:querySelectorAll(".eg-toast__close")
+  closeBtns:forEach(function(btn, i)
+    btn:addEventListener("click", function(e)
+      local toast = btn.parentNode
+      if toast then toast:remove() end
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Corner Dialog behavior
+-- -----------------------------------------------------------------
+local function initCornerDialog()
+  local dialogs = document:querySelectorAll(".eg-corner-dialog")
+  dialogs:forEach(function(dialog, i)
+    -- Close (✕) button
+    local closeBtn = dialog:querySelector(".eg-icon-btn")
+    if closeBtn then
+      closeBtn:addEventListener("click", function(e)
+        dialog.style:setProperty("display", "none")
+      end)
+    end
+    -- Cancel button
+    local footer = dialog:querySelector(".eg-corner-dialog__footer")
+    if footer then
+      local buttons = footer:querySelectorAll(".eg-btn")
+      buttons:forEach(function(btn, bi)
+        btn:addEventListener("click", function(e)
+          dialog.style:setProperty("display", "none")
+        end)
+      end)
+    end
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- File Card remove behavior
+-- -----------------------------------------------------------------
+local function initFileCardRemove()
+  local removeBtns = document:querySelectorAll(".eg-file-card__remove")
+  removeBtns:forEach(function(btn, i)
+    btn:addEventListener("click", function(e)
+      local card = btn.parentNode
+      if card then card:remove() end
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Static Dialog preview behavior (close/cancel/confirm)
+-- -----------------------------------------------------------------
+local function initStaticDialogPreview()
+  local dialogHeaders = document:querySelectorAll(".eg-dialog__header")
+  dialogHeaders:forEach(function(header, i)
+    local closeBtn = header:querySelector(".eg-icon-btn")
+    if closeBtn then
+      closeBtn:addEventListener("click", function(e)
+        -- Find the containing card/dialog
+        local card = header.parentNode
+        if card then card.style:setProperty("display", "none") end
+      end)
+    end
+  end)
+
+  local dialogFooters = document:querySelectorAll(".eg-dialog__footer")
+  dialogFooters:forEach(function(footer, i)
+    local buttons = footer:querySelectorAll(".eg-btn")
+    buttons:forEach(function(btn, bi)
+      btn:addEventListener("click", function(e)
+        local card = footer.parentNode
+        if card then card.style:setProperty("display", "none") end
+      end)
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Menu item click behavior
+-- -----------------------------------------------------------------
+local function initMenuItems()
+  local menus = document:querySelectorAll(".eg-menu")
+  menus:forEach(function(menu, mi)
+    local items = menu:querySelectorAll(".eg-menu__item")
+    items:forEach(function(item, ii)
+      item:addEventListener("click", function(e)
+        if item:hasClass("eg-menu__item--disabled") then return end
+        -- Deselect siblings in same menu
+        items:forEach(function(it, idx)
+          it:removeClass("eg-menu__item--selected")
+        end)
+        item:addClass("eg-menu__item--selected")
+      end)
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Popover toggle behavior
+-- -----------------------------------------------------------------
+local function initPopovers()
+  local wrappers = document:querySelectorAll(".eg-popover-wrapper")
+  wrappers:forEach(function(wrapper, wi)
+    local trigger = wrapper:querySelector(".eg-btn")
+    local popover = wrapper:querySelector(".eg-popover")
+    if trigger and popover then
+      local visible = true -- shown by default in static preview
+      trigger:addEventListener("click", function(e)
+        visible = not visible
+        if visible then
+          popover.style:setProperty("display", "block")
+        else
+          popover.style:setProperty("display", "none")
+        end
+      end)
+    end
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Side Sheet static preview close button
+-- -----------------------------------------------------------------
+local function initSideSheetPreview()
+  local sheetHeaders = document:querySelectorAll(".eg-side-sheet__header")
+  sheetHeaders:forEach(function(header, i)
+    local closeBtn = header:querySelector(".eg-icon-btn")
+    if closeBtn then
+      closeBtn:addEventListener("click", function(e)
+        -- Find the sheet panel (parent chain)
+        local panel = header.parentNode
+        if panel then panel.style:setProperty("display", "none") end
+      end)
+    end
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Alert close behavior (bind click events to close buttons in HTML)
+-- -----------------------------------------------------------------
+local function initAlerts()
+  local closeBtns = document:querySelectorAll(".eg-alert__close")
+  closeBtns:forEach(function(btn, i)
+    btn:addEventListener("click", function(e)
+      local alert = btn.parentElement
+      if alert then alert:remove() end
+    end)
+  end)
+end
+
+-- -----------------------------------------------------------------
+-- Initialize all behaviors
+-- -----------------------------------------------------------------
+initSwitches()
+initTabs()
+initDialogs()
+initTagInput()
+initGroups()
+initSideSheet()
+initPagination()
+initToastClose()
+initCornerDialog()
+initFileCardRemove()
+initStaticDialogPreview()
+initMenuItems()
+initPopovers()
+initSideSheetPreview()
+initAlerts()
+
+console.log("[Evergreen UI] Showcase initialized — all components interactive")
+</script>
+
+</body>
+</html>

@@ -1,0 +1,41 @@
+<html><body>
+<div id="box" style="color:red;font-size:20px;margin:10px"></div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test CSSStyleDeclaration: item(), length, getPropertyValue, getPropertyPriority
+local el = document:getElementById("box")
+local s = el.style
+local ok = true
+local detail = ""
+
+-- length should be >= 3
+local len = s.length
+ok = ok and (len >= 3)
+detail = detail .. "len=" .. tostring(len) .. "; "
+
+-- item(0..len-1) should return property names
+local names = {}
+for i = 0, len - 1 do
+    local name = s:item(i)
+    ok = ok and (name ~= "")
+    table.insert(names, name)
+end
+detail = detail .. "names=" .. table.concat(names, ",") .. "; "
+
+-- getPropertyValue should return serialized values
+local fs = s:getPropertyValue("font-size")
+ok = ok and (fs == "20px")
+detail = detail .. "fs=" .. fs .. "; "
+
+-- getPropertyPriority should return "" for non-important
+local pri = s:getPropertyPriority("font-size")
+ok = ok and (pri == "")
+detail = detail .. "pri=[" .. pri .. "]; "
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

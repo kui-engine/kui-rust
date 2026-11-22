@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="parent"><span id="child">hi</span></div>
+<script>
+-- L1: Element:contains() and attributes list
+local parent = document:getElementById("parent")
+local child = document:getElementById("child")
+local other = document:getElementById("result")
+
+local ok = true
+local msg = ""
+
+if not parent:contains(child) then ok = false; msg = msg .. "contains(child) failed; " end
+if parent:contains(other) then ok = false; msg = msg .. "contains(other) should be false; " end
+
+-- Test attributes list
+child:setAttribute("data-x", "1")
+local attrs = child:attributes()
+local found = false
+for i = 1, #attrs do
+    if attrs[i].name == "data-x" and attrs[i].value == "1" then found = true end
+end
+if not found then ok = false; msg = msg .. "attributes list missing data-x; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body>
+</html>

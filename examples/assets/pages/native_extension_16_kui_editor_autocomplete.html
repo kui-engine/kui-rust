@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    padding: 16px;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #0f172a; color: #e2e8f0; min-height: 100vh;
+}
+header { display: flex; align-items: baseline; justify-content: space-between;
+         margin-bottom: 10px; }
+h1 { font-size: 18px; }
+.subtitle { color: #94a3b8; font-size: 12px; }
+.hint {
+    margin: 0 0 10px 0; color: #94a3b8; font-size: 12px;
+    font-family: "Consolas", monospace; line-height: 1.7;
+}
+.hint kbd { background: #313244; padding: 2px 6px; border-radius: 4px;
+            color: #cdd6f4; margin: 0 2px; }
+.hint b { color: #f1f5f9; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.toolbar button {
+    padding: 6px 12px; border-radius: 4px; border: 1px solid #334155;
+    background: #334155; color: #e2e8f0; font: 13px "Segoe UI"; cursor: pointer;
+}
+.toolbar button:hover { background: #475569; }
+.editor-wrap { display: flex; height: 520px; }
+kui-editor { flex: 1; height: 100%;
+             background: #1e293b; border: 1px solid #334155;
+             font-family: "Cascadia Code", "Consolas", monospace; }
+#log {
+    margin-top: 8px; padding: 8px 12px;
+    background: #020617; border: 1px solid #334155; border-radius: 4px;
+    max-height: 150px; overflow-y: auto;
+    font: 11px "Cascadia Code", monospace; color: #cbd5e1; white-space: pre;
+}
+</style></head>
+<body>
+<header>
+  <h1>kui-editor — host-driven autocomplete (ghost text + input events)</h1>
+  <span class="subtitle">SDK 3.14.0 • KUI-036 • getLineText / getTextRange / getCaretByteOffset / setGhostText / input events</span>
+</header>
+
+<p class="hint">
+  Type an identifier prefix (try <kbd>fun</kbd>, <kbd>ret</kbd>, <kbd>con</kbd>, <kbd>doc</kbd>, <kbd>add</kbd>) and a faded
+  ghost completion appears · <kbd>Tab</kbd> accept (native) · <kbd>Esc</kbd> dismiss (native) ·
+  <b>Accept word</b> button = partial accept
+</p>
+
+<div class="toolbar" style="margin-bottom:10px;">
+  <button id="accept-word">Accept word (acceptGhostWord)</button>
+</div>
+
+<div class="editor-wrap">
+  <kui-editor id="ed" line-numbers="true"></kui-editor>
+</div>
+<div id="log"></div>
+
+<script>
+local ed     = document:getElementById("ed")
+local logBox = document:getElementById("log")
+local function logLine(s)
+    logBox.textContent = (logBox.textContent or "") .. tostring(s) .. "\n"
+end
+
+ed:setValue("// KUI-036 autocomplete demo — type a prefix below.\nfunction main() {\n    \n}\n")
+ed:setLanguage("javascript")
+ed:setTheme("mocha")
+ed:setCaret(2, 4)          -- start inside main()'s body
+ed:focus()
+
+-- ---------------------------------------------------------------------------
+-- A tiny static completion dictionary: prefix -> full identifier/snippet.
+-- A real host would query an LSP or an AI FIM model with the prefix/suffix
+-- window pulled via getTextRange + getCaretByteOffset.
+-- ---------------------------------------------------------------------------
+local DICT = {
+    "function", "return", "const", "continue", "console", "document",
+    "addEventListener", "getElementById", "for", "forEach", "filter",
+}
+
+-- Read the word fragment ending at the caret on the current line.
+-- getLineText(line) is 0-indexed; columns are UTF-8 byte offsets, which match
+-- the ASCII identifiers we care about here.
+local function wordBeforeCaret()
+    local line = ed:getCaretLine()
+    local col  = ed:getCaretCol()
+    local text = ed:getLineText(line)              -- KUI-036 #1
+    if not text or text == "" then return "" end
+    local prefix = text:sub(1, col)                -- bytes up to the caret
+    -- Last run of [A-Za-z_][A-Za-z0-9_]* touching the caret.
+    return prefix:match("[%a_][%w_]*$") or ""
+end
+
+-- Find the first dictionary entry that the fragment is a *strict* prefix of.
+local function suggestFor(frag)
+    if frag == "" then return nil end
+    for _, word in ipairs(DICT) do
+        if #word > #frag and word:sub(1, #frag) == frag then
+            return word:sub(#frag + 1)             -- only the missing tail
+        end
+    end
+    return nil
+end
+
+local lastFrag = nil
+local function refreshSuggestion(reason)
+    local frag = wordBeforeCaret()
+    if frag == lastFrag then return end
+    lastFrag = frag
+    local tail = suggestFor(frag)
+    if tail then
+        ed:setGhostText(tail)                       -- KUI-036 ghost API
+        logLine(string.format("[%s] frag=%q -> ghost=%q  (caretByte=%d)",
+            reason, frag, tail, ed:getCaretByteOffset()))
+    else
+        if ed:hasGhostText() == 1 then ed:clearGhostText() end
+    end
+end
+
+-- ---------------------------------------------------------------------------
+-- KUI-036 editor InputEvents — dispatched to the <kui-editor> element through
+-- the host EventDispatcher, so a plain addEventListener observes them.
+-- ---------------------------------------------------------------------------
+ed:addEventListener("input", function(e)
+    -- e.data = inserted text, e.inputType = W3C-ish edit reason.
+    refreshSuggestion("input:" .. (e.inputType or "?"))
+end)
+
+ed:addEventListener("ghostaccept", function(e)
+    logLine(string.format("ghostaccept data=%q type=%s", e.data or "", e.inputType or "?"))
+    lastFrag = nil                                  -- force a fresh suggestion
+    refreshSuggestion("after-accept")
+end)
+
+ed:addEventListener("ghostdismiss", function(e)
+    logLine("ghostdismiss type=" .. (e.inputType or "?"))
+    if e.inputType == "escape" then lastFrag = "\0" end  -- suppress until next edit
+end)
+
+-- ---------------------------------------------------------------------------
+-- Accept / dismiss keys.
+--
+-- Tab and Esc are handled NATIVELY by the editor when a ghost is active
+-- (editor_events.cpp:131-146): Tab -> acceptGhostText (fires "ghostaccept"
+-- type=full), Esc -> clearGhostText (fires "ghostdismiss" type=escape). The
+-- host does NOT need to wire these up — it just observes the resulting events
+-- above. Likewise any caret-move key dismisses the ghost natively
+-- (ghostdismiss type=caretmove). So this demo deliberately does NOT add a
+-- keydown handler for Tab/Esc; doing so would double-handle the native path.
+--
+-- acceptGhostWord (partial accept of one word) has NO native key binding, so
+-- the host drives it — here via a toolbar button so it stays reliable (a
+-- Ctrl+Right keydown would be consumed as a caret-move and dismiss the ghost
+-- before our handler could run).
+-- ---------------------------------------------------------------------------
+document:getElementById("accept-word"):addEventListener("click", function()
+    if ed:hasGhostText() == 1 then
+        ed:acceptGhostWord()                        -- editor_lua_api.cpp:2994
+    end
+    ed:focus()
+end)
+
+logLine("ready — type a prefix; ghost text follows your edits via the 'input' event")
+print("[autocomplete demo] ready")
+</script>
+</body></html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    padding: 16px;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+header { display: flex; align-items: center; justify-content: space-between;
+         margin-bottom: 12px; }
+h1     { font-size: 18px; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.toolbar button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #334155;
+    background: #1e293b;
+    color: #e2e8f0;
+    font: 13px "Segoe UI";
+    cursor: pointer;
+}
+.toolbar button:hover { background: #334155; }
+.toolbar button.danger  { background: #7f1d1d; border-color: #b91c1c; }
+.toolbar button.danger:hover { background: #b91c1c; }
+.toolbar input { padding: 6px 10px; border-radius: 4px; border: 1px solid #334155;
+                  background: #1e293b; color: #e2e8f0; width: 320px; }
+.editor-wrap { display: flex; height: 620px; }
+kui-editor    { flex: 1; height: 100%;
+                background: #1e293b; border: 1px solid #334155;
+                font-family: "Cascadia Code", "Consolas", monospace; }
+.statusbar {
+    margin-top: 8px; padding: 6px 12px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    font: 12px "Cascadia Code", monospace;
+}
+.statusbar .err  { color: #f87171; }
+.statusbar .warn { color: #fbbf24; }
+.statusbar .ok   { color: #4ade80; }
+#log {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #020617;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    max-height: 160px;
+    overflow-y: auto;
+    font: 11px "Cascadia Code", monospace;
+    color: #cbd5e1;
+    white-space: pre;
+}
+</style></head>
+<body>
+<header>
+    <h1>kui-editor M2 LSP integration demo</h1>
+    <small style="color:#94a3b8;">v2.13.0 • synthetic + clangd modes</small>
+</header>
+
+<div class="toolbar">
+    <button id="inject-diag">Inject diagnostics</button>
+    <button id="clear-diag">Clear diagnostics</button>
+    <input id="clangd-path" placeholder="C:\path\to\clangd.exe (optional)" />
+    <button id="start-clangd">Start clangd</button>
+    <button id="hover-caret">Hover at caret</button>
+    <button id="stop-lsp" class="danger">Stop LSP</button>
+</div>
+
+<div class="editor-wrap">
+    <kui-editor id="ed" line-numbers="true"></kui-editor>
+</div>
+
+<div class="statusbar" id="stats"></div>
+<div id="log"></div>
+
+<script>
+local sampleCode = [[
+// Hover anywhere; the demo will issue a textDocument/hover request when
+// the manager is in Initialized state.  Edit the buffer to mutate doc
+// version (didChange is sent on every keystroke).
+#include <iostream>
+#include <string>
+#include <vector>
+
+struct Report {
+    int value = 0;
+    std::string label;
+};
+
+int summarize(const std::vector<Report>& reports) {
+    int total = 0;
+    for (const auto& r : reports) {
+        total += r.value;       // <-- inject error here
+    }
+    return total;
+}
+
+int main() {
+    std::vector<Report> rs = { {1, "a"}, {2, "b"}, {3, "c"} };
+    std::cout << "sum = " << summarize(rs) << "\n";
+    return 0;
+}
+]]
+
+local ed     = document:getElementById("ed")
+local stats  = document:getElementById("stats")
+local logBox = document:getElementById("log")
+local pathEl = document:getElementById("clangd-path")
+
+local docUri  = "file:///demo/demo.cpp"
+
+local function logLine(s)
+    -- Append text; KUI textContent works for plain text.
+    logBox.textContent = (logBox.textContent or "") .. tostring(s) .. "\n"
+end
+
+-- After lspAttach, the manager auto-opens the document on initialize
+-- and onTick auto-syncs every buffer change.  This helper just checks
+-- whether the document has reached the LSP server yet.
+local function ensureDocOpen()
+    if not ed:lspIsInitialized() then return false end
+    if not ed:lspIsOpen(docUri) then
+        -- Manager wasn't initialized yet when we attached -- re-attach
+        -- now to drive didOpen.
+        ed:lspAttach(docUri, "cpp")
+        logLine("re-attached after initialize -> " .. docUri)
+    end
+    return ed:lspIsOpen(docUri)
+end
+
+-- Inject synthetic publishDiagnostics so demo works without clangd.
+document:getElementById("inject-diag"):addEventListener("click", function(e)
+    local body = [[
+{
+  "uri": "file:///demo/demo.cpp",
+  "version": 1,
+  "diagnostics": [
+    {
+      "range": { "start": {"line": 17, "character": 8}, "end": {"line": 17, "character": 13} },
+      "severity": 1,
+      "source": "demo",
+      "message": "expected ';' before '}' token"
+    },
+    {
+      "range": { "start": {"line": 14, "character": 4}, "end": {"line": 14, "character": 9} },
+      "severity": 2,
+      "source": "demo",
+      "message": "variable 'total' shadows previous local"
+    },
+    {
+      "range": { "start": {"line": 4, "character": 0}, "end": {"line": 4, "character": 18} },
+      "severity": 3,
+      "source": "demo",
+      "message": "consider including <cstdint>"
+    }
+  ]
+}
+]]
+    if ed:lspInjectPublishDiagnosticsJson(body) then
+        logLine("injected 3 synthetic diagnostics")
+    else
+        logLine("inject failed")
+    end
+    ed:focus()
+end)
+
+document:getElementById("clear-diag"):addEventListener("click", function(e)
+    -- Replace with an empty diagnostics array == clear in LSP semantics.
+    ed:lspInjectPublishDiagnosticsJson(
+        '{"uri":"file:///demo/demo.cpp","version":99,"diagnostics":[]}')
+    logLine("diagnostics cleared")
+    ed:focus()
+end)
+
+-- Spawn clangd if a path was supplied.
+document:getElementById("start-clangd"):addEventListener("click", function(e)
+    local p = pathEl.value
+    if not p or p == "" then
+        logLine("set clangd path first (e.g. C:\\Program Files\\LLVM\\bin\\clangd.exe)")
+        return
+    end
+    if ed:lspStart(p, "--log=error") then
+        logLine("clangd spawned at " .. p)
+    else
+        logLine("clangd spawn failed: " .. (ed:lspLastError() or "unknown"))
+    end
+end)
+
+-- Hover at the current caret position.
+local pendingHover = 0
+document:getElementById("hover-caret"):addEventListener("click", function(e)
+    if not ensureDocOpen() then logLine("LSP not initialized; using synthetic mode"); return end
+    local line = ed:getCaretLine()
+    local col  = ed:getCaretCol()
+    pendingHover = ed:lspRequestHover(docUri, line, col)
+    if pendingHover > 0 then
+        logLine(string.format("requested hover @ %d:%d (id=%d)", line, col, pendingHover))
+    end
+    ed:focus()
+end)
+
+document:getElementById("stop-lsp"):addEventListener("click", function(e)
+    ed:lspStop()
+    logLine("LSP stopped")
+end)
+
+-- ----- Initial load -----
+ed:setValue(sampleCode)
+ed:setLanguage("cpp")
+ed:setTheme("mocha")
+
+-- M2-14-INTEG: attach the document to the LSP layer right away.  This
+-- records the URI on the editor so paint can query DiagnosticStore for
+-- squiggle underlines + gutter markers BEFORE any real LSP server is
+-- spawned.  Once `lspStart` succeeds + initialize handshake completes,
+-- the auto-sync hook in onTick will start emitting didChangeFull on
+-- every buffer mutation -- no manual driving required.
+ed:lspAttach(docUri, "cpp")
+logLine("attached document: " .. docUri)
+
+-- ----- Frame tick: poll pending hover + status -----------------
+-- onTick (in C++) drives lspTick() + auto-sync; this Lua interval
+-- only handles the parts that need Lua context: pending poll IDs +
+-- status-bar UI updates.
+setInterval(function()
+    -- 1. Resolve pending hover request if any.
+    if pendingHover > 0 then
+        local r = ed:lspPollResultJson(pendingHover)
+        if r then
+            logLine("hover result: " .. r:sub(1, 180))
+            pendingHover = 0
+        else
+            local err = ed:lspPollErrorJson(pendingHover)
+            if err then
+                logLine("hover error: " .. err)
+                pendingHover = 0
+            end
+        end
+    end
+
+    -- 2. Status bar -- always cheap.
+    local counts = ed:lspDiagnosticCountsJson(docUri)
+    local state  = ed:lspState() or "Uninitialized"
+    local running = ed:lspIsRunning() and "running" or "idle"
+    stats.textContent = string.format(
+        "  state=%s  proc=%s  diag=%s  caret=%d:%d  ver=%d",
+        state, running, counts, ed:getCaretLine(), ed:getCaretCol(),
+        ed:getVersion())
+end, 100)
+
+print("[LSP demo] ready -- try 'Inject diagnostics' (no clangd needed)")
+</script>
+
+</body></html>

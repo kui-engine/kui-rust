@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.list{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden}
+.lhdr{display:flex;padding:12px 16px;background:#f1f5f9;font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase}
+.lhdr .col{flex:1}.lhdr .csm{width:80px;text-align:center}
+.li{display:flex;padding:12px 16px;border-bottom:1px solid #f1f5f9;align-items:center;cursor:pointer;font-size:14px;color:#475569}
+.li:hover{background:#f8fafc}.li.sel{background:#dbeafe;color:#1e40af}
+.li .col{flex:1}.li .csm{width:80px;text-align:center}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px;margin-right:12px}
+.badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.ba{background:#dcfce7;color:#166534}.bw{background:#fef3c7;color:#92400e}.bo{background:#f1f5f9;color:#94a3b8}
+.sb{padding:12px 16px;background:#f8fafc;font-size:12px;color:#94a3b8;border-top:1px solid #e2e8f0}
+</style></head><body>
+<h2>List View</h2>
+<div class="list">
+<div class="lhdr"><div class="col">Name</div><div class="col">Role</div><div class="csm">Status</div></div>
+<div class="li" id="r0"><div class="av" style="background:#3b82f6">AL</div><div class="col">Alice Liu</div><div class="col">Frontend</div><div class="csm"><span class="badge ba">Active</span></div></div>
+<div class="li" id="r1"><div class="av" style="background:#10b981">BK</div><div class="col">Bob Kim</div><div class="col">Backend</div><div class="csm"><span class="badge ba">Active</span></div></div>
+<div class="li" id="r2"><div class="av" style="background:#f59e0b">CW</div><div class="col">Carol Wang</div><div class="col">Designer</div><div class="csm"><span class="badge bw">Away</span></div></div>
+<div class="li" id="r3"><div class="av" style="background:#ef4444">DM</div><div class="col">Dave Miller</div><div class="col">DevOps</div><div class="csm"><span class="badge bo">Offline</span></div></div>
+<div class="li" id="r4"><div class="av" style="background:#8b5cf6">EJ</div><div class="col">Eve Johnson</div><div class="col">PM</div><div class="csm"><span class="badge ba">Active</span></div></div>
+<div class="sb" id="status">5 members — Click to select</div>
+</div></body></html>

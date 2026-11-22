@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",sans-serif;background:#0f172a;color:#f8fafc;height:100vh;display:flex}
+.sidebar{width:240px;background:#0f172a;border-right:1px solid #1e293b;display:flex;flex-direction:column}
+.sb-hdr{padding:16px;font-size:16px;font-weight:700;border-bottom:1px solid #1e293b}
+.contact{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03)}
+.contact:hover{background:#1e293b}.contact.active{background:#1e293b}
+.contact .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:13px}
+.contact .info{flex:1;min-width:0}.contact .info .name{font-size:13px;font-weight:600}.contact .info .last{font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat{flex:1;display:flex;flex-direction:column;background:#0f172a}
+.chat-hdr{padding:16px;border-bottom:1px solid #1e293b;font-weight:600;font-size:15px;display:flex;align-items:center;gap:10px}
+.chat-hdr .status{width:8px;height:8px;border-radius:50%;background:#10b981}
+.messages{flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:70%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5}
+.msg.sent{align-self:flex-end;background:#3b82f6;color:white;border-bottom-right-radius:4px}
+.msg.recv{align-self:flex-start;background:#1e293b;color:#e2e8f0;border-bottom-left-radius:4px}
+.msg .time{font-size:10px;opacity:.6;margin-top:4px}
+.input-bar{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #1e293b}
+.input-bar input{flex:1;padding:10px 16px;border-radius:20px;background:#1e293b;border:1px solid #334155;color:#f8fafc;font-size:13px}
+.input-bar input:focus{outline:none;border-color:#3b82f6}
+.send-btn{padding:10px 20px;border-radius:20px;background:#3b82f6;color:white;border:none;font-size:13px;font-weight:600;cursor:pointer}
+</style></head><body>
+<div class="sidebar">
+<div class="sb-hdr">Messages</div>
+<div class="contact active"><div class="av" style="background:#3b82f6">AL</div><div class="info"><div class="name">Alice Liu</div><div class="last">Hey, check out the new UI!</div></div></div>
+<div class="contact"><div class="av" style="background:#10b981">BK</div><div class="info"><div class="name">Bob Kim</div><div class="last">The build is passing now</div></div></div>
+<div class="contact"><div class="av" style="background:#f59e0b">CW</div><div class="info"><div class="name">Carol Wang</div><div class="last">Design review tomorrow</div></div></div>
+<div class="contact"><div class="av" style="background:#8b5cf6">DM</div><div class="info"><div class="name">Dave Miller</div><div class="last">Deployed to staging</div></div></div>
+</div>
+<div class="chat">
+<div class="chat-hdr"><div class="status"></div>Alice Liu</div>
+<div class="messages" id="msgs">
+<div class="msg recv">Hey! Have you seen the new KUI dashboard?<div class="time">10:30 AM</div></div>
+<div class="msg sent">Yes! The layout looks great. Using flex + grid?<div class="time">10:31 AM</div></div>
+<div class="msg recv">Exactly! And the Skia renderer makes it super smooth.<div class="time">10:32 AM</div></div>
+<div class="msg sent">Nice. Let me check the component examples too.<div class="time">10:33 AM</div></div>
+<div class="msg recv">Sure, the tabs and accordion are interactive now!<div class="time">10:34 AM</div></div>
+</div>
+<div class="input-bar"><input type="text" id="msgInput" placeholder="Type a message..."><button class="send-btn" id="sendBtn">Send</button></div>
+</div>
+</body></html>

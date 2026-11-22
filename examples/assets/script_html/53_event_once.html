@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="target">click me</div>
+<script>
+-- E3: addEventListener with {once=true} should fire only once
+local count = 0
+local el = document:getElementById("target")
+el:addEventListener("click", function(e)
+    count = count + 1
+end, {once = true})
+
+-- Dispatch twice
+el:dispatchEvent("click")
+el:dispatchEvent("click")
+
+if count == 1 then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = "expected 1, got " .. tostring(count)
+end
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="container"></div>
+<input id="focusable" type="text" />
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+-- document:createTextNode
+local tn = document:createTextNode("hello world")
+if tn == nil then ok = false; msg = msg .. "createTextNode nil; "
+else
+    if tn.nodeType ~= 3 then ok = false; msg = msg .. "textNode type=" .. tostring(tn.nodeType) .. "; " end
+    if tn.textContent ~= "hello world" then ok = false; msg = msg .. "textNode text=" .. tostring(tn.textContent) .. "; " end
+    -- Note: appendChild expects Element*, so text nodes cannot be directly appended via Lua API.
+    -- Test text node properties instead.
+    if tn.nodeName ~= "#text" then ok = false; msg = msg .. "textNode name=" .. tostring(tn.nodeName) .. "; " end
+    tn.textContent = "modified"
+    if tn.textContent ~= "modified" then ok = false; msg = msg .. "textNode write failed; " end
+end
+
+-- document.activeElement (may be nil in headless — just verify no crash)
+local ae = document.activeElement
+-- ae may be nil or an Element, both are valid
+
+-- document.basePath (read/write)
+local bp = document.basePath
+if type(bp) ~= "string" then ok = false; msg = msg .. "basePath not string; " end
+document.basePath = "/test/path"
+local bp2 = document.basePath
+if bp2 ~= "/test/path" then ok = false; msg = msg .. "basePath set=" .. tostring(bp2) .. "; " end
+
+-- document:invalidate() — should not crash
+document:invalidate()
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

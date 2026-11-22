@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<!--
+    R-23A/F/G/H + R-24C — Bidi 完整闭环 showcase (Arabic + Latin + Digits)
+    Specs:
+      UAX #9     — Unicode Bidirectional Algorithm
+      CSS WM 4   — direction / unicode-bidi
+      HTML       — dir="auto" (§3.2.6.2), <bdi> / <bdo>
+      Selectors L4 — :dir() (§11.3)
+      CSS Logical Properties 1 — margin-inline-* / padding-inline-* / inset-inline-*
+    Coverage:
+      §1  direction: rtl 段落基线（R-23A）
+      §2  unicode-bidi 6 值（R-23F: normal / embed / isolate / bidi-override / isolate-override / plaintext）
+      §3  <bdi> / <bdo> 隐式 / 显式隔离
+      §4  dir="auto" first-strong（R-23G）
+      §5  <input type="text" dir="auto"> 表单本地化（R-23H）
+      §6  :dir(ltr) / :dir(rtl) 选择器（R-24C）
+      §7  CSS Logical Properties RTL 自动镜像（R-24C）
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>R-23A/F/G/H + R-24C — Bidi Arabic showcase</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: #0f172a;
+        color: #e2e8f0;
+        font-family: "Segoe UI", "Microsoft YaHei", "Tahoma", "Arial", sans-serif;
+        padding: 24px;
+        line-height: 1.75;
+    }
+    h2 { font-size: 22px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 18px 0 6px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 18px 22px; margin-bottom: 18px; }
+    .label { font-size: 11px; color: #64748b; margin-bottom: 4px; font-family: monospace; }
+    .demo { font-size: 18px; color: #f1f5f9; padding: 6px 0; }
+    .arabic { font-family: "Tahoma", "Arial", "Segoe UI", sans-serif; font-size: 20px; }
+    .badge {
+        display: inline-block; background: #334155; color: #38bdf8;
+        font-size: 10px; padding: 2px 8px; border-radius: 4px;
+        font-family: monospace; margin-left: 6px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .box {
+        background: #0f172a; border-radius: 6px; padding: 10px 14px;
+        border-left: 3px solid #38bdf8;
+    }
+    .box.rtl { border-left: none; border-right: 3px solid #10b981; }
+
+    /* §1 — direction baseline */
+    .dir-rtl { direction: rtl; }
+    .dir-ltr { direction: ltr; }
+
+    /* §2 — unicode-bidi 6 values */
+    .ub-normal     { unicode-bidi: normal; }
+    .ub-embed      { unicode-bidi: embed; direction: rtl; }
+    .ub-isolate    { unicode-bidi: isolate; }
+    .ub-override   { unicode-bidi: bidi-override; direction: rtl; }
+    .ub-isooverride{ unicode-bidi: isolate-override; direction: rtl; }
+    .ub-plaintext  { unicode-bidi: plaintext; }
+
+    /* §6 — :dir() selectors */
+    p:dir(ltr) { background: rgba(56, 189, 248, 0.1); padding-inline-start: 8px; border-inline-start: 3px solid #38bdf8; }
+    p:dir(rtl) { background: rgba(16, 185, 129, 0.1); padding-inline-start: 8px; border-inline-start: 3px solid #10b981; }
+
+    /* §7 — CSS Logical Properties */
+    .lp-card {
+        padding-inline-start: 14px;
+        padding-inline-end: 24px;
+        margin-inline-start: 0;
+        margin-inline-end: 32px;
+        border-inline-start: 4px solid #f59e0b;
+        background: #0f172a;
+        border-radius: 6px;
+        padding-block: 10px;
+    }
+
+    input.bidi-input {
+        font-size: 16px;
+        padding: 8px 12px;
+        background: #0f172a;
+        color: #f1f5f9;
+        border: 1px solid #334155;
+        border-radius: 4px;
+        width: 100%;
+        margin-bottom: 8px;
+        font-family: inherit;
+    }
+</style>
+</head>
+<body>
+    <h2>R-23 系列 + R-24C — 完整 Bidi 闭环（阿拉伯语 / 拉丁文 / 数字混排）</h2>
+
+    <!-- ============================================================ -->
+    <!-- §1 — direction: rtl 段落基线方向 (R-23A) -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h3>§1 · direction 段落基线方向 <span class="badge">R-23A</span></h3>
+
+        <div class="label">direction: ltr — 段落基线 LTR，阿拉伯 run 内部仍 RTL shaping</div>
+        <div class="demo dir-ltr">
+            English text mixed with Arabic <span class="arabic">العربية</span> and numbers 12345.
+        </div>
+
+        <div class="label">direction: rtl — 段落基线 RTL，整体右起，run 重排</div>
+        <div class="demo dir-rtl arabic">
+            مرحبا English mixed 12345 العالم
+        </div>
+
+        <div class="label">阿拉伯纯 RTL 段（长段混排：拉丁 + 阿拉伯 + 数字）</div>
+        <div class="demo dir-rtl arabic">
+            النص العربي مع كلمات Latin words و الأرقام 2026 ثم رجوع إلى العربية.
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- §2 — unicode-bidi 6 values (R-23F) -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h3>§2 · unicode-bidi 6 值 <span class="badge">R-23F</span></h3>
+
+        <div class="grid-2">
+            <div class="box">
+                <div class="label">unicode-bidi: normal（默认，无 Bidi 隔离）</div>
+                <div class="demo ub-normal">外部 Arabic <span>العربية words</span> tail</div>
+            </div>
+            <div class="box rtl">
+                <div class="label">unicode-bidi: embed + direction: rtl</div>
+                <div class="demo">外部 ltr text <span class="ub-embed arabic">العربية مدمج</span> 收尾</div>
+            </div>
+            <div class="box">
+                <div class="label">unicode-bidi: isolate（外部上下文不被打断）</div>
+                <div class="demo">外部 ltr text <span class="ub-isolate arabic">العربية معزول</span> 收尾</div>
+            </div>
+            <div class="box rtl">
+                <div class="label">unicode-bidi: bidi-override + direction: rtl（强制反向）</div>
+                <div class="demo">前 <span class="ub-override">ABCDEF reversed</span> 后</div>
+            </div>
+            <div class="box">
+                <div class="label">unicode-bidi: isolate-override（隔离 + 反向）</div>
+                <div class="demo">前 <span class="ub-isooverride">ABCDEF isolated+rev</span> 后</div>
+            </div>
+            <div class="box rtl">
+                <div class="label">unicode-bidi: plaintext（按内容首字符自动）</div>
+                <div class="demo arabic"><span class="ub-plaintext">العربية تستنتج اتجاه</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- §3 — <bdi> / <bdo> HTML 元素 -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h3>§3 · &lt;bdi&gt; / &lt;bdo&gt; HTML 元素 <span class="badge">UA 默认</span></h3>
+
+        <div class="label">&lt;bdi&gt; 隐式 unicode-bidi: isolate + dir=auto（用户名混排首选）</div>
+        <div class="demo">
+            User <bdi class="arabic">العربية</bdi> posted 42 likes
+        </div>
+        <div class="demo">
+            User <bdi class="arabic">المستخدم123</bdi> said: hello
+        </div>
+
+        <div class="label">&lt;bdo dir="rtl"&gt; 强制反向（unicode-bidi: isolate-override）</div>
+        <div class="demo">
+            normal <bdo dir="rtl">ABCDEF GHIJKL</bdo> back
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- §4 — dir="auto" first-strong (R-23G) -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h3>§4 · dir="auto" first-strong 检测 <span class="badge">R-23G</span></h3>
+
+        <div class="label">dir="auto" + 首字符 Latin → 推断 LTR</div>
+        <div class="demo" dir="auto">Hello world (mixed العربية text follows)</div>
+
+        <div class="label">dir="auto" + 首字符 Arabic → 推断 RTL</div>
+        <div class="demo arabic" dir="auto">العربية في البداية (Latin words follow)</div>
+
+        <div class="label">dir="auto" + 首字符为数字 → 跳过到下一个 strong</div>
+        <div class="demo arabic" dir="auto">2026 العربية تأتي بعد الأرقام</div>
+
+        <div class="label">dir="auto" + 子树排除 &lt;bdi&gt;（first-strong 跳过 bdi 内容）</div>
+        <div class="demo" dir="auto"><bdi class="arabic">العربية</bdi> English content here is dominant</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- §5 — <input dir="auto"> 表单本地化 (R-23H) -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h3>§5 · 表单本地化（input/textarea + dir="auto"） <span class="badge">R-23H</span></h3>
+
+        <div class="label">type="text" + dir="auto" + value 以 Arabic 开头 → 字段内显示为 RTL</div>
+        <input class="bidi-input arabic" type="text" dir="auto" value="مرحبا العالم" placeholder="Type here">
+
+        <div class="label">type="text" + dir="auto" + value 以 Latin 开头 → 字段内显示为 LTR</div>
+        <input class="bidi-input" type="text" dir="auto" value="Hello world from KUI" placeholder="Type here">
+
+        <div class="label">type="tel" → 强制 LTR（HTML §4.10.5.1.2，phone 字段不应反转）</div>
+        <input class="bidi-input" type="tel" dir="auto" value="+966-50-1234567" placeholder="Phone">
+
+        <div class="label">type="email" → 强制 LTR（HTML §4.10.5.1.5）</div>
+        <input class="bidi-input" type="email" dir="auto" value="user@example.com" placeholder="Email">
+
+        <div class="label">type="url" → 强制 LTR（HTML §4.10.5.1.6）</div>
+        <input class="bidi-input" type="url" dir="auto" value="https://example.com/path" placeholder="URL">
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- §6 — :dir() 选择器 (R-24C) -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h3>§6 · :dir(ltr) / :dir(rtl) 选择器 <span class="badge">R-24C</span></h3>
+
+        <div class="label">CSS 规则：p:dir(ltr) 蓝色左边框、p:dir(rtl) 绿色左边框（RTL 下变右边框）</div>
+
+        <p dir="ltr">This paragraph is LTR — selector matches :dir(ltr).</p>
+        <p dir="rtl" class="arabic">هذه الفقرة RTL — يطابق المنتقي :dir(rtl).</p>
+        <p dir="auto" class="arabic">العربية تأتي أولاً — :dir(rtl) يطابق ضمنياً.</p>
+        <p dir="auto">English first — :dir(ltr) implicitly matches.</p>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- §7 — CSS Logical Properties RTL 物理化 (R-24C) -->
+    <!-- ============================================================ -->
+    <div class="section">
+        <h3>§7 · CSS Logical Properties — 自动镜像 <span class="badge">R-24C</span></h3>
+
+        <div class="label">LTR 容器：padding-inline-start = padding-left，border-inline-start = border-left</div>
+        <div dir="ltr">
+            <div class="lp-card">
+                <strong>LTR card</strong> — 左边有橙色 4px 边框，内边距 left=14、right=24。
+            </div>
+        </div>
+
+        <div class="label">RTL 容器：padding-inline-start = padding-RIGHT（物理上自动镜像）</div>
+        <div dir="rtl">
+            <div class="lp-card arabic">
+                <strong>بطاقة RTL</strong> — الحد البرتقالي ينتقل إلى اليمين تلقائياً، والحشو ينعكس.
+            </div>
+        </div>
+
+        <div class="label">说明：14 个 inline / block 系列 shorthand 全部支持自动 start↔end 镜像</div>
+    </div>
+</body>
+</html>

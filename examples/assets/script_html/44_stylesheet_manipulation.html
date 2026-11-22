@@ -1,0 +1,53 @@
+<html><body>
+<div id="box">Test</div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test full stylesheet manipulation workflow
+local ok = true
+local detail = ""
+
+-- Add multiple stylesheets
+document:addStylesheet("#box { font-size: 16px; }")
+document:addStylesheet(".highlight { color: red; }")
+
+local sheets = document.styleSheets
+detail = detail .. "sheets=" .. tostring(#sheets) .. "; "
+ok = ok and (#sheets >= 2)
+
+-- Find our sheets (last two)
+local sheet1 = sheets[#sheets - 1]
+local sheet2 = sheets[#sheets]
+
+-- Verify rule contents
+if sheet1 then
+    local rules = sheet1:cssRules()
+    if #rules > 0 then
+        detail = detail .. "s1.sel=[" .. rules[1].selectorText .. "]; "
+    end
+end
+
+if sheet2 then
+    -- Insert a new rule
+    sheet2:insertRule(".extra { margin: 10px; }")
+    ok = ok and (sheet2.ruleCount >= 2)
+    detail = detail .. "s2.count=" .. tostring(sheet2.ruleCount) .. "; "
+
+    -- Delete the inserted rule
+    sheet2:deleteRule(sheet2.ruleCount - 1)
+    detail = detail .. "s2.after=" .. tostring(sheet2.ruleCount) .. "; "
+
+    -- Disable/enable
+    sheet2.disabled = true
+    ok = ok and (sheet2.disabled == true)
+    sheet2.disabled = false
+    ok = ok and (sheet2.disabled == false)
+    detail = detail .. "toggle=ok; "
+end
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DOM Mutation Stress Test</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f172a; color: #cbd5e1;
+    font-family: 'Segoe UI', sans-serif; font-size: 14px;
+    padding: 24px; line-height: 1.5;
+  }
+  h1 { color: #38bdf8; font-size: 22px; margin-bottom: 4px; }
+  .subtitle { color: #475569; font-size: 13px; margin-bottom: 24px; }
+  h2 { color: #7dd3fc; font-size: 15px; margin-bottom: 12px;
+       border-bottom: 1px solid #1e293b; padding-bottom: 6px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card {
+    background: #1e293b; border: 1px solid #334155;
+    border-radius: 8px; padding: 16px;
+  }
+
+  button {
+    background: #334155; border: 1px solid #475569; color: #cbd5e1;
+    padding: 6px 14px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; transition: background 0.1s;
+  }
+  button:hover { background: #475569; }
+  button.primary { background: #2563eb; border-color: #3b82f6; color: #fff; }
+  button.primary:hover { background: #3b82f6; }
+  button.danger { background: #7f1d1d; border-color: #ef4444; color: #fca5a5; }
+  button.danger:hover { background: #991b1b; }
+  button.success { background: #14532d; border-color: #22c55e; color: #bbf7d0; }
+  button.success:hover { background: #166534; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .result {
+    font-family: 'Consolas', monospace; font-size: 12px;
+    background: #020617; border: 1px solid #1e293b; border-radius: 6px;
+    padding: 10px; min-height: 40px; margin-top: 8px;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  .result .ok   { color: #34d399; }
+  .result .fail { color: #f87171; }
+  .result .info { color: #7dd3fc; }
+
+  .item {
+    display: flex; align-items: center; gap: 8px;
+    background: #0f172a; border: 1px solid #1e293b;
+    border-radius: 6px; padding: 6px 10px; margin-bottom: 4px;
+  }
+  .item span { flex: 1; font-size: 13px; }
+  .item button { font-size: 12px; padding: 3px 10px; }
+
+  .log-panel { grid-column: 1 / -1; }
+  .log-output {
+    background: #020617; border: 1px solid #1e293b; border-radius: 6px;
+    padding: 10px; height: 200px; overflow-y: auto;
+    font-family: 'Consolas', monospace; font-size: 12px;
+  }
+  .log-line { padding: 1px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .log-line.ok    { color: #34d399; }
+  .log-line.fail  { color: #f87171; }
+  .log-line.info  { color: #7dd3fc; }
+  .log-line.warn  { color: #fbbf24; }
+
+  .status-bar {
+    margin-top: 8px; padding: 8px 12px; border-radius: 6px;
+    font-size: 13px; font-weight: 600; text-align: center;
+  }
+  .status-bar.pass { background: #14532d; color: #bbf7d0; border: 1px solid #22c55e; }
+  .status-bar.fail { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+  .status-bar.pending { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+</style>
+</head>
+<body>
+
+<h1>DOM Mutation Stress Test</h1>
+<p class="subtitle">Tests for setTextContent, setInnerHTML, replaceChild, remove, removeChild — especially during event dispatch (deferred deletion safety)</p>
+
+<div class="grid">
+
+  <!-- Test 1: setTextContent -->
+  <div class="card" id="card-textcontent">
+    <h2>1. setTextContent</h2>
+    <div class="btn-row">
+      <button id="btn-tc-basic" class="primary">Basic Set</button>
+      <button id="btn-tc-self">Self Replace</button>
+      <button id="btn-tc-clear" class="danger">Clear All</button>
+    </div>
+    <div id="tc-target">
+      <span id="tc-child-a">Child A</span>
+      <span id="tc-child-b">Child B</span>
+      <span id="tc-child-c">Child C</span>
+    </div>
+    <div class="result" id="tc-result"></div>
+  </div>
+
+  <!-- Test 2: setInnerHTML -->
+  <div class="card" id="card-innerhtml">
+    <h2>2. setInnerHTML</h2>
+    <div class="btn-row">
+      <button id="btn-ih-replace" class="primary">Replace Content</button>
+      <button id="btn-ih-append">Append HTML</button>
+      <button id="btn-ih-nested">Nested Replace</button>
+      <button id="btn-ih-clear" class="danger">Clear</button>
+    </div>
+    <div id="ih-target">
+      <div id="ih-old-1" class="item"><span>Original Item 1</span></div>
+      <div id="ih-old-2" class="item"><span>Original Item 2</span></div>
+    </div>
+    <div class="result" id="ih-result"></div>
+  </div>
+
+  <!-- Test 3: replaceChild -->
+  <div class="card" id="card-replacechild">
+    <h2>3. replaceChild</h2>
+    <div class="btn-row">
+      <button id="btn-rc-replace" class="primary">Replace First</button>
+      <button id="btn-rc-chain">Chain Replace</button>
+      <button id="btn-rc-self">Replace Self Parent</button>
+    </div>
+    <div id="rc-container">
+      <div id="rc-item-1" class="item"><span>Replaceable 1</span></div>
+      <div id="rc-item-2" class="item"><span>Replaceable 2</span></div>
+      <div id="rc-item-3" class="item"><span>Replaceable 3</span></div>
+    </div>
+    <div class="result" id="rc-result"></div>
+  </div>
+
+  <!-- Test 4: remove / removeChild during events -->
+  <div class="card" id="card-remove-event">
+    <h2>4. Remove During Events</h2>
+    <p style="font-size:12px;color:#64748b;margin-bottom:8px;">Click items to remove them — tests deferred deletion safety</p>
+    <div id="re-container">
+      <div id="re-item-1" class="item"><span>Click to remove</span><button class="danger" id="re-del-1">X</button></div>
+      <div id="re-item-2" class="item"><span>Click to remove</span><button class="danger" id="re-del-2">X</button></div>
+      <div id="re-item-3" class="item"><span>Click to remove</span><button class="danger" id="re-del-3">X</button></div>
+      <div id="re-item-4" class="item"><span>Click to remove</span><button class="danger" id="re-del-4">X</button></div>
+      <div id="re-item-5" class="item"><span>Click to remove</span><button class="danger" id="re-del-5">X</button></div>
+    </div>
+    <div class="btn-row" style="margin-top:8px;">
+      <button id="btn-re-repopulate" class="success">Repopulate</button>
+      <button id="btn-re-removeall" class="danger">Remove All</button>
+    </div>
+    <div class="result" id="re-result"></div>
+  </div>
+
+  <!-- Test 5: Combined stress -->
+  <div class="card" id="card-stress">
+    <h2>5. Combined Stress</h2>
+    <p style="font-size:12px;color:#64748b;margin-bottom:8px;">Runs multiple DOM mutations in rapid succession</p>
+    <div class="btn-row">
+      <button id="btn-stress-run" class="primary">Run Stress Test</button>
+      <button id="btn-stress-reset">Reset</button>
+    </div>
+    <div id="stress-container"></div>
+    <div class="result" id="stress-result"></div>
+  </div>
+
+  <!-- Test 6: textContent/innerHTML on self during click -->
+  <div class="card" id="card-self-mutation">
+    <h2>6. Self-Mutation During Event</h2>
+    <p style="font-size:12px;color:#64748b;margin-bottom:8px;">Element modifies its own parent's content while handling click</p>
+    <div id="sm-container">
+      <div id="sm-parent">
+        <button id="btn-sm-tc" class="primary">textContent on parent</button>
+        <button id="btn-sm-ih">innerHTML on parent</button>
+        <button id="btn-sm-replace">replaceChild self</button>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:8px;">
+      <button id="btn-sm-reset" class="success">Reset</button>
+    </div>
+    <div class="result" id="sm-result"></div>
+  </div>
+
+  <!-- Log panel -->
+  <div class="card log-panel" id="log-card">
+    <h2>Event Log</h2>
+    <div class="log-output" id="log-output"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+      <button id="btn-run-all" class="success">Run All Auto-Tests</button>
+      <button id="btn-log-clear">Clear Log</button>
+      <span id="log-count" style="font-size:11px;color:#475569;margin-left:auto;">0 lines</span>
+    </div>
+    <div class="status-bar pending" id="status-bar">Click "Run All Auto-Tests" to verify</div>
+  </div>
+
+</div>
+
+<!-- ============================================================
+     Lua Script
+     ============================================================ -->
+<script type="text/lua">
+
+-- ================================================================
+-- Log utility
+-- ================================================================
+local logCount = 0
+
+local function log(level, msg)
+  logCount = logCount + 1
+  local output = document:getElementById("log-output")
+  local countEl = document:getElementById("log-count")
+  if not output then return end
+  local line = document:createElement("div")
+  line:setAttribute("class", "log-line " .. level)
+  line.textContent = "[" .. string.upper(level) .. "] " .. msg
+  output:appendChild(line)
+  output.scrollTop = output.scrollHeight
+  if countEl then countEl.textContent = logCount .. " lines" end
+end
+
+local function logOk(msg)   log("ok", msg) end
+local function logFail(msg) log("fail", msg) end
+local function logInfo(msg) log("info", msg) end
+local function logWarn(msg) log("warn", msg) end
+
+local passCount = 0
+local failCount = 0
+
+local function assert_eq(name, actual, expected)
+  if tostring(actual) == tostring(expected) then
+    passCount = passCount + 1
+    logOk("PASS: " .. name .. " = " .. tostring(actual))
+    return true
+  else
+    failCount = failCount + 1
+    logFail("FAIL: " .. name .. " expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
+    return false
+  end
+end
+
+local function assert_true(name, cond)
+  if cond then
+    passCount = passCount + 1
+    logOk("PASS: " .. name)
+    return true
+  else
+    failCount = failCount + 1
+    logFail("FAIL: " .. name)
+    return false
+  end
+end
+
+local function assert_nil(name, val)
+  if val == nil then
+    passCount = passCount + 1
+    logOk("PASS: " .. name .. " is nil")
+    return true
+  else
+    failCount = failCount + 1
+    logFail("FAIL: " .. name .. " expected nil, got " .. tostring(val))
+    return false
+  end
+end
+
+local function setResult(id, text, ok)
+  local el = document:getElementById(id)
+  if el then
+    local cls = ok and "ok" or (ok == false and "fail" or "info")
+    el.textContent = text
+    el.style:setProperty("color", cls == "ok" and "#34d399" or (cls == "fail" and "#f87171" or "#7dd3fc"))
+  end
+end
+
+local function updateStatusBar()
+  local bar = document:getElementById("status-bar")
+  if not bar then return end
+  local total = passCount + failCount
+  if failCount == 0 then
+    bar.textContent = "ALL PASSED (" .. passCount .. "/" .. total .. ")"
+    bar:setAttribute("class", "status-bar pass")
+  else
+    bar.textContent = failCount .. " FAILED / " .. passCount .. " passed / " .. total .. " total"
+    bar:setAttribute("class", "status-bar fail")
+  end
+end
+
+-- ================================================================
+-- 1. setTextContent tests
+-- ================================================================
+local replaceCounter = 0
+
+local btnTcBasic = document:getElementById("btn-tc-basic")
+if btnTcBasic then
+  btnTcBasic:addEventListener("click", function(e)
+    replaceCounter = replaceCounter + 1
+    local target = document:getElementById("tc-target")
+    if target then
+      -- This replaces all children (span A, B, C) with a text node
+      target.textContent = "Replaced content #" .. replaceCounter
+      logInfo("setTextContent: replaced children with text #" .. replaceCounter)
+
+      -- Verify old children are gone from getElementById
+      local a = document:getElementById("tc-child-a")
+      local b = document:getElementById("tc-child-b")
+      assert_nil("tc-child-a after textContent", a)
+      assert_nil("tc-child-b after textContent", b)
+      setResult("tc-result", "textContent set to: " .. target.textContent, true)
+    end
+  end)
+end
+
+local btnTcSelf = document:getElementById("btn-tc-self")
+if btnTcSelf then
+  btnTcSelf:addEventListener("click", function(e)
+    -- The button's parent (.btn-row) gets its textContent replaced
+    -- This removes the button itself while its click handler is running!
+    local target = document:getElementById("tc-target")
+    if target then
+      target.textContent = "Self-replacement OK"
+      logOk("setTextContent on container with active handler - no crash!")
+      setResult("tc-result", "Self-replacement survived event dispatch", true)
+    end
+  end)
+end
+
+local btnTcClear = document:getElementById("btn-tc-clear")
+if btnTcClear then
+  btnTcClear:addEventListener("click", function(e)
+    local target = document:getElementById("tc-target")
+    if target then
+      target.textContent = ""
+      logInfo("setTextContent: cleared to empty")
+      assert_eq("tc-target.textContent after clear", target.textContent, "")
+      setResult("tc-result", "Cleared to empty", true)
+    end
+  end)
+end
+
+-- ================================================================
+-- 2. setInnerHTML tests
+-- ================================================================
+local ihCounter = 0
+
+local btnIhReplace = document:getElementById("btn-ih-replace")
+if btnIhReplace then
+  btnIhReplace:addEventListener("click", function(e)
+    ihCounter = ihCounter + 1
+    local target = document:getElementById("ih-target")
+    if target then
+      -- Replace all children with new HTML
+      target.innerHTML = '<div class="item"><span>New Item A (#' .. ihCounter .. ')</span></div>' ..
+                         '<div class="item"><span>New Item B (#' .. ihCounter .. ')</span></div>' ..
+                         '<div class="item"><span>New Item C (#' .. ihCounter .. ')</span></div>'
+      logInfo("innerHTML: replaced with 3 new items (#" .. ihCounter .. ")")
+
+      -- Old items should be gone
+      local old1 = document:getElementById("ih-old-1")
+      local old2 = document:getElementById("ih-old-2")
+      assert_nil("ih-old-1 after innerHTML", old1)
+      assert_nil("ih-old-2 after innerHTML", old2)
+      setResult("ih-result", "innerHTML replaced " .. ihCounter .. " time(s)", true)
+    end
+  end)
+end
+
+local btnIhAppend = document:getElementById("btn-ih-append")
+if btnIhAppend then
+  btnIhAppend:addEventListener("click", function(e)
+    local target = document:getElementById("ih-target")
+    if target then
+      -- Use createElement/appendChild instead of innerHTML concatenation
+      -- to avoid O(n^2) re-serialization and re-parsing
+      local newItem = document:createElement("div")
+      newItem:setAttribute("class", "item")
+      local span = document:createElement("span")
+      span.textContent = "Appended via appendChild"
+      newItem:appendChild(span)
+      target:appendChild(newItem)
+      logInfo("innerHTML: appended new item via appendChild")
+      setResult("ih-result", "Appended content via appendChild", true)
+    end
+  end)
+end
+
+local btnIhNested = document:getElementById("btn-ih-nested")
+if btnIhNested then
+  btnIhNested:addEventListener("click", function(e)
+    local target = document:getElementById("ih-target")
+    if target then
+      target.innerHTML = '<div class="item">' ..
+        '<span>Outer</span>' ..
+        '<div style="margin-left:20px;padding:4px;border-left:2px solid #38bdf8;">' ..
+          '<div class="item"><span>Nested Level 1</span></div>' ..
+          '<div class="item"><span>Nested Level 2</span></div>' ..
+        '</div>' ..
+      '</div>'
+      logInfo("innerHTML: set nested HTML structure")
+      setResult("ih-result", "Nested innerHTML set OK", true)
+    end
+  end)
+end
+
+local btnIhClear = document:getElementById("btn-ih-clear")
+if btnIhClear then
+  btnIhClear:addEventListener("click", function(e)
+    local target = document:getElementById("ih-target")
+    if target then
+      target.innerHTML = ""
+      logInfo("innerHTML: cleared")
+      setResult("ih-result", "Cleared via innerHTML", true)
+    end
+  end)
+end
+
+-- ================================================================
+-- 3. replaceChild tests
+-- ================================================================
+local rcCounter = 0
+
+local btnRcReplace = document:getElementById("btn-rc-replace")
+if btnRcReplace then
+  btnRcReplace:addEventListener("click", function(e)
+    rcCounter = rcCounter + 1
+    local container = document:getElementById("rc-container")
+    if not container then return end
+    local first = container.firstElementChild
+    if not first then
+      logWarn("replaceChild: no children to replace")
+      setResult("rc-result", "No children to replace", false)
+      return
+    end
+
+    local newItem = document:createElement("div")
+    newItem:setAttribute("class", "item")
+    newItem:setAttribute("id", "rc-new-" .. rcCounter)
+    local span = document:createElement("span")
+    span.textContent = "Replaced #" .. rcCounter
+    span.style:setProperty("color", "#34d399")
+    newItem:appendChild(span)
+
+    container:replaceChild(newItem, first)
+    logOk("replaceChild: replaced first child with #" .. rcCounter)
+    setResult("rc-result", "Replaced first child -> #" .. rcCounter, true)
+  end)
+end
+
+local btnRcChain = document:getElementById("btn-rc-chain")
+if btnRcChain then
+  btnRcChain:addEventListener("click", function(e)
+    local container = document:getElementById("rc-container")
+    if not container then return end
+
+    -- Replace ALL children in a loop
+    local children = container:children()
+    local count = 0
+    for i = 1, #children do
+      rcCounter = rcCounter + 1
+      count = count + 1
+      local newItem = document:createElement("div")
+      newItem:setAttribute("class", "item")
+      local span = document:createElement("span")
+      span.textContent = "Chain-replaced #" .. rcCounter
+      span.style:setProperty("color", "#a78bfa")
+      newItem:appendChild(span)
+      container:replaceChild(newItem, children[i])
+    end
+
+    logOk("replaceChild chain: replaced " .. count .. " children")
+    setResult("rc-result", "Chain-replaced " .. count .. " children", true)
+  end)
+end
+
+local btnRcSelf = document:getElementById("btn-rc-self")
+if btnRcSelf then
+  btnRcSelf:addEventListener("click", function(e)
+    -- Replace a child of rc-container while the click handler is on
+    -- a button inside the card (not inside rc-container), so this is safe
+    local container = document:getElementById("rc-container")
+    if not container then return end
+    local first = container.firstElementChild
+    if not first then
+      logWarn("replaceChild self: no children")
+      return
+    end
+
+    local newItem = document:createElement("div")
+    newItem:setAttribute("class", "item")
+    local span = document:createElement("span")
+    span.textContent = "Self-replaced during event"
+    span.style:setProperty("color", "#fbbf24")
+    newItem:appendChild(span)
+
+    container:replaceChild(newItem, first)
+    logOk("replaceChild: replaced during event dispatch - no crash!")
+    setResult("rc-result", "Self-replace during event OK", true)
+  end)
+end
+
+-- ================================================================
+-- 4. Remove during events
+-- ================================================================
+local removeCount = 0
+
+local function setupRemoveHandlers()
+  for i = 1, 5 do
+    local btn = document:getElementById("re-del-" .. i)
+    local item = document:getElementById("re-item-" .. i)
+    if btn and item then
+      btn:addEventListener("click", function(e)
+        removeCount = removeCount + 1
+        -- Remove the parent item (which contains this button!)
+        item:remove()
+        logOk("remove #" .. i .. ": removed item during own click handler")
+        setResult("re-result", "Removed " .. removeCount .. " item(s) via click", true)
+      end)
+    end
+  end
+end
+
+setupRemoveHandlers()
+
+local btnReRepopulate = document:getElementById("btn-re-repopulate")
+if btnReRepopulate then
+  btnReRepopulate:addEventListener("click", function(e)
+    local container = document:getElementById("re-container")
+    if not container then return end
+    -- Clear existing children
+    while container.firstElementChild do
+      container:removeChild(container.firstElementChild)
+    end
+    -- Rebuild using createElement/appendChild (avoids innerHTML concatenation OOM)
+    for i = 1, 5 do
+      local item = document:createElement("div")
+      item:setAttribute("id", "re-item-" .. i)
+      item:setAttribute("class", "item")
+      local span = document:createElement("span")
+      span.textContent = "Click to remove"
+      local btn = document:createElement("button")
+      btn:setAttribute("class", "danger")
+      btn:setAttribute("id", "re-del-" .. i)
+      btn.textContent = "X"
+      item:appendChild(span)
+      item:appendChild(btn)
+      container:appendChild(item)
+    end
+    setupRemoveHandlers()
+    removeCount = 0
+    logInfo("Repopulated 5 items")
+    setResult("re-result", "Repopulated", true)
+  end)
+end
+
+local btnReRemoveAll = document:getElementById("btn-re-removeall")
+if btnReRemoveAll then
+  btnReRemoveAll:addEventListener("click", function(e)
+    local container = document:getElementById("re-container")
+    if not container then return end
+    -- Remove all children via removeChild loop
+    while container.firstElementChild do
+      container:removeChild(container.firstElementChild)
+    end
+    logOk("removeChild loop: removed all children")
+    setResult("re-result", "All children removed via removeChild loop", true)
+  end)
+end
+
+-- ================================================================
+-- 5. Combined stress test
+-- ================================================================
+local btnStressRun = document:getElementById("btn-stress-run")
+if btnStressRun then
+  btnStressRun:addEventListener("click", function(e)
+    local container = document:getElementById("stress-container")
+    if not container then return end
+
+    local ops = 0
+
+    -- Phase 1: Create 20 items (clear first)
+    while container.firstElementChild do
+      container:removeChild(container.firstElementChild)
+    end
+    for i = 1, 20 do
+      local div = document:createElement("div")
+      div:setAttribute("class", "item")
+      div:setAttribute("id", "stress-" .. i)
+      local span = document:createElement("span")
+      span.textContent = "Stress item " .. i
+      div:appendChild(span)
+      container:appendChild(div)
+      ops = ops + 1
+    end
+    logInfo("Stress: created 20 items")
+
+    -- Phase 2: Replace even items with replaceChild
+    for i = 2, 20, 2 do
+      local old = document:getElementById("stress-" .. i)
+      if old then
+        local newDiv = document:createElement("div")
+        newDiv:setAttribute("class", "item")
+        newDiv:setAttribute("id", "stress-" .. i)
+        local span = document:createElement("span")
+        span.textContent = "Replaced #" .. i
+        span.style:setProperty("color", "#34d399")
+        newDiv:appendChild(span)
+        container:replaceChild(newDiv, old)
+        ops = ops + 1
+      end
+    end
+    logInfo("Stress: replaced 10 even items")
+
+    -- Phase 3: Remove odd items
+    for i = 1, 20, 2 do
+      local item = document:getElementById("stress-" .. i)
+      if item then
+        item:remove()
+        ops = ops + 1
+      end
+    end
+    logInfo("Stress: removed 10 odd items")
+
+    -- Phase 4: innerHTML replace remaining
+    container.innerHTML = '<div class="item"><span style="color:#38bdf8;">Stress test complete: ' .. ops .. ' operations</span></div>'
+    ops = ops + 1
+    logInfo("Stress: innerHTML replaced remaining")
+
+    -- Phase 5: textContent clear and set
+    local remaining = container.firstElementChild
+    if remaining then
+      remaining.textContent = "Final: " .. ops .. " operations executed"
+      ops = ops + 1
+    end
+
+    logOk("Stress test: " .. ops .. " DOM operations completed without crash")
+    setResult("stress-result", ops .. " operations OK", true)
+  end)
+end
+
+local btnStressReset = document:getElementById("btn-stress-reset")
+if btnStressReset then
+  btnStressReset:addEventListener("click", function(e)
+    local container = document:getElementById("stress-container")
+    if container then
+      while container.firstElementChild do
+        container:removeChild(container.firstElementChild)
+      end
+    end
+    setResult("stress-result", "Reset", nil)
+    logInfo("Stress: reset")
+  end)
+end
+
+-- ================================================================
+-- 6. Self-mutation during event (most dangerous scenario)
+-- ================================================================
+local smResetHtml = ""
+
+local function resetSelfMutation()
+  local container = document:getElementById("sm-container")
+  if not container then return end
+  -- Clear existing children
+  while container.firstElementChild do
+    container:removeChild(container.firstElementChild)
+  end
+  -- Rebuild using createElement (avoids innerHTML parsing overhead)
+  local parent = document:createElement("div")
+  parent:setAttribute("id", "sm-parent")
+
+  local btnTcNew = document:createElement("button")
+  btnTcNew:setAttribute("id", "btn-sm-tc")
+  btnTcNew:setAttribute("class", "primary")
+  btnTcNew.textContent = "textContent on parent"
+  parent:appendChild(btnTcNew)
+
+  local btnIhNew = document:createElement("button")
+  btnIhNew:setAttribute("id", "btn-sm-ih")
+  btnIhNew.textContent = "innerHTML on parent"
+  parent:appendChild(btnIhNew)
+
+  local btnRepNew = document:createElement("button")
+  btnRepNew:setAttribute("id", "btn-sm-replace")
+  btnRepNew.textContent = "replaceChild self"
+  parent:appendChild(btnRepNew)
+
+  container:appendChild(parent)
+  setupSelfMutationHandlers()
+end
+
+function setupSelfMutationHandlers()
+  local btnTc = document:getElementById("btn-sm-tc")
+  if btnTc then
+    btnTc:addEventListener("click", function(e)
+      -- This button sets textContent on its own parent, removing itself!
+      local parent = document:getElementById("sm-parent")
+      if parent then
+        parent.textContent = "Parent textContent set - buttons gone!"
+        logOk("Self-mutation: textContent on own parent - survived!")
+        setResult("sm-result", "textContent on own parent: OK (no crash)", true)
+      end
+    end)
+  end
+
+  local btnIh = document:getElementById("btn-sm-ih")
+  if btnIh then
+    btnIh:addEventListener("click", function(e)
+      -- This button sets innerHTML on its own parent, removing itself!
+      local parent = document:getElementById("sm-parent")
+      if parent then
+        parent.innerHTML = '<span style="color:#34d399;">innerHTML replaced - buttons gone!</span>'
+        logOk("Self-mutation: innerHTML on own parent - survived!")
+        setResult("sm-result", "innerHTML on own parent: OK (no crash)", true)
+      end
+    end)
+  end
+
+  local btnReplace = document:getElementById("btn-sm-replace")
+  if btnReplace then
+    btnReplace:addEventListener("click", function(e)
+      -- replaceChild: replace this button with a new element
+      local parent = document:getElementById("sm-parent")
+      if parent then
+        local newEl = document:createElement("span")
+        newEl.textContent = "Replaced via replaceChild - button gone!"
+        newEl.style:setProperty("color", "#a78bfa")
+        parent:replaceChild(newEl, btnReplace)
+        logOk("Self-mutation: replaceChild on self - survived!")
+        setResult("sm-result", "replaceChild on self: OK (no crash)", true)
+      end
+    end)
+  end
+end
+
+setupSelfMutationHandlers()
+
+local btnSmReset = document:getElementById("btn-sm-reset")
+if btnSmReset then
+  btnSmReset:addEventListener("click", function(e)
+    resetSelfMutation()
+    logInfo("Self-mutation: reset")
+    setResult("sm-result", "Reset", nil)
+  end)
+end
+
+-- ================================================================
+-- Run All Auto-Tests
+-- ================================================================
+local btnRunAll = document:getElementById("btn-run-all")
+if btnRunAll then
+  btnRunAll:addEventListener("click", function(e)
+    passCount = 0
+    failCount = 0
+    logInfo("========== AUTO-TEST START ==========")
+
+    -- Test A: setTextContent basic
+    logInfo("--- Test A: setTextContent ---")
+    local testDiv = document:createElement("div")
+    testDiv:setAttribute("id", "auto-test-div")
+    local c1 = document:createElement("span")
+    c1.textContent = "child1"
+    c1:setAttribute("id", "auto-c1")
+    local c2 = document:createElement("span")
+    c2.textContent = "child2"
+    c2:setAttribute("id", "auto-c2")
+    testDiv:appendChild(c1)
+    testDiv:appendChild(c2)
+    document:body():appendChild(testDiv)
+
+    assert_eq("childElementCount before", testDiv.childElementCount, 2)
+    testDiv.textContent = "replaced"
+    assert_eq("textContent after set", testDiv.textContent, "replaced")
+    assert_nil("auto-c1 after textContent", document:getElementById("auto-c1"))
+    assert_nil("auto-c2 after textContent", document:getElementById("auto-c2"))
+    testDiv:remove()
+
+    -- Test B: innerHTML replace
+    logInfo("--- Test B: innerHTML ---")
+    local testDiv2 = document:createElement("div")
+    testDiv2:setAttribute("id", "auto-test-div2")
+    local oldKid = document:createElement("div")
+    oldKid:setAttribute("id", "auto-old-kid")
+    oldKid.textContent = "old"
+    testDiv2:appendChild(oldKid)
+    document:body():appendChild(testDiv2)
+
+    testDiv2.innerHTML = '<span id="auto-new-kid">new</span>'
+    assert_nil("auto-old-kid after innerHTML", document:getElementById("auto-old-kid"))
+    local newKid = document:getElementById("auto-new-kid")
+    assert_true("auto-new-kid exists", newKid ~= nil)
+    if newKid then
+      assert_eq("auto-new-kid text", newKid.textContent, "new")
+    end
+    testDiv2:remove()
+
+    -- Test C: replaceChild
+    logInfo("--- Test C: replaceChild ---")
+    local testDiv3 = document:createElement("div")
+    testDiv3:setAttribute("id", "auto-test-div3")
+    local origChild = document:createElement("span")
+    origChild:setAttribute("id", "auto-orig")
+    origChild.textContent = "original"
+    testDiv3:appendChild(origChild)
+    document:body():appendChild(testDiv3)
+
+    local replacement = document:createElement("span")
+    replacement:setAttribute("id", "auto-replacement")
+    replacement.textContent = "replacement"
+    testDiv3:replaceChild(replacement, origChild)
+
+    assert_nil("auto-orig after replaceChild", document:getElementById("auto-orig"))
+    local rep = document:getElementById("auto-replacement")
+    assert_true("auto-replacement exists", rep ~= nil)
+    if rep then
+      assert_eq("auto-replacement text", rep.textContent, "replacement")
+    end
+    testDiv3:remove()
+
+    -- Test D: removeChild loop
+    logInfo("--- Test D: removeChild loop ---")
+    local testDiv4 = document:createElement("div")
+    for i = 1, 5 do
+      local item = document:createElement("div")
+      item.textContent = "item-" .. i
+      testDiv4:appendChild(item)
+    end
+    document:body():appendChild(testDiv4)
+    assert_eq("childElementCount before removeChild loop", testDiv4.childElementCount, 5)
+
+    while testDiv4.firstElementChild do
+      testDiv4:removeChild(testDiv4.firstElementChild)
+    end
+    assert_eq("childElementCount after removeChild loop", testDiv4.childElementCount, 0)
+    testDiv4:remove()
+
+    -- Test E: innerHTML empty string
+    logInfo("--- Test E: innerHTML clear ---")
+    local testDiv5 = document:createElement("div")
+    for i = 1, 3 do
+      local item = document:createElement("span")
+      item.textContent = "x"
+      testDiv5:appendChild(item)
+    end
+    document:body():appendChild(testDiv5)
+    testDiv5.innerHTML = ""
+    assert_eq("childElementCount after innerHTML clear", testDiv5.childElementCount, 0)
+    testDiv5:remove()
+
+    -- Test F: rapid create-replace-remove cycle
+    logInfo("--- Test F: rapid cycle ---")
+    local testDiv6 = document:createElement("div")
+    document:body():appendChild(testDiv6)
+    for i = 1, 50 do
+      local el = document:createElement("div")
+      el.textContent = "cycle-" .. i
+      testDiv6:appendChild(el)
+      if i % 3 == 0 then
+        -- Replace with new
+        local newEl = document:createElement("div")
+        newEl.textContent = "replaced-" .. i
+        testDiv6:replaceChild(newEl, el)
+      elseif i % 5 == 0 then
+        -- Remove
+        el:remove()
+      end
+    end
+    -- Clear all
+    testDiv6.innerHTML = ""
+    assert_eq("childElementCount after rapid cycle clear", testDiv6.childElementCount, 0)
+    testDiv6:remove()
+    logOk("Rapid cycle: 50 create/replace/remove ops completed")
+
+    -- Summary
+    logInfo("========== AUTO-TEST END ==========")
+    local total = passCount + failCount
+    if failCount == 0 then
+      logOk("ALL " .. total .. " ASSERTIONS PASSED")
+    else
+      logFail(failCount .. " FAILED / " .. passCount .. " passed / " .. total .. " total")
+    end
+
+    updateStatusBar()
+  end)
+end
+
+-- ================================================================
+-- Log controls
+-- ================================================================
+local btnLogClear = document:getElementById("btn-log-clear")
+if btnLogClear then
+  btnLogClear:addEventListener("click", function(e)
+    local output = document:getElementById("log-output")
+    if output then output.innerHTML = "" end
+    logCount = 0
+    local countEl = document:getElementById("log-count")
+    if countEl then countEl.textContent = "0 lines" end
+  end)
+end
+
+-- ================================================================
+-- Startup
+-- ================================================================
+logInfo("DOM Mutation Stress Test loaded")
+logInfo("Click individual test buttons or 'Run All Auto-Tests'")
+
+</script>
+</body>
+</html>

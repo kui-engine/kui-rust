@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html><head><title>KUI API — DOM tree</title><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 18px 22px; font-family: "Segoe UI", sans-serif; font-size: 13px;
+       background: #f8fafc; color: #1e293b; }
+h1 { font-size: 20px; margin-bottom: 2px; }
+.lead { color: #64748b; margin-bottom: 10px; }
+#tour-result { padding: 8px 12px; border-radius: 8px; font-weight: 600; background: #e2e8f0;
+               margin-bottom: 12px; }
+#tour-result.pass { background: #dcfce7; color: #166534; }
+#tour-result.fail { background: #fee2e2; color: #991b1b; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.panel { background: white; border-radius: 10px; padding: 12px 14px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.panel h2 { font-size: 14px; margin-bottom: 2px; }
+.api { font-family: Consolas, monospace; font-size: 11px; color: #7c3aed; margin-bottom: 4px; }
+.note { color: #64748b; margin-bottom: 8px; }
+.sandbox { border: 1px dashed #cbd5e1; border-radius: 6px; padding: 8px; margin-bottom: 8px;
+           min-height: 36px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+button { padding: 5px 10px; border: none; border-radius: 5px; background: #3b82f6; color: white;
+         font-size: 12px; cursor: pointer; }
+.out { font-family: Consolas, monospace; font-size: 12px; background: #f1f5f9; padding: 6px 8px;
+       border-radius: 5px; color: #334155; min-height: 26px; }
+.chip { display: inline-block; padding: 2px 8px; margin-right: 4px; border-radius: 10px;
+        background: #e2e8f0; font-style: normal; }
+.chip.hot { background: #fde68a; }
+#hit-target { display: inline-block; margin-top: 6px; padding: 6px 14px; border-radius: 6px;
+              background: #ede9fe; color: #5b21b6; }
+#trav-list li { list-style: none; display: inline-block; padding: 3px 10px; margin-right: 4px;
+                border-radius: 5px; background: #e2e8f0; }
+#trav-list li.cur { background: #3b82f6; color: white; }
+#build-box p { padding: 2px 6px; margin-bottom: 3px; border-radius: 4px; background: #f1f5f9; }
+#build-box p.seed { background: #e0f2fe; }
+#build-box p.replaced { background: #fce7f3; }
+#rm-box .tag { display: inline-block; padding: 2px 8px; margin-right: 4px; border-radius: 4px;
+               background: #e2e8f0; }
+#rm-box[data-flag] { border-color: #f59e0b; background: #fffbeb; }
+#html-box i { color: #db2777; font-style: normal; font-weight: 700; }
+.log-title { margin: 16px 0 6px; font-size: 14px; }
+#tour-log { border-collapse: collapse; width: 100%; background: white; }
+#tour-log td { border-bottom: 1px solid #e2e8f0; padding: 3px 8px; font-family: Consolas, monospace;
+               font-size: 12px; }
+#tour-log tr.bad td { color: #b91c1c; }
+#scratch { display: none; }
+</style></head><body>
+<h1>KUI API — DOM tree</h1>
+<p class="lead">Host-side DOM tree operations through the C ABI (and the Go / Rust wrappers): lookups,
+traversal, creating and moving elements, removal, attributes, HTML and text. On start the host
+runs every call below once and checks the result; the buttons repeat the calls by hand.</p>
+<div id="tour-result" data-total="0" data-failed="0">running…</div>
+
+<div class="grid">
+  <section class="panel" id="p-lookup">
+    <h2>Document lookups</h2>
+    <div class="api">root · head · body · get_element_by_id · query_selector(_all) ·
+      get_elements_by_class_name · get_elements_by_tag_name · element_from_point</div>
+    <p class="note">Find elements from the document: by id, by selector, by class or tag, or by a
+      point in the viewport.</p>
+    <div class="sandbox" id="lookup-box">
+      <span class="chip">alpha</span><span class="chip hot">beta</span><span class="chip">gamma</span><em class="chip hot">delta</em>
+      <div id="hit-target">hit target</div>
+    </div>
+    <div class="toolbar">
+      <button id="btn-lookup-count">Count chips</button>
+      <button id="btn-lookup-hit">Hit-test target</button>
+      <button id="btn-lookup-root">Root / head / body</button>
+    </div>
+    <div class="out" id="lookup-out">—</div>
+  </section>
+
+  <section class="panel" id="p-trav">
+    <h2>Traversal</h2>
+    <div class="api">parent · next_sibling · previous_sibling · first_child · last_child ·
+      closest · matches</div>
+    <p class="note">Walk the element tree from the highlighted item.</p>
+    <div class="sandbox">
+      <ul id="trav-list"><li id="t1" class="cur">one</li><li id="t2" class="mid">two</li><li id="t3">three</li><li id="t4">four</li></ul>
+    </div>
+    <div class="toolbar">
+      <button id="btn-trav-prev">Previous</button>
+      <button id="btn-trav-next">Next</button>
+      <button id="btn-trav-info">Parent / closest / matches</button>
+    </div>
+    <div class="out" id="trav-out">#t1</div>
+  </section>
+
+  <section class="panel" id="p-build">
+    <h2>Create &amp; insert</h2>
+    <div class="api">create_element · append_child · insert_before · clone · replace_child</div>
+    <p class="note">Build new elements and place them; clone copies the seed with its subtree.</p>
+    <div class="sandbox" id="build-box"><p id="build-seed" class="seed"><b>seed</b> node</p></div>
+    <div class="toolbar">
+      <button id="btn-build-append">Append item</button>
+      <button id="btn-build-prepend">Insert first</button>
+      <button id="btn-build-clone">Clone seed</button>
+      <button id="btn-build-replace">Replace first</button>
+    </div>
+    <div class="out" id="build-out">children=1</div>
+  </section>
+
+  <section class="panel" id="p-rm">
+    <h2>Remove, attributes &amp; handles</h2>
+    <div class="api">remove · remove_child · set/get/has/remove_attribute · retain</div>
+    <p class="note">Remove children, toggle the data-flag attribute (the box turns amber while it is
+      set), and keep an extra handle reference.</p>
+    <div class="sandbox" id="rm-box" data-flag="on"><span class="tag">a</span><span class="tag">b</span><span class="tag">c</span><span class="tag">d</span></div>
+    <div class="toolbar">
+      <button id="btn-rm-last">Remove last</button>
+      <button id="btn-rm-first">Remove first child</button>
+      <button id="btn-rm-attr">Toggle data-flag</button>
+      <button id="btn-rm-retain">Retain handle</button>
+    </div>
+    <div class="out" id="rm-out">left=4 | data-flag=on</div>
+  </section>
+
+  <section class="panel" id="p-html">
+    <h2>HTML &amp; text</h2>
+    <div class="api">set_inner_html · get_inner_html · get_outer_html · insert_adjacent_html ·
+      append_text · set/get_text_content</div>
+    <p class="note">Parse markup into the box, insert around the core element, append raw text.</p>
+    <div class="sandbox" id="html-box"><span id="html-core">core</span></div>
+    <div class="toolbar">
+      <button id="btn-html-reset">Reset inner HTML</button>
+      <button id="btn-html-adjacent">Insert around</button>
+      <button id="btn-html-text">Append text</button>
+      <button id="btn-html-outer">Show outer HTML</button>
+    </div>
+    <div class="out" id="html-out">—</div>
+  </section>
+</div>
+
+<h2 class="log-title">Self-check log</h2>
+<table id="tour-log"></table>
+<div id="scratch"></div>
+</body></html>

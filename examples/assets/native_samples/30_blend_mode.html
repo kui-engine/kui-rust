@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; text-align: center; }
+    .row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+
+    .blend-demo {
+        position: relative;
+        width: 120px; height: 100px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .blend-bg {
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, #3b82f6, #ec4899);
+    }
+    .blend-overlay {
+        position: absolute;
+        top: 20px; left: 20px;
+        width: 80px; height: 60px;
+        border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 10px; font-weight: 600; color: white;
+    }
+</style>
+</head>
+<body>
+    <h2>mix-blend-mode</h2>
+
+    <h3>Blend Modes on Colored Overlays</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #f59e0b; mix-blend-mode: normal;">normal</div>
+                </div>
+                <div class="label">normal</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #f59e0b; mix-blend-mode: multiply;">multiply</div>
+                </div>
+                <div class="label">multiply</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #f59e0b; mix-blend-mode: screen;">screen</div>
+                </div>
+                <div class="label">screen</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #f59e0b; mix-blend-mode: overlay;">overlay</div>
+                </div>
+                <div class="label">overlay</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>More Blend Modes</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #22c55e; mix-blend-mode: darken;">darken</div>
+                </div>
+                <div class="label">darken</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #22c55e; mix-blend-mode: lighten;">lighten</div>
+                </div>
+                <div class="label">lighten</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #22c55e; mix-blend-mode: color-dodge;">dodge</div>
+                </div>
+                <div class="label">color-dodge</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #22c55e; mix-blend-mode: color-burn;">burn</div>
+                </div>
+                <div class="label">color-burn</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Hard/Soft Light &amp; Difference</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #ef4444; mix-blend-mode: hard-light;">hard</div>
+                </div>
+                <div class="label">hard-light</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #ef4444; mix-blend-mode: soft-light;">soft</div>
+                </div>
+                <div class="label">soft-light</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #ef4444; mix-blend-mode: difference;">diff</div>
+                </div>
+                <div class="label">difference</div>
+            </div>
+            <div>
+                <div class="blend-demo">
+                    <div class="blend-bg"></div>
+                    <div class="blend-overlay" style="background: #ef4444; mix-blend-mode: exclusion;">excl</div>
+                </div>
+                <div class="label">exclusion</div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Text with Blend Modes</h3>
+    <div class="section">
+        <div style="position: relative; height: 80px; background: linear-gradient(to right, #ef4444, #f59e0b, #22c55e, #3b82f6); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <div style="font-size: 36px; font-weight: 900; color: white; mix-blend-mode: overlay;">BLEND MODE</div>
+        </div>
+    </div>
+</body>
+</html>

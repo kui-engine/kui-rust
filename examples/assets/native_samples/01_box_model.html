@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+    .demo { background: #1e293b; border-radius: 8px; padding: 16px; flex: 1; min-width: 200px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 8px; }
+
+    /* Box Model demos */
+    .box { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; text-align: center; }
+
+    .margin-demo .box { margin: 16px; background: #3b82f6; }
+    .padding-demo .box { padding: 24px; background: #8b5cf6; }
+    .border-demo .box { border: 3px solid #f59e0b; padding: 12px; }
+    .radius-demo .box { border-radius: 16px; background: #10b981; padding: 16px; }
+
+    .sizing-content { box-sizing: content-box; width: 120px; padding: 16px; border: 2px solid #ef4444; background: #7f1d1d; }
+    .sizing-border  { box-sizing: border-box;  width: 120px; padding: 16px; border: 2px solid #22c55e; background: #14532d; }
+
+    .w-fixed { width: 200px; height: 60px; background: #0ea5e9; }
+    .w-percent { width: 50%; height: 60px; background: #6366f1; }
+    .w-auto { height: 60px; background: #ec4899; }
+
+    .margin-collapse-a { margin-bottom: 20px; background: #dc2626; padding: 12px; }
+    .margin-collapse-b { margin-top: 30px; background: #2563eb; padding: 12px; }
+
+    .nested-outer {
+        padding: 20px; margin: 10px;
+        border: 2px solid #f59e0b;
+        border-radius: 12px;
+        background: #1a1a2e;
+    }
+    .nested-inner {
+        padding: 16px; margin: 8px;
+        border: 2px dashed #38bdf8;
+        border-radius: 8px;
+        background: #162032;
+    }
+    .nested-core {
+        padding: 12px;
+        background: #334155;
+        border-radius: 4px;
+    }
+</style>
+</head>
+<body>
+    <h2>Box Model</h2>
+
+    <h3>Margin / Padding / Border / Border-Radius</h3>
+    <div class="row">
+        <div class="demo margin-demo">
+            <div class="label">margin: 16px</div>
+            <div class="box">Margin</div>
+        </div>
+        <div class="demo padding-demo">
+            <div class="label">padding: 24px</div>
+            <div class="box">Padding</div>
+        </div>
+        <div class="demo border-demo">
+            <div class="label">border: 3px solid</div>
+            <div class="box">Border</div>
+        </div>
+        <div class="demo radius-demo">
+            <div class="label">border-radius: 16px</div>
+            <div class="box">Radius</div>
+        </div>
+    </div>
+
+    <h3>Box Sizing: content-box vs border-box (both width: 120px, padding: 16px, border: 2px)</h3>
+    <div class="row">
+        <div class="demo">
+            <div class="sizing-content box">content-box (total: 156px)</div>
+            <div class="label">width = content only</div>
+        </div>
+        <div class="demo">
+            <div class="sizing-border box">border-box (total: 120px)</div>
+            <div class="label">width = content + padding + border</div>
+        </div>
+    </div>
+
+    <h3>Width: fixed / percentage / auto</h3>
+    <div class="demo">
+        <div class="w-fixed box" style="margin-bottom: 8px;">width: 200px</div>
+        <div class="w-percent box" style="margin-bottom: 8px;">width: 50%</div>
+        <div class="w-auto box">width: auto (fills parent)</div>
+    </div>
+
+    <h3>Nested Box Model</h3>
+    <div class="nested-outer">
+        <div class="label">outer: padding 20, margin 10, border 2px solid</div>
+        <div class="nested-inner">
+            <div class="label">inner: padding 16, margin 8, border 2px dashed</div>
+            <div class="nested-core">
+                <div class="label">core: padding 12</div>
+                Content inside nested boxes
+            </div>
+        </div>
+    </div>
+</body>
+</html>

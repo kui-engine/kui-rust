@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; }
+    .code { background: #0f172a; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-size: 11px; color: #10b981; margin-bottom: 10px; }
+
+    /* :first-of-type */
+    .fot-demo p:first-of-type { color: #ef4444; font-weight: bold; }
+
+    /* :nth-of-type */
+    .nth-demo div:nth-of-type(odd) { background: #334155; }
+    .nth-demo div:nth-of-type(even) { background: #475569; }
+
+    /* :last-child */
+    .last-demo div:last-child { border-bottom: 3px solid #f59e0b; }
+
+    /* :not() */
+    .not-demo div { padding: 8px; margin-bottom: 4px; border-radius: 4px; font-size: 13px; }
+    .not-demo div:not(.special) { background: #334155; color: #94a3b8; }
+    .not-demo div.special { background: #3b82f6; color: white; font-weight: bold; }
+
+    /* :hover */
+    .hover-demo div { padding: 10px; margin-bottom: 4px; border-radius: 6px; background: #334155; font-size: 13px; transition: background 0.2s; cursor: pointer; }
+    .hover-demo div:hover { background: #3b82f6; color: white; }
+
+    /* :focus-within */
+    .fw-demo { padding: 12px; border: 2px solid #334155; border-radius: 8px; transition: border-color 0.2s; }
+    .fw-demo:focus-within { border-color: #3b82f6; }
+    .fw-demo input { background: #0f172a; border: 1px solid #475569; color: #e2e8f0; padding: 6px 10px; border-radius: 4px; font-size: 13px; outline: none; width: 100%; }
+</style>
+</head>
+<body>
+    <h2>Advanced Selectors</h2>
+
+    <h3>:first-of-type</h3>
+    <div class="section">
+        <div class="code">p:first-of-type { color: red; font-weight: bold; }</div>
+        <div class="fot-demo">
+            <p>First paragraph (styled)</p>
+            <p>Second paragraph</p>
+            <p>Third paragraph</p>
+        </div>
+    </div>
+
+    <h3>:nth-of-type(odd/even)</h3>
+    <div class="section">
+        <div class="code">div:nth-of-type(odd) { bg: dark; }  div:nth-of-type(even) { bg: lighter; }</div>
+        <div class="nth-demo">
+            <div style="padding: 8px; border-radius: 4px; font-size: 13px;">Row 1 (odd)</div>
+            <div style="padding: 8px; border-radius: 4px; font-size: 13px;">Row 2 (even)</div>
+            <div style="padding: 8px; border-radius: 4px; font-size: 13px;">Row 3 (odd)</div>
+            <div style="padding: 8px; border-radius: 4px; font-size: 13px;">Row 4 (even)</div>
+            <div style="padding: 8px; border-radius: 4px; font-size: 13px;">Row 5 (odd)</div>
+        </div>
+    </div>
+
+    <h3>:not()</h3>
+    <div class="section">
+        <div class="code">div:not(.special) { muted }  div.special { blue bold }</div>
+        <div class="not-demo">
+            <div>Normal item</div>
+            <div class="special">Special item</div>
+            <div>Normal item</div>
+            <div class="special">Special item</div>
+            <div>Normal item</div>
+        </div>
+    </div>
+
+    <h3>:hover (interactive)</h3>
+    <div class="section">
+        <div class="code">div:hover { background: blue; }</div>
+        <div class="hover-demo">
+            <div>Hover me - Item A</div>
+            <div>Hover me - Item B</div>
+            <div>Hover me - Item C</div>
+        </div>
+    </div>
+
+    <h3>:focus-within</h3>
+    <div class="section">
+        <div class="code">.container:focus-within { border-color: blue; }</div>
+        <div class="fw-demo">
+            <div style="font-size: 13px; margin-bottom: 6px; color: #94a3b8;">Click the input — border turns blue:</div>
+            <input type="text" placeholder="Focus me...">
+        </div>
+    </div>
+
+    <h3>:last-child</h3>
+    <div class="section">
+        <div class="code">div:last-child { border-bottom: 3px solid gold; }</div>
+        <div class="last-demo">
+            <div style="padding: 8px; font-size: 13px;">Item 1</div>
+            <div style="padding: 8px; font-size: 13px;">Item 2</div>
+            <div style="padding: 8px; font-size: 13px;">Item 3 (last-child → gold border)</div>
+        </div>
+    </div>
+</body>
+</html>

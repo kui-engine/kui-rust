@@ -1,0 +1,344 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="512" height="512"></canvas>
+<canvas id="big" width="2048" height="2048"></canvas>
+<script type="text/lua">
+local ok, errMsg = pcall(function()
+
+-- ============================================================
+-- Canvas 2D Performance Benchmark Suite
+-- ============================================================
+
+local report = {}
+local allOk = true
+
+local function now()
+    return window.performance.now()
+end
+
+local function bench(name, iterations, fn)
+    local success, err = pcall(function()
+        for i = 1, math.min(10, iterations) do fn(i) end
+        local t0 = now()
+        for i = 1, iterations do fn(i) end
+        local t1 = now()
+        local elapsed = t1 - t0
+        local opsPerMs = iterations / math.max(elapsed, 0.001)
+        table.insert(report, string.format("%s: %.2fms (%d iters, %.0f ops/ms)", name, elapsed, iterations, opsPerMs))
+    end)
+    if not success then
+        allOk = false
+        table.insert(report, name .. ": ERR " .. tostring(err))
+    end
+end
+
+local el = document:getElementById("c")
+if el == nil then allOk = false; table.insert(report, "ERR: no canvas") end
+local ctx = el and el:getContext("2d") or nil
+if ctx == nil then allOk = false; table.insert(report, "ERR: no ctx") end
+
+local bigEl = document:getElementById("big")
+local bigCtx = bigEl and bigEl:getContext("2d") or nil
+
+if ctx then
+
+-- ============================================================
+-- B1: fillRect — small rects flood (512x512 canvas, 10x10 rects)
+-- ============================================================
+bench("B1_fillRect_small", 2000, function(i)
+    ctx.fillStyle = "#ff0000"
+    ctx:fillRect((i * 7) % 500, (i * 13) % 500, 10, 10)
+end)
+
+-- ============================================================
+-- B2: fillRect — large rect overwrite
+-- ============================================================
+bench("B2_fillRect_large", 500, function(i)
+    ctx.fillStyle = "#0000ff"
+    ctx:fillRect(0, 0, 512, 512)
+end)
+
+-- ============================================================
+-- B3: clearRect
+-- ============================================================
+bench("B3_clearRect", 1000, function(i)
+    ctx:clearRect(0, 0, 512, 512)
+end)
+
+-- ============================================================
+-- B4: strokeRect
+-- ============================================================
+bench("B4_strokeRect", 1000, function(i)
+    ctx.strokeStyle = "#00ff00"
+    ctx.lineWidth = 2
+    ctx:strokeRect((i * 11) % 480, (i * 7) % 480, 30, 30)
+end)
+
+-- ============================================================
+-- B5: Path — lineTo chain + stroke
+-- ============================================================
+bench("B5_path_lineTo", 300, function(i)
+    ctx:beginPath()
+    ctx:moveTo(0, 0)
+    for j = 1, 50 do
+        ctx:lineTo((j * 10) % 512, (j * 7 + i) % 512)
+    end
+    ctx:stroke()
+end)
+
+-- ============================================================
+-- B6: Path — arc (full circles)
+-- ============================================================
+bench("B6_path_arc", 500, function(i)
+    ctx:beginPath()
+    ctx:arc((i * 17) % 400 + 50, (i * 13) % 400 + 50, 20, 0, 2 * math.pi)
+    ctx:fill()
+end)
+
+-- ============================================================
+-- B7: Path — bezierCurveTo
+-- ============================================================
+bench("B7_path_bezier", 200, function(i)
+    ctx:beginPath()
+    ctx:moveTo(10, 10)
+    for j = 1, 20 do
+        ctx:bezierCurveTo(
+            (j * 25) % 512, (j * 13) % 512,
+            (j * 37) % 512, (j * 19) % 512,
+            (j * 29) % 512, (j * 23) % 512)
+    end
+    ctx:stroke()
+end)
+
+-- ============================================================
+-- B8: Linear gradient fill
+-- ============================================================
+bench("B8_gradient_linear", 200, function(i)
+    local g = ctx:createLinearGradient(0, 0, 512, 0)
+    g:addColorStop(0, "#ff0000")
+    g:addColorStop(0.5, "#00ff00")
+    g:addColorStop(1, "#0000ff")
+    ctx.fillStyle = g
+    ctx:fillRect(0, 0, 512, 512)
+end)
+
+-- ============================================================
+-- B9: Radial gradient fill
+-- ============================================================
+bench("B9_gradient_radial", 200, function(i)
+    local g = ctx:createRadialGradient(256, 256, 0, 256, 256, 256)
+    g:addColorStop(0, "#ffffff")
+    g:addColorStop(1, "#000000")
+    ctx.fillStyle = g
+    ctx:fillRect(0, 0, 512, 512)
+end)
+
+-- ============================================================
+-- B10: Text rendering — fillText
+-- ============================================================
+bench("B10_fillText", 500, function(i)
+    ctx.fillStyle = "#000000"
+    ctx.font = "16px sans-serif"
+    ctx:fillText("Hello Canvas Benchmark " .. tostring(i), (i * 3) % 400, (i * 7) % 500)
+end)
+
+-- ============================================================
+-- B11: Text rendering — measureText
+-- ============================================================
+bench("B11_measureText", 1000, function(i)
+    ctx.font = "14px monospace"
+    local m = ctx:measureText("Sample text for measurement")
+end)
+
+-- ============================================================
+-- B12: Transform — save/restore stack
+-- ============================================================
+bench("B12_save_restore", 1000, function(i)
+    ctx:save()
+    ctx:translate(1, 1)
+    ctx:rotate(0.01)
+    ctx:scale(1.001, 1.001)
+    ctx:fillRect(0, 0, 10, 10)
+    ctx:restore()
+end)
+
+-- ============================================================
+-- B13: setTransform + fillRect
+-- ============================================================
+bench("B13_setTransform", 500, function(i)
+    ctx:setTransform(1, 0, 0, 1, (i % 100), (i % 100))
+    ctx:fillRect(0, 0, 50, 50)
+end)
+ctx:resetTransform()
+
+-- ============================================================
+-- B14: getImageData — small region
+-- ============================================================
+bench("B14_getImageData_small", 100, function(i)
+    local d = ctx:getImageData(0, 0, 64, 64)
+end)
+
+-- ============================================================
+-- B15: getImageData — full canvas
+-- ============================================================
+bench("B15_getImageData_full", 20, function(i)
+    local d = ctx:getImageData(0, 0, 512, 512)
+end)
+
+-- ============================================================
+-- B16: putImageData — small region
+-- ============================================================
+do
+    local imgData = ctx:createImageData(64, 64)
+    -- Fill with test pattern
+    for y = 0, 63 do
+        for x = 0, 63 do
+            local idx = (y * 64 + x) * 4
+            imgData:set(idx + 1, x * 4)
+            imgData:set(idx + 2, y * 4)
+            imgData:set(idx + 3, 128)
+            imgData:set(idx + 4, 255)
+        end
+    end
+    bench("B16_putImageData_small", 100, function(i)
+        ctx:putImageData(imgData, (i * 7) % 448, (i * 11) % 448)
+    end)
+end
+
+-- ============================================================
+-- B17: createImageData + putImageData — large (256x256)
+-- ============================================================
+do
+    local imgData = ctx:createImageData(256, 256)
+    bench("B17_putImageData_large", 20, function(i)
+        ctx:putImageData(imgData, 0, 0)
+    end)
+end
+
+-- ============================================================
+-- B18: State property changes (style switching)
+-- ============================================================
+bench("B18_style_switch", 1000, function(i)
+    if i % 3 == 0 then ctx.fillStyle = "#ff0000"
+    elseif i % 3 == 1 then ctx.fillStyle = "#00ff00"
+    else ctx.fillStyle = "#0000ff" end
+    ctx.lineWidth = (i % 10) + 1
+    ctx.globalAlpha = 0.5 + (i % 50) / 100.0
+    ctx:fillRect(0, 0, 10, 10)
+end)
+
+-- ============================================================
+-- B19: Compositing — globalCompositeOperation
+-- ============================================================
+bench("B19_compositing", 500, function(i)
+    local ops = {"source-over", "multiply", "screen", "overlay"}
+    ctx.globalCompositeOperation = ops[(i % 4) + 1]
+    ctx.fillStyle = "#ff8800"
+    ctx:fillRect((i * 5) % 480, (i * 3) % 480, 30, 30)
+end)
+ctx.globalCompositeOperation = "source-over"
+ctx.globalAlpha = 1.0
+
+-- ============================================================
+-- B20: Large canvas — 2048x2048 fillRect flood
+-- ============================================================
+if bigCtx then
+    bench("B20_large_canvas_fill", 100, function(i)
+        bigCtx.fillStyle = "#336699"
+        bigCtx:fillRect(0, 0, 2048, 2048)
+    end)
+
+    bench("B21_large_canvas_path", 50, function(i)
+        bigCtx:beginPath()
+        bigCtx:moveTo(0, 0)
+        for j = 1, 100 do
+            bigCtx:lineTo((j * 20) % 2048, (j * 15 + i) % 2048)
+        end
+        bigCtx:stroke()
+    end)
+end
+
+-- ============================================================
+-- B22: Mixed workload — simulates real rendering frame
+-- ============================================================
+bench("B22_mixed_frame", 100, function(i)
+    ctx:clearRect(0, 0, 512, 512)
+    -- background
+    ctx.fillStyle = "#f0f0f0"
+    ctx:fillRect(0, 0, 512, 512)
+    -- 10 colored rects
+    for j = 1, 10 do
+        ctx.fillStyle = "#" .. string.format("%02x%02x%02x", (j * 25) % 256, (j * 37) % 256, (j * 53) % 256)
+        ctx:fillRect(j * 40, j * 30, 60, 40)
+    end
+    -- path
+    ctx:beginPath()
+    ctx:moveTo(50, 50)
+    ctx:lineTo(200, 100)
+    ctx:lineTo(300, 250)
+    ctx:closePath()
+    ctx:stroke()
+    -- circle
+    ctx:beginPath()
+    ctx:arc(256, 256, 80, 0, 2 * math.pi)
+    ctx.fillStyle = "#4488cc"
+    ctx:fill()
+    -- text
+    ctx.fillStyle = "#000000"
+    ctx.font = "20px sans-serif"
+    ctx:fillText("Frame " .. tostring(i), 10, 490)
+end)
+
+-- ============================================================
+-- B23: Gradient creation only (no rendering)
+-- ============================================================
+bench("B23_gradient_create_only", 500, function(i)
+    local g = ctx:createLinearGradient(0, 0, 512, 0)
+    g:addColorStop(0, "#ff0000")
+    g:addColorStop(0.5, "#00ff00")
+    g:addColorStop(1, "#0000ff")
+    ctx.fillStyle = g
+end)
+
+-- ============================================================
+-- B24: Pre-created gradient fill (reuse same gradient)
+-- ============================================================
+do
+    local gPre = ctx:createLinearGradient(0, 0, 512, 0)
+    gPre:addColorStop(0, "#ff0000")
+    gPre:addColorStop(0.5, "#00ff00")
+    gPre:addColorStop(1, "#0000ff")
+    ctx.fillStyle = gPre
+    bench("B24_gradient_reuse_fill", 200, function(i)
+        ctx:fillRect(0, 0, 512, 512)
+    end)
+end
+
+-- ============================================================
+-- B25: Small gradient fill (50x50 instead of 512x512)
+-- ============================================================
+bench("B25_gradient_small_fill", 500, function(i)
+    local g = ctx:createLinearGradient(0, 0, 50, 0)
+    g:addColorStop(0, "#ff0000")
+    g:addColorStop(1, "#0000ff")
+    ctx.fillStyle = g
+    ctx:fillRect(0, 0, 50, 50)
+end)
+
+end -- if ctx
+
+-- Format result
+if allOk then
+    document:getElementById("result").textContent = "PASS"
+end
+document:getElementById("detail").textContent = table.concat(report, " | ")
+
+end) -- pcall
+
+if not ok then
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = "SCRIPT ERROR: " .. tostring(errMsg)
+end
+</script>
+</body></html>

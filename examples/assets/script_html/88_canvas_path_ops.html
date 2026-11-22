@@ -1,0 +1,188 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="200" height="200"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: lineTo + stroke draws a line
+ctx.strokeStyle = "#ff0000"
+ctx.lineWidth = 4
+ctx:beginPath()
+ctx:moveTo(10, 10)
+ctx:lineTo(50, 10)
+ctx:stroke()
+local px1 = ctx:getImageData(30, 10, 1, 1)
+if px1 == nil then fail("T1: nil")
+else
+    local r = px1:get(1)
+    if r < 200 then fail("T1: lineTo red="..tostring(r)) end
+end
+
+-- T2: rect + fill draws a filled rectangle
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#00ff00"
+ctx:beginPath()
+ctx:rect(0, 0, 30, 30)
+ctx:fill()
+local px2 = ctx:getImageData(15, 15, 1, 1)
+if px2 == nil then fail("T2: nil")
+else
+    local g = px2:get(2)
+    if g < 200 then fail("T2: rect fill green="..tostring(g)) end
+end
+
+-- T3: arc + fill draws a circle
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#0000ff"
+ctx:beginPath()
+ctx:arc(100, 100, 30, 0, 2 * math.pi)
+ctx:closePath()
+ctx:fill()
+-- Scan center region for blue pixels
+local found3 = false
+for y = 95, 105 do
+    for x = 95, 105 do
+        local p = ctx:getImageData(x, y, 1, 1)
+        if p ~= nil and p:get(3) > 150 and p:get(4) > 150 then found3 = true; break end
+    end
+    if found3 then break end
+end
+if not found3 then fail("T3: arc fill no blue pixels in center") end
+-- Well outside the circle should be clear
+local px3o = ctx:getImageData(10, 10, 1, 1)
+if px3o ~= nil then
+    local a = px3o:get(4)
+    if a > 50 then fail("T3: arc outside alpha="..tostring(a)) end
+end
+
+-- T4: isPointInPath
+ctx:beginPath()
+ctx:rect(10, 10, 50, 50)
+local inside = ctx:isPointInPath(30, 30)
+local outside = ctx:isPointInPath(80, 80)
+if inside ~= true then fail("T4: isPointInPath inside="..tostring(inside)) end
+if outside ~= false then fail("T4: isPointInPath outside="..tostring(outside)) end
+
+-- T5: quadraticCurveTo draws something
+ctx:clearRect(0, 0, 200, 200)
+ctx.strokeStyle = "#ff00ff"
+ctx.lineWidth = 3
+ctx:beginPath()
+ctx:moveTo(10, 80)
+ctx:quadraticCurveTo(50, 10, 90, 80)
+ctx:stroke()
+-- Check a point near the peak of the curve
+local px5 = ctx:getImageData(50, 30, 1, 1)
+if px5 ~= nil then
+    local a = px5:get(4)
+    if a < 50 then
+        -- The curve might not pass through exact pixel, just check it drew something on canvas
+        local px5b = ctx:getImageData(50, 40, 1, 1)
+        if px5b ~= nil and px5b:get(4) < 50 then
+            -- Check more broadly
+            local found = false
+            for y = 20, 60 do
+                local p = ctx:getImageData(50, y, 1, 1)
+                if p ~= nil and p:get(4) > 100 then found = true; break end
+            end
+            if not found then fail("T5: quadraticCurveTo no pixels") end
+        end
+    end
+end
+
+-- T6: bezierCurveTo draws something
+ctx:clearRect(0, 0, 200, 200)
+ctx.strokeStyle = "#00ffff"
+ctx.lineWidth = 3
+ctx:beginPath()
+ctx:moveTo(10, 100)
+ctx:bezierCurveTo(30, 30, 70, 170, 90, 100)
+ctx:stroke()
+local found6 = false
+for y = 50, 150 do
+    local p = ctx:getImageData(50, y, 1, 1)
+    if p ~= nil and p:get(4) > 100 then found6 = true; break end
+end
+if not found6 then fail("T6: bezierCurveTo no pixels") end
+
+-- T7: closePath forms a triangle
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#ffff00"
+ctx:beginPath()
+ctx:moveTo(100, 10)
+ctx:lineTo(130, 60)
+ctx:lineTo(70, 60)
+ctx:closePath()
+ctx:fill()
+local px7 = ctx:getImageData(100, 40, 1, 1)
+if px7 == nil then fail("T7: nil")
+else
+    local r = px7:get(1); local g = px7:get(2)
+    if r < 200 or g < 200 then fail("T7: triangle r="..tostring(r).." g="..tostring(g)) end
+end
+
+-- T8: ellipse
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#ff8000"
+ctx:beginPath()
+ctx:ellipse(100, 100, 40, 20, 0, 0, 2 * math.pi)
+ctx:closePath()
+ctx:fill()
+-- Scan center region for orange-ish pixels
+local found8 = false
+for y = 95, 105 do
+    for x = 95, 105 do
+        local p = ctx:getImageData(x, y, 1, 1)
+        if p ~= nil and p:get(1) > 150 and p:get(4) > 150 then found8 = true; break end
+    end
+    if found8 then break end
+end
+if not found8 then fail("T8: ellipse no pixels in center") end
+
+-- T9: arcTo
+ctx:clearRect(0, 0, 200, 200)
+ctx.strokeStyle = "#ffffff"
+ctx.lineWidth = 3
+ctx:beginPath()
+ctx:moveTo(20, 20)
+ctx:arcTo(80, 20, 80, 80, 20)
+ctx:stroke()
+local found9 = false
+for x = 20, 80 do
+    local p = ctx:getImageData(x, 20, 1, 1)
+    if p ~= nil and p:get(4) > 100 then found9 = true; break end
+end
+if not found9 then fail("T9: arcTo no pixels") end
+
+-- T10: roundRect
+ctx:clearRect(0, 0, 200, 200)
+ctx.fillStyle = "#808080"
+ctx:beginPath()
+ctx:roundRect(10, 10, 60, 40, 8)
+ctx:fill()
+local px10 = ctx:getImageData(40, 30, 1, 1)
+if px10 == nil then fail("T10: nil")
+else
+    local r = px10:get(1)
+    if r < 100 or r > 160 then fail("T10: roundRect gray="..tostring(r)) end
+end
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "path ops ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

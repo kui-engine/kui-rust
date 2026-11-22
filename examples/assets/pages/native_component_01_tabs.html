@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.tabs{background:white;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);overflow:hidden}
+.tab-bar{display:flex;border-bottom:2px solid #e2e8f0;padding:0 8px}
+.tab{padding:12px 20px;font-size:14px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:500}
+.tab.active{color:#3b82f6;border-bottom-color:#3b82f6;font-weight:600}
+.tab:hover{color:#3b82f6;background:#f8fafc}
+.panel{padding:24px;display:none;font-size:14px;color:#475569;line-height:1.7}
+.panel.active{display:block}
+.panel h3{font-size:16px;color:#1e293b;margin-bottom:8px}
+.tag{display:inline-block;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;margin:2px}
+.t1{background:#dbeafe;color:#1e40af}.t2{background:#dcfce7;color:#166534}.t3{background:#fef3c7;color:#92400e}
+</style></head><body>
+<h2>Tab Component</h2>
+<div class="tabs">
+<div class="tab-bar" id="tabBar">
+<div class="tab active" id="tab0">Overview</div>
+<div class="tab" id="tab1">Features</div>
+<div class="tab" id="tab2">Specs</div>
+<div class="tab" id="tab3">Reviews</div>
+</div>
+<div class="panel active" id="p0"><h3>Product Overview</h3><p>KUI is a high-performance C++ UI framework that uses HTML and CSS for layout and styling.</p></div>
+<div class="panel" id="p1"><h3>Key Features</h3><p><span class="tag t1">HTML/CSS</span> <span class="tag t2">Flexbox</span> <span class="tag t3">Grid</span> <span class="tag t1">Canvas 2D</span> <span class="tag t2">WebGL</span> <span class="tag t3">Lua</span></p></div>
+<div class="panel" id="p2"><h3>Specifications</h3><p><b>Renderer:</b> Skia (GPU)<br><b>Scripting:</b> Lua 5.4<br><b>Layout:</b> CSS 2.1 + Flex + Grid<br><b>Platform:</b> Windows</p></div>
+<div class="panel" id="p3"><h3>Reviews</h3><p>"Fast and lightweight!" — Dev A<br>"Best native UI framework." — Dev B</p></div>
+</div></body></html>

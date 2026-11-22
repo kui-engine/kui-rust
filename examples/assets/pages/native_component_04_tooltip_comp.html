@@ -1,0 +1,33 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);margin-bottom:16px}
+.card h3{font-size:14px;color:#64748b;margin-bottom:12px}
+.demo-row{display:flex;gap:16px;flex-wrap:wrap}
+.tip-wrap{position:relative;display:inline-block}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600}
+.bp{background:#3b82f6;color:white}.bg{background:#10b981;color:white}
+.ba{background:#f59e0b;color:#1e293b}.br{background:#ef4444;color:white}
+.tooltip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);padding:8px 14px;border-radius:8px;font-size:12px;color:white;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+.tooltip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent}
+.t-dark{background:#1e293b}.t-dark::after{border-top-color:#1e293b}
+.t-blue{background:#3b82f6}.t-blue::after{border-top-color:#3b82f6}
+.t-green{background:#10b981}.t-green::after{border-top-color:#10b981}
+.t-red{background:#ef4444}.t-red::after{border-top-color:#ef4444}
+.tip-wrap:hover .tooltip{opacity:1}
+</style></head><body>
+<h2>Tooltip Component</h2>
+<div class="card"><h3>Hover to show tooltips</h3>
+<div class="demo-row">
+<div class="tip-wrap"><button class="btn bp">Save</button><div class="tooltip t-dark">Save your changes</div></div>
+<div class="tip-wrap"><button class="btn bg">Export</button><div class="tooltip t-blue">Export as PDF</div></div>
+<div class="tip-wrap"><button class="btn ba">Settings</button><div class="tooltip t-green">Open preferences</div></div>
+<div class="tip-wrap"><button class="btn br">Delete</button><div class="tooltip t-red">Permanently remove</div></div>
+</div></div>
+<div class="card"><h3>Tooltips with different content</h3>
+<div class="demo-row">
+<div class="tip-wrap"><button class="btn bp">Short</button><div class="tooltip t-dark">Hi!</div></div>
+<div class="tip-wrap"><button class="btn bg">Long text</button><div class="tooltip t-dark">This tooltip has a longer description text</div></div>
+</div></div>
+</body></html>

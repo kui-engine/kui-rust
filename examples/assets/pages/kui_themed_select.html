@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ---- Catppuccin Mocha (dark) ---- */
+body.mocha {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    /* Dropdown theme tokens — inherited by every <select> below. */
+    --kui-popup-bg:          #313244;
+    --kui-popup-fg:          #cdd6f4;
+    --kui-popup-hover-bg:    #45475a;
+    --kui-popup-selected-fg: #a6e3a1;
+    --kui-popup-border:      #585b70;
+    --kui-popup-radius:      6px;
+}
+body.mocha select.themed {
+    background-color: #313244; color: #cdd6f4;
+    border: 1px solid #585b70;
+}
+
+/* ---- Catppuccin Latte (light) ---- */
+body.latte {
+    background: #eff1f5;
+    color: #4c4f69;
+    --kui-popup-bg:          #e6e9ef;
+    --kui-popup-fg:          #4c4f69;
+    --kui-popup-hover-bg:    #ccd0da;
+    --kui-popup-selected-fg: #40a02b;
+    --kui-popup-border:      #9ca0b0;
+    --kui-popup-radius:      6px;
+}
+body.latte select.themed {
+    background-color: #e6e9ef; color: #4c4f69;
+    border: 1px solid #9ca0b0;
+}
+
+body { padding: 24px; font-family: "Segoe UI", sans-serif; font-size: 14px; }
+h1   { font-size: 18px; margin-bottom: 4px; }
+p.hint { opacity: 0.7; font-size: 12px; margin-bottom: 16px; }
+.row  { margin: 14px 0; }
+label { display: block; font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+select { min-width: 260px; padding: 4px 8px; border-radius: 4px; font-size: 14px; }
+select.plain { background-color: #fff; color: #000; border: 1px solid #767676; }
+button {
+    padding: 6px 14px; border-radius: 4px; cursor: pointer;
+    border: 1px solid #585b70; background: transparent; color: inherit;
+    font: 13px "Segoe UI";
+}
+</style></head>
+<body class="mocha">
+<h1>Themed &lt;select&gt; dropdown</h1>
+<p class="hint">Switch the flavor, then open each dropdown — the popup follows
+the select's computed style + the inherited --kui-popup-* tokens.</p>
+
+<button id="btn-flavor">Switch to latte</button>
+
+<div class="row">
+    <label>themed (palette derives from the select + body tokens)</label>
+    <select class="themed" id="sel-llm">
+        <option>DeepSeek V3</option>
+        <option selected>GPT-5.2</option>
+        <option>Claude Fable 5</option>
+        <option>Local llama.cpp</option>
+    </select>
+</div>
+
+<div class="row">
+    <label>untouched (classic light look — unaffected by the theme)</label>
+    <select class="plain">
+        <option selected>Alpha</option>
+        <option>Beta</option>
+        <option>Gamma</option>
+    </select>
+</div>
+
+<script>
+local body = document:querySelector("body")
+local btn  = document:getElementById("btn-flavor")
+btn:addEventListener("click", function(e)
+    if body.className == "mocha" then
+        body.className = "latte"
+        btn.textContent = "Switch to mocha"
+    else
+        body.className = "mocha"
+        btn.textContent = "Switch to latte"
+    end
+end)
+</script>
+</body></html>

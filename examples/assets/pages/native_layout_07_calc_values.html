@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.bar{height:40px;border-radius:8px;display:flex;align-items:center;padding:0 12px;font-size:11px;font-weight:600;color:white;margin-bottom:8px;font-family:"Consolas",monospace}
+.sidebar-demo{display:flex;gap:0;height:100px;border-radius:8px;overflow:hidden;margin-bottom:8px}
+.side{background:#1e293b;color:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.main{background:#dbeafe;color:#1e40af;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+</style></head><body>
+<h2>CSS calc()</h2>
+<div class="card"><h3>Width with calc()</h3>
+<div class="bar" style="width:calc(100% - 40px);background:#3b82f6">calc(100% - 40px)</div>
+<div class="bar" style="width:calc(50% + 100px);background:#10b981">calc(50% + 100px)</div>
+<div class="bar" style="width:calc(75% - 60px);background:#f59e0b">calc(75% - 60px)</div>
+<div class="info">calc() mixes percentages and pixels in one expression</div></div>
+<div class="card"><h3>Sidebar Layout</h3>
+<div class="sidebar-demo">
+<div class="side" style="width:200px">Sidebar 200px</div>
+<div class="main" style="width:calc(100% - 200px)">Main: calc(100% - 200px)</div>
+</div>
+<div class="info">Common pattern: fixed sidebar + fluid main area</div></div>
+</body></html>

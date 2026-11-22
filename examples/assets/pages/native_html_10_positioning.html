@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { padding: 20px 20px 12px; color: #1e293b; }
+.container { position: relative; height: 300px; margin: 0 20px 20px;
+             background: #e2e8f0; border-radius: 8px; overflow: hidden; }
+.box { width: 80px; height: 80px; border-radius: 8px; display: flex;
+       align-items: center; justify-content: center; color: white;
+       font-size: 12px; font-weight: 600; }
+.rel { position: relative; top: 20px; left: 20px; background: #3b82f6; }
+.abs-tl { position: absolute; top: 10px; left: 10px; background: #ef4444; }
+.abs-tr { position: absolute; top: 10px; right: 10px; background: #10b981; }
+.abs-bl { position: absolute; bottom: 10px; left: 10px; background: #f59e0b; }
+.abs-br { position: absolute; bottom: 10px; right: 10px; background: #8b5cf6; }
+.abs-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+              background: #ec4899; width: 120px; }
+.fixed-badge { position: fixed; bottom: 20px; right: 20px; background: #ef4444;
+               padding: 8px 16px; border-radius: 20px; color: white; font-size: 13px;
+               box-shadow: 0 4px 12px rgba(239,68,68,0.4); z-index: 100; }
+.sticky-header { position: sticky; top: 0; background: #1e293b; color: white;
+                 padding: 10px 16px; font-size: 14px; z-index: 10; }
+</style></head><body>
+<h2>CSS Positioning</h2>
+<div class="sticky-header">Sticky Header — stays at top when scrolling</div>
+<div class="container">
+  <div class="box rel">Relative</div>
+  <div class="box abs-tl">Abs TL</div>
+  <div class="box abs-tr">Abs TR</div>
+  <div class="box abs-bl">Abs BL</div>
+  <div class="box abs-br">Abs BR</div>
+  <div class="box abs-center">Abs Center</div>
+</div>
+<div class="fixed-badge">Fixed Badge</div>
+</body></html>

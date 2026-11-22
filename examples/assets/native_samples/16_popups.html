@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    :root {
+        --bg: #1a1a2e;
+        --card-bg: #16213e;
+        --text: #e0e0e0;
+        --accent: #3b82f6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --border: #2a2a4a;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        background: var(--bg);
+        color: var(--text);
+        font-family: sans-serif;
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 22px;
+        margin: 0 0 6px 0;
+        color: #ffffff;
+    }
+
+    .subtitle {
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .section {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 12px;
+    }
+
+    .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    /* Tooltip demo buttons */
+    .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--accent);
+        color: #ffffff;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        opacity: 0.85;
+    }
+    .btn-success { background: var(--success); }
+    .btn-warning { background: var(--warning); color: #1a1a2e; }
+    .btn-danger  { background: var(--danger); }
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+    }
+
+    /* Tooltip target areas */
+    .tooltip-target {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #2a2a4a;
+        border: 1px dashed #444;
+        border-radius: 6px;
+        cursor: default;
+        font-size: 13px;
+    }
+
+    /* Context menu demo area */
+    .context-area {
+        min-height: 100px;
+        background: #0f3460;
+        border: 1px dashed var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7eb8da;
+        font-size: 13px;
+        cursor: context-menu;
+    }
+
+    /* Info text */
+    .info {
+        color: #888;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .code {
+        font-family: monospace;
+        background: #2a2a4a;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 12px;
+        color: var(--accent);
+    }
+
+    /* Icon placeholder */
+    .icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        background: var(--accent);
+        margin-right: 6px;
+        vertical-align: middle;
+    }
+    .icon-success { background: var(--success); }
+    .icon-warning { background: var(--warning); }
+    .icon-danger  { background: var(--danger); }
+</style>
+</head>
+<body>
+
+<h1>Popups: Tooltips & Context Menus</h1>
+<div class="subtitle">Tooltip (hover) and Context Menu (right-click) demonstrations</div>
+
+<!-- Section 1: Tooltips via title attribute -->
+<div class="section">
+    <div class="section-title">1. Tooltips (title attribute)</div>
+    <div class="row">
+        <div class="tooltip-target" title="This is a basic tooltip">
+            Hover me (basic)
+        </div>
+        <div class="tooltip-target" title="Save your current progress to disk">
+            <span class="icon"></span>Save
+        </div>
+        <div class="tooltip-target" title="Warning: this action cannot be undone!">
+            <span class="icon icon-warning"></span>Delete
+        </div>
+        <div class="tooltip-target" title="Opens settings panel with advanced configuration options">
+            <span class="icon icon-success"></span>Settings
+        </div>
+    </div>
+    <div class="info">Hover over each element to see the tooltip. Uses the standard <span class="code">title</span> attribute.</div>
+</div>
+
+<!-- Section 2: Tooltips on buttons -->
+<div class="section">
+    <div class="section-title">2. Tooltips on Buttons</div>
+    <div class="row">
+        <div class="btn" title="Click to submit the form">Submit</div>
+        <div class="btn btn-success" title="Approve and continue">Approve</div>
+        <div class="btn btn-warning" title="Review before proceeding">Review</div>
+        <div class="btn btn-danger" title="Permanently delete this item">Delete</div>
+        <div class="btn btn-outline" title="Cancel current operation">Cancel</div>
+    </div>
+    <div class="info">Tooltips appear after a brief hover delay (~500ms).</div>
+</div>
+
+<!-- Section 3: Context Menu area -->
+<div class="section">
+    <div class="section-title">3. Context Menu (Right-Click)</div>
+    <div class="context-area" id="ctx-area-1">
+        Right-click here for context menu
+    </div>
+    <div class="info">Right-click the blue area to see a context menu with actions.</div>
+</div>
+
+<!-- Section 4: Another context menu -->
+<div class="section">
+    <div class="section-title">4. Text Editor Context Menu</div>
+    <div class="context-area" id="ctx-area-2" style="background: #1e3a5f;">
+        Right-click for text editing options
+    </div>
+    <div class="info">Different elements can have different context menus.</div>
+</div>
+
+<!-- Declarative right-click menus for sections 3-5 (hidden until right-click;
+     see 77_context_menu.html for full customization). The engine's own
+     built-in default menu is off by default. -->
+<kui-context-menu for="ctx-area-1">
+    <kui-menu-item text="Open" shortcut="Enter"></kui-menu-item>
+    <kui-menu-item text="Duplicate" shortcut="Ctrl+D"></kui-menu-item>
+    <kui-menu-item separator></kui-menu-item>
+    <kui-menu-item text="Delete" shortcut="Del"></kui-menu-item>
+</kui-context-menu>
+<kui-context-menu for="ctx-area-2">
+    <kui-menu-item text="Cut" shortcut="Ctrl+X"></kui-menu-item>
+    <kui-menu-item text="Copy" shortcut="Ctrl+C"></kui-menu-item>
+    <kui-menu-item text="Paste" shortcut="Ctrl+V"></kui-menu-item>
+    <kui-menu-item separator></kui-menu-item>
+    <kui-menu-item text="Select All" shortcut="Ctrl+A"></kui-menu-item>
+</kui-context-menu>
+<kui-context-menu for="combined-btn">
+    <kui-menu-item text="Run"></kui-menu-item>
+    <kui-menu-item text="Run with options..."></kui-menu-item>
+    <kui-menu-item text="Disabled action" disabled></kui-menu-item>
+</kui-context-menu>
+
+<!-- Section 5: Combined -->
+<div class="section">
+    <div class="section-title">5. Combined: Tooltip + Context Menu</div>
+    <div class="row">
+        <div class="btn" title="Right-click for more options" id="combined-btn">
+            Hover for tooltip, right-click for menu
+        </div>
+    </div>
+    <div class="info">This button shows a tooltip on hover and a context menu on right-click.</div>
+</div>
+
+<!-- Section 6: API Usage -->
+<div class="section">
+    <div class="section-title">6. C++ API Reference</div>
+    <div style="font-size: 12px; color: #aaa; line-height: 1.8;">
+        <div><span class="code">doc->popupManager().showTooltip(text, anchorRect, position)</span></div>
+        <div><span class="code">doc->popupManager().showContextMenu(x, y, menuItems)</span></div>
+        <div><span class="code">doc->popupManager().dismissAll()</span></div>
+        <div><span class="code">doc->popupManager().dismissByType(PopupType::Tooltip)</span></div>
+    </div>
+</div>
+
+</body>
+</html>

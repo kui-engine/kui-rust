@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 20px; font-family: "Segoe UI", sans-serif; background: #f8fafc; }
+h2 { margin-bottom: 12px; color: #1e293b; }
+h3 { margin: 16px 0 8px; color: #475569; font-size: 14px; }
+.grid { display: grid; gap: 8px; margin-bottom: 16px; padding: 12px;
+        background: #e2e8f0; border-radius: 8px; }
+.cell { padding: 12px; background: #3b82f6; color: white; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.cell:nth-child(2) { background: #10b981; }
+.cell:nth-child(3) { background: #f59e0b; }
+.cell:nth-child(4) { background: #ef4444; }
+.cell:nth-child(5) { background: #8b5cf6; }
+.cell:nth-child(6) { background: #ec4899; }
+.g3col { grid-template-columns: 1fr 1fr 1fr; }
+.g-mixed { grid-template-columns: 200px 1fr 100px; }
+.g-auto { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 60px; }
+.span2 { grid-column: span 2; background: #06b6d4 !important; }
+.span-row { grid-row: span 2; background: #d946ef !important; }
+</style></head><body>
+<h2>CSS Grid Layout</h2>
+<h3>3-column equal</h3>
+<div class="grid g3col">
+  <div class="cell">1</div><div class="cell">2</div><div class="cell">3</div>
+  <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div>
+</div>
+<h3>Mixed columns: 200px 1fr 100px</h3>
+<div class="grid g-mixed">
+  <div class="cell">Fixed 200</div><div class="cell">Flexible</div><div class="cell">Fixed 100</div>
+</div>
+<h3>Column span</h3>
+<div class="grid g3col">
+  <div class="cell span2">Span 2</div><div class="cell">3</div>
+  <div class="cell">4</div><div class="cell">5</div><div class="cell">6</div>
+</div>
+<h3>Row span</h3>
+<div class="grid g-auto">
+  <div class="cell span-row">Span 2 rows</div><div class="cell">B</div><div class="cell">C</div>
+  <div class="cell">D</div><div class="cell">E</div>
+</div>
+</body></html>

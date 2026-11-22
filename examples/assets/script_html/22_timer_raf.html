@@ -1,0 +1,9 @@
+<html><body>
+<div id="result">WAITING</div>
+<script>
+-- rAF callback writes result directly; tickTimers(0) fires after executeScripts
+requestAnimationFrame(function()
+    document:getElementById("result").textContent = "PASS"
+end)
+</script>
+</body></html>

@@ -1,0 +1,22 @@
+<html><body>
+<div id="result"></div>
+<script>
+-- Test passing functions as values and calling them
+function apply(fn, x) return fn(x) end
+function double(x) return x * 2 end
+function square(x) return x * x end
+
+local ok = (apply(double, 5) == 10)
+    and (apply(square, 4) == 16)
+
+-- Higher-order: function returning function
+function multiplier(n)
+    return function(x) return x * n end
+end
+local times3 = multiplier(3)
+ok = ok and (times3(7) == 21)
+
+local r = document:getElementById("result")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+</script>
+</body></html>

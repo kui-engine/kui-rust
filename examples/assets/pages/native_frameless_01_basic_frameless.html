@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1e293b; color: #f8fafc; font-family: "Segoe UI", sans-serif;
+       border-radius: 12px; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+.titlebar { display: flex; align-items: center; padding: 8px 16px; background: #0f172a;
+             cursor: move; -webkit-app-region: drag; }
+.titlebar .title { flex: 1; font-size: 14px; font-weight: 600; }
+.titlebar .btn { width: 32px; height: 32px; border-radius: 6px; display: flex;
+                  align-items: center; justify-content: center; cursor: pointer;
+                  color: #cbd5e1; -webkit-app-region: no-drag;
+                  transition: background .15s ease, color .15s ease; }
+.titlebar .btn:hover { background: rgba(255,255,255,0.1); color: #f8fafc; }
+.titlebar .close:hover { background: #ef4444; color: #ffffff; }
+/* Window control icons are drawn with CSS, not glyphs: characters such as
+   - / [] / x differ in size, stroke weight and baseline from font to font, so
+   the three buttons never line up. One shared 10x10 canvas, 1px strokes,
+   colour inherited from the button. */
+.ico { position: relative; display: block; width: 10px; height: 10px; }
+.ico::before, .ico::after { content: ""; position: absolute; background: currentColor; }
+.ico-min::before { left: 0; top: 5px; width: 10px; height: 1px; }
+.ico-max::before { left: 0; top: 0; width: 10px; height: 10px; background: none;
+                   border: 1px solid currentColor; border-radius: 1.5px; }
+.ico-close::before, .ico-close::after { left: -1px; top: 5px; width: 12px; height: 1px; }
+.ico-close::before { transform: rotate(45deg); }
+.ico-close::after  { transform: rotate(-45deg); }
+.content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.content p { font-size: 16px; color: #94a3b8; text-align: center; }
+</style></head><body>
+<div class="titlebar">
+  <span class="title">Frameless Window</span>
+  <div class="btn minimize" id="minBtn" title="Minimize"><span class="ico ico-min"></span></div>
+  <div class="btn maximize" id="maxBtn" title="Maximize"><span class="ico ico-max"></span></div>
+  <div class="btn close" id="closeBtn" title="Close"><span class="ico ico-close"></span></div>
+</div>
+<div class="content">
+  <p>Custom title bar with frameless window.<br>Drag the title bar to move, resize from edges.</p>
+</div>
+</body></html>

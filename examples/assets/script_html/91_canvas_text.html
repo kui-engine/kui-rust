@@ -1,0 +1,163 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="300" height="200"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: measureText returns valid width
+ctx.font = "20px sans-serif"
+local m = ctx:measureText("Hello")
+local w = nil
+if type(m) == "table" then
+    w = m.width or m["width"]
+elseif type(m) == "number" then
+    w = m
+end
+if w == nil then fail("T1: measureText nil")
+elseif w <= 0 then fail("T1: measureText width="..tostring(w))
+end
+
+-- T2: fillText draws visible pixels
+ctx:clearRect(0, 0, 300, 200)
+ctx.fillStyle = "#ff0000"
+ctx.font = "30px sans-serif"
+ctx:fillText("X", 10, 40)
+-- Scan for red pixels in the text area
+local found2 = false
+for y = 10, 50 do
+    for x = 10, 40 do
+        local p = ctx:getImageData(x, y, 1, 1)
+        if p ~= nil and p:get(4) > 100 then
+            found2 = true
+            break
+        end
+    end
+    if found2 then break end
+end
+if not found2 then fail("T2: fillText no pixels") end
+
+-- T3: strokeText draws visible pixels
+ctx:clearRect(0, 0, 300, 200)
+ctx.strokeStyle = "#0000ff"
+ctx.lineWidth = 2
+ctx.font = "30px sans-serif"
+ctx:strokeText("O", 10, 80)
+local found3 = false
+for y = 50, 90 do
+    for x = 10, 40 do
+        local p = ctx:getImageData(x, y, 1, 1)
+        if p ~= nil and p:get(4) > 100 then
+            found3 = true
+            break
+        end
+    end
+    if found3 then break end
+end
+if not found3 then fail("T3: strokeText no pixels") end
+
+-- T4: font property round-trip
+ctx.font = "16px monospace"
+local f = ctx.font
+if f == nil then fail("T4: font nil")
+elseif type(f) ~= "string" then fail("T4: font type="..type(f))
+end
+
+-- T5: textAlign property
+ctx.textAlign = "center"
+local ta = ctx.textAlign
+if ta ~= "center" then fail("T5: textAlign="..tostring(ta)) end
+
+-- T6: textBaseline property
+ctx.textBaseline = "middle"
+local tb = ctx.textBaseline
+if tb ~= "middle" then fail("T6: textBaseline="..tostring(tb)) end
+
+-- T7: measureText with empty string
+local m2 = ctx:measureText("")
+local w2 = nil
+if type(m2) == "table" then
+    w2 = m2.width or m2["width"]
+elseif type(m2) == "number" then
+    w2 = m2
+end
+if w2 == nil then fail("T7: measureText empty nil")
+elseif w2 ~= 0 then
+    -- Some implementations return 0 for empty string, some return small value
+    if w2 < 0 then fail("T7: measureText empty negative="..tostring(w2)) end
+end
+
+-- T8: fillText with gradient
+ctx:clearRect(0, 0, 300, 200)
+local tg = ctx:createLinearGradient(0, 0, 100, 0)
+tg:addColorStop(0, "#ff0000")
+tg:addColorStop(1, "#0000ff")
+ctx.fillStyle = tg
+ctx.font = "40px sans-serif"
+ctx:fillText("AB", 10, 150)
+local found8 = false
+for y = 110, 160 do
+    for x = 10, 80 do
+        local p = ctx:getImageData(x, y, 1, 1)
+        if p ~= nil and p:get(4) > 100 then
+            found8 = true
+            break
+        end
+    end
+    if found8 then break end
+end
+if not found8 then fail("T8: fillText gradient no pixels") end
+
+-- T9（T-DEBT-LINUX-CANVAS-TEXT-MEASURE-ZERO）：各个泛型族、没装的族、族列表都必须量出宽度
+-- （量不出字形的空字体会让 measureText 恒为 0、fillText 什么都不画）。
+local function widthOf(font)
+    ctx.font = font
+    local mm = ctx:measureText("Hello")
+    if type(mm) == "table" then return mm.width or mm["width"] end
+    return mm
+end
+for _, font in ipairs({"20px serif", "20px monospace", "20px system-ui",
+                       "20px NoSuchFontFamilyXyz", "20px 'NoSuchFontFamilyXyz', sans-serif",
+                       "20px Arial, Helvetica, sans-serif"}) do
+    local fw = widthOf(font)
+    if fw == nil or fw <= 0 then fail("T9: measureText(" .. font .. ")=" .. tostring(fw)) end
+end
+
+-- T10：没装的族照样画出像素（落到平台默认字体）
+ctx:clearRect(0, 0, 300, 200)
+ctx.fillStyle = "#00ff00"
+ctx.font = "30px NoSuchFontFamilyXyz"
+ctx.textAlign = "left"
+ctx.textBaseline = "alphabetic"
+ctx:fillText("X", 10, 40)
+local found10 = false
+for y = 10, 50 do
+    for x = 10, 40 do
+        local p = ctx:getImageData(x, y, 1, 1)
+        if p ~= nil and p:get(4) > 100 then
+            found10 = true
+            break
+        end
+    end
+    if found10 then break end
+end
+if not found10 then fail("T10: fillText with missing family no pixels") end
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "text ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

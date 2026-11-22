@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    padding: 18px;
+    font-family: "Segoe UI", sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+}
+header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+h2 { color: #f1f5f9; font-size: 20px; }
+.subtitle { color: #94a3b8; font-size: 13px; }
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+button {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+}
+button:hover { background: #334155; }
+button.active { background: #3b82f6; border-color: #2563eb; }
+.tag {
+    background: #334155;
+    color: #cbd5e1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+.editor-wrap {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 12px;
+    height: 600px;
+}
+kui-editor {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #334155;
+    border-radius: 4px;
+}
+.cheatsheet {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 12px;
+    overflow-y: auto;
+    font-size: 12px;
+    color: #cbd5e1;
+}
+.cheatsheet h3 { color: #f1f5f9; font-size: 13px; margin: 12px 0 6px; }
+.cheatsheet h3:first-child { margin-top: 0; }
+.cheatsheet kbd {
+    background: #334155;
+    color: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 11px;
+    border: 1px solid #475569;
+}
+.cheatsheet ul { list-style: none; padding: 0; }
+.cheatsheet li { margin: 4px 0; }
+#stats {
+    padding: 8px 12px;
+    background: #1e293b;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 8px;
+}
+</style></head>
+<body>
+
+<header>
+    <h2>KUI Editor — M1 Feature Demo</h2>
+    <span class="subtitle">multi-cursor · find/replace · minimap · folding · comment · line-ops · auto-pair</span>
+</header>
+
+<div class="toolbar">
+    <button id="thm-mocha" class="active">Mocha</button>
+    <button id="thm-latte">Latte</button>
+    <button id="thm-hc">High Contrast</button>
+    <span class="tag">|</span>
+    <button id="toggle-minimap">Minimap: OFF</button>
+    <button id="toggle-folding">Folding: ON</button>
+    <button id="collapse-all">Collapse all</button>
+    <button id="expand-all">Expand all</button>
+    <span class="tag">|</span>
+    <button id="open-find">Open Find (Ctrl+F)</button>
+    <button id="open-replace">Open Replace (Ctrl+H)</button>
+    <span class="tag">|</span>
+    <button id="clear-cursors">Clear extra cursors (Esc)</button>
+</div>
+
+<div class="editor-wrap">
+    <kui-editor id="ed"></kui-editor>
+    <div class="cheatsheet">
+        <h3>Multi-cursor</h3>
+        <ul>
+            <li><kbd>Ctrl+D</kbd> select next occurrence</li>
+            <li><kbd>Ctrl+Shift+L</kbd> select all occurrences</li>
+            <li><kbd>Ctrl+Alt+Up/Down</kbd> add cursor above/below</li>
+            <li><kbd>Alt+Click</kbd> add cursor at click</li>
+            <li><kbd>Esc</kbd> clear extra cursors</li>
+        </ul>
+        <h3>Find / Replace</h3>
+        <ul>
+            <li><kbd>Ctrl+F</kbd> open find widget</li>
+            <li><kbd>Ctrl+H</kbd> open replace widget</li>
+            <li><kbd>Enter</kbd> next match · <kbd>Shift+Enter</kbd> prev</li>
+            <li><kbd>Tab</kbd> switch find ↔ replace field</li>
+        </ul>
+        <h3>Line operations</h3>
+        <ul>
+            <li><kbd>Ctrl+/</kbd> toggle comment</li>
+            <li><kbd>Alt+Up/Down</kbd> move line up/down</li>
+            <li><kbd>Shift+Alt+Up/Down</kbd> copy line up/down</li>
+            <li><kbd>Ctrl+Shift+K</kbd> delete line</li>
+        </ul>
+        <h3>Editing</h3>
+        <ul>
+            <li>Auto-pair <kbd>(</kbd><kbd>[</kbd><kbd>{</kbd><kbd>"</kbd><kbd>'</kbd></li>
+            <li>Smart indent on <kbd>Enter</kbd> inside <kbd>{}</kbd></li>
+            <li>Same-word + bracket match highlight while caret moves</li>
+        </ul>
+    </div>
+</div>
+
+<div id="stats">loading...</div>
+
+<script>
+local sampleCode = [[# M1 demo sample
+# Multiple "count" / "total" identifiers below so Ctrl+D and
+# Ctrl+Shift+L are visually convincing.
+
+def process_items(items):
+    count = 0
+    total = 0.0
+    for item in items:
+        count = count + 1
+        total = total + item.price
+    return count, total
+
+def summarise(reports):
+    count = len(reports)
+    total = sum(r.value for r in reports)
+    average = total / count if count else 0
+    return {
+        "count": count,
+        "total": total,
+        "average": average,
+    }
+
+# Try: place caret inside "count", press Ctrl+D repeatedly
+# Try: Ctrl+Shift+L while on "total" to select every match
+# Try: Ctrl+Alt+Down to add a column-style cursor below
+# Try: Ctrl+F to find, Ctrl+H to replace
+# Try: Ctrl+/ to toggle line comments on the current line
+# Try: Alt+Up/Down to move a line vertically
+]]
+
+local ed       = document:getElementById("ed")
+local stats    = document:getElementById("stats")
+local minimapBtn = document:getElementById("toggle-minimap")
+local foldingBtn = document:getElementById("toggle-folding")
+local minimapOn  = false
+local foldingOn  = true
+
+local function setActive(groupIds, activeId)
+    for _, id in ipairs(groupIds) do
+        local b = document:getElementById(id)
+        if b then
+            if id == activeId then b:addClass("active")
+            else                   b:removeClass("active") end
+        end
+    end
+end
+
+local function applyTheme(name)
+    ed:setTheme(name)
+    ed:focus()
+    setActive({"thm-mocha", "thm-latte", "thm-hc"},
+              "thm-"..(name == "hc" and "hc" or name))
+end
+
+document:getElementById("thm-mocha"):addEventListener("click",
+    function(e) applyTheme("mocha") end)
+document:getElementById("thm-latte"):addEventListener("click",
+    function(e) applyTheme("latte") end)
+document:getElementById("thm-hc"):addEventListener("click",
+    function(e) applyTheme("hc") end)
+
+minimapBtn:addEventListener("click", function(e)
+    minimapOn = not minimapOn
+    ed:setMinimapVisible(minimapOn and 1 or 0)
+    minimapBtn.textContent = minimapOn and "Minimap: ON" or "Minimap: OFF"
+    ed:focus()
+end)
+
+foldingBtn:addEventListener("click", function(e)
+    foldingOn = not foldingOn
+    ed:setFoldingEnabled(foldingOn and 1 or 0)
+    foldingBtn.textContent = foldingOn and "Folding: ON" or "Folding: OFF"
+    ed:focus()
+end)
+
+document:getElementById("collapse-all"):addEventListener("click",
+    function(e) ed:collapseAllFolds(); ed:focus() end)
+document:getElementById("expand-all"):addEventListener("click",
+    function(e) ed:expandAllFolds(); ed:focus() end)
+document:getElementById("open-find"):addEventListener("click",
+    function(e) ed:openFindWidget(0); ed:focus() end)
+document:getElementById("open-replace"):addEventListener("click",
+    function(e) ed:openFindWidget(1); ed:focus() end)
+document:getElementById("clear-cursors"):addEventListener("click",
+    function(e) ed:clearSecondaryCursors(); ed:focus() end)
+
+-- ----- Initial load -------------------------------------------------------
+ed:setValue(sampleCode)
+ed:setLanguage("python")
+applyTheme("mocha")
+
+-- ----- Stats poll (10 Hz, redraw only on version bump) --------------------
+local lastV = -1
+setInterval(function()
+    local v = ed:getVersion()
+    if v == lastV then return end
+    lastV = v
+    local cursors = ed:getCursorCount()
+    local widget = ed:isFindWidgetVisible() == 1
+    local pat = ed:getFindWidgetPattern()
+    local widgetStr = widget
+        and string.format("find='%s'", pat ~= "" and pat or "(empty)")
+        or "no widget"
+    stats.textContent = string.format(
+        "  lines=%d  v=%d  cursors=%d  matches=%d  %s",
+        ed:getLineCount(), v, cursors, ed:findCount(), widgetStr)
+end, 100)
+
+print("[M1 demo] ready — try Ctrl+D / Ctrl+F / Alt+Up etc")
+</script>
+
+</body></html>

@@ -1,0 +1,26 @@
+<html><body>
+<div id="target"></div>
+<div id="result"></div>
+<script>
+local count = 0
+local el = document:getElementById("target")
+
+el:addEventListener("custom", function(e)
+    count = count + 1
+end)
+
+el:on("custom", function(e)
+    count = count + 10
+end)
+
+-- Dispatch custom event twice
+el:dispatchEvent("custom")
+el:dispatchEvent("custom")
+
+-- Expected: 2 * (1 + 10) = 22
+local r = document:getElementById("result")
+if count == 22 then r.textContent = "PASS"
+else r.textContent = "FAIL: count=" .. tostring(count)
+end
+</script>
+</body></html>

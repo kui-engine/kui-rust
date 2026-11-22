@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<script>
+-- L4: JSON.parse and JSON.stringify
+local ok = true
+local msg = ""
+
+-- Parse object
+local obj = JSON.parse('{"name":"kui","version":1,"active":true}')
+if obj.name ~= "kui" then ok = false; msg = msg .. "name mismatch; " end
+if obj.version ~= 1 then ok = false; msg = msg .. "version mismatch; " end
+if obj.active ~= true then ok = false; msg = msg .. "active mismatch; " end
+
+-- Parse array
+local arr = JSON.parse('[10, 20, 30]')
+if arr[1] ~= 10 or arr[2] ~= 20 or arr[3] ~= 30 then
+    ok = false; msg = msg .. "array parse failed; "
+end
+
+-- Stringify
+local str = JSON.stringify({x = 42, y = "hello"})
+if type(str) ~= "string" then ok = false; msg = msg .. "stringify not string; " end
+
+-- Round-trip
+local data = {items = {1, 2, 3}, flag = false}
+local json = JSON.stringify(data)
+local back = JSON.parse(json)
+if back.flag ~= false then ok = false; msg = msg .. "round-trip flag; " end
+
+-- Parse null
+local n = JSON.parse("null")
+if n ~= nil then ok = false; msg = msg .. "null parse; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body>
+</html>

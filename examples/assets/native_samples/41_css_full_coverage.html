@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* ============================================================
+   CSS FULL COVERAGE TEST — KUI Engine
+   Tests 200+ CSS features across 16 categories.
+   ============================================================ */
+
+/* === @rules === */
+@keyframes pulse {
+  0%   { opacity: 1; transform: scale(1); }
+  50%  { opacity: 0.6; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes slideIn {
+  from { transform: translateX(-20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes colorCycle {
+  0%   { background-color: #e74c3c; }
+  33%  { background-color: #2ecc71; }
+  66%  { background-color: #3498db; }
+  100% { background-color: #e74c3c; }
+}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+@media (min-width: 100px) {
+  .media-test { border-left: 3px solid #2ecc71; }
+}
+@supports (display: flex) {
+  .supports-test { border-left: 3px solid #3498db; }
+}
+
+/* === CSS Custom Properties === */
+:root {
+  --primary: #4facfe;
+  --secondary: #00f2fe;
+  --accent: #f093fb;
+  --bg-dark: #1a1a2e;
+  --bg-card: #16213e;
+  --bg-inner: #0f3460;
+  --text: #e0e0e0;
+  --text-dim: #999;
+  --radius: 8px;
+  --gap: 12px;
+  --font-mono: "Consolas", monospace;
+}
+
+/* === Global Reset & Base === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+  padding: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* === Section Layout === */
+h1 { color: var(--primary); font-size: 22px; margin-bottom: 12px; text-align: center; }
+h2 {
+  color: var(--secondary);
+  font-size: 15px;
+  margin: 16px 0 8px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #333;
+  counter-increment: section;
+}
+h2::before { content: counter(section) ". "; color: var(--accent); }
+h3 { color: #ccc; font-size: 13px; margin: 8px 0 4px 0; }
+
+.section {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+.row {
+  display: flex;
+  gap: var(--gap);
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.box {
+  background: var(--bg-inner);
+  border-radius: 6px;
+  padding: 8px;
+  min-width: 60px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.label { font-size: 10px; color: #777; margin-top: 2px; }
+.tag {
+  display: inline-block;
+  background: #2d2d5e;
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   1. SELECTORS
+   ============================================================ */
+/* Type + class + ID */
+#sel-id-test { color: #e74c3c; font-weight: bold; }
+.sel-class-test { color: #2ecc71; }
+
+/* Attribute selectors */
+[data-test] { border-left: 2px solid #f39c12; padding-left: 4px; }
+[data-test="exact"] { background: rgba(243,156,18,0.1); }
+[data-test^="pre"] { font-style: italic; }
+[data-test$="suf"] { text-decoration: underline; }
+[data-test*="mid"] { letter-spacing: 1px; }
+
+/* Combinators */
+.comb-parent > .comb-child { color: #e74c3c; }
+.comb-parent .comb-desc { color: #2ecc71; }
+.comb-adj + .comb-adj-next { color: #3498db; }
+.comb-gen ~ .comb-gen-sib { color: #9b59b6; }
+
+/* Pseudo-classes: structural */
+.nth-test > div:first-child { background: #e74c3c; color: white; }
+.nth-test > div:last-child { background: #3498db; color: white; }
+.nth-test > div:nth-child(2) { background: #2ecc71; color: white; }
+.nth-test > div:nth-child(odd) { border: 1px solid rgba(255,255,255,0.3); }
+.nth-test > div:only-of-type { font-weight: bold; }
+
+/* :not, :is, :where, :has */
+.pseudo-logic > div:not(.skip) { background: var(--bg-inner); }
+.pseudo-logic > div:is(.highlight) { border: 2px solid var(--accent); }
+.has-test:has(> .trigger) { background: rgba(240,147,251,0.15); border-radius: 4px; }
+
+/* :empty */
+.empty-test:empty { width: 40px; height: 20px; background: #e74c3c; border-radius: 4px; }
+.empty-test:not(:empty) { background: #2ecc71; padding: 2px 6px; border-radius: 4px; }
+
+/* ::before / ::after */
+.pseudo-el::before { content: "▸ "; color: var(--accent); }
+.pseudo-el::after { content: " ◂"; color: var(--secondary); }
+
+/* ============================================================
+   2. BOX MODEL
+   ============================================================ */
+.bm-content { box-sizing: content-box; width: 80px; padding: 8px; border: 2px solid #e74c3c; background: var(--bg-inner); }
+.bm-border  { box-sizing: border-box;  width: 80px; padding: 8px; border: 2px solid #2ecc71; background: var(--bg-inner); }
+.bm-margin  { margin: 8px; padding: 6px; background: #3498db; border-radius: 4px; color: white; }
+.bm-auto    { width: 120px; margin: 0 auto; background: var(--bg-inner); padding: 4px; text-align: center; border-radius: 4px; }
+.bm-minmax  { min-width: 60px; max-width: 150px; min-height: 20px; max-height: 60px; overflow: hidden; background: var(--bg-inner); padding: 4px; border-radius: 4px; }
+
+/* ============================================================
+   3. POSITIONING
+   ============================================================ */
+.pos-container { position: relative; height: 80px; background: var(--bg-inner); border-radius: 6px; overflow: hidden; }
+.pos-rel { position: relative; top: 4px; left: 8px; background: #e74c3c; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+.pos-abs { position: absolute; top: 4px; right: 4px; background: #2ecc71; padding: 2px 6px; border-radius: 3px; }
+.pos-fixed-demo { position: relative; background: #3498db; padding: 2px 6px; border-radius: 3px; display: inline-block; }
+.pos-sticky-demo { position: sticky; top: 0; background: #9b59b6; padding: 2px 6px; border-radius: 3px; z-index: 1; }
+.pos-zindex { position: relative; z-index: 2; }
+.pos-inset { position: absolute; inset: 4px 4px auto auto; background: #f39c12; padding: 2px 6px; border-radius: 3px; }
+
+/* ============================================================
+   4. TYPOGRAPHY
+   ============================================================ */
+.typo-size-sm { font-size: 10px; }
+.typo-size-md { font-size: 14px; }
+.typo-size-lg { font-size: 18px; }
+.typo-size-em { font-size: 1.2em; }
+.typo-weight-300 { font-weight: 300; }
+.typo-weight-700 { font-weight: 700; }
+.typo-weight-900 { font-weight: 900; }
+.typo-italic { font-style: italic; }
+.typo-underline { text-decoration: underline; }
+.typo-overline { text-decoration: overline; }
+.typo-linethrough { text-decoration: line-through; }
+.typo-deco-color { text-decoration: underline; text-decoration-color: #e74c3c; }
+.typo-deco-wavy { text-decoration: underline; text-decoration-style: wavy; text-decoration-color: #2ecc71; }
+.typo-upper { text-transform: uppercase; }
+.typo-lower { text-transform: lowercase; }
+.typo-cap { text-transform: capitalize; }
+.typo-spacing { letter-spacing: 3px; }
+.typo-word-spacing { word-spacing: 8px; }
+.typo-indent { text-indent: 20px; }
+.typo-align-left { text-align: left; }
+.typo-align-center { text-align: center; }
+.typo-align-right { text-align: right; }
+.typo-nowrap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.typo-pre { white-space: pre; font-family: var(--font-mono); font-size: 11px; }
+.typo-lh { line-height: 2.0; }
+.typo-shadow { text-shadow: 2px 2px 4px rgba(0,0,0,0.5), 0 0 8px var(--primary); }
+.typo-direction-rtl { direction: rtl; }
+
+/* ============================================================
+   5. BACKGROUNDS & BORDERS
+   ============================================================ */
+.bg-solid { background-color: #2c3e50; padding: 8px; border-radius: 4px; }
+.bg-linear { background: linear-gradient(135deg, #667eea, #764ba2); padding: 8px; border-radius: 4px; color: white; }
+.bg-radial { background: radial-gradient(circle, #f093fb, #f5576c); padding: 8px; border-radius: 4px; color: white; }
+.bg-conic { background: conic-gradient(from 0deg, #e74c3c, #f39c12, #2ecc71, #3498db, #9b59b6, #e74c3c); padding: 8px; border-radius: 50%; width: 60px; height: 60px; }
+.bg-repeat-linear { background: repeating-linear-gradient(45deg, #333 0px, #333 10px, #444 10px, #444 20px); padding: 8px; border-radius: 4px; }
+.bg-size-cover { background: linear-gradient(#e74c3c, #3498db); background-size: cover; padding: 8px; border-radius: 4px; }
+.bg-clip-content { background: #e74c3c; background-clip: content-box; padding: 8px; border: 2px dashed #666; border-radius: 4px; }
+
+/* Border styles */
+.bdr-solid { border: 2px solid #e74c3c; padding: 6px; border-radius: 4px; }
+.bdr-dashed { border: 2px dashed #2ecc71; padding: 6px; border-radius: 4px; }
+.bdr-dotted { border: 2px dotted #3498db; padding: 6px; border-radius: 4px; }
+.bdr-double { border: 4px double #f39c12; padding: 6px; border-radius: 4px; }
+.bdr-groove { border: 3px groove #9b59b6; padding: 6px; }
+.bdr-ridge { border: 3px ridge #e74c3c; padding: 6px; }
+.bdr-mixed {
+  border-top: 3px solid #e74c3c;
+  border-right: 3px dashed #2ecc71;
+  border-bottom: 3px dotted #3498db;
+  border-left: 3px double #f39c12;
+  padding: 6px;
+}
+.bdr-radius-all { border-radius: 12px; background: var(--bg-inner); padding: 8px; }
+.bdr-radius-tl { border-radius: 20px 0 0 0; background: var(--bg-inner); padding: 8px; }
+.bdr-radius-50 { border-radius: 50%; width: 50px; height: 50px; background: #e74c3c; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; }
+.bdr-shadow { box-shadow: 4px 4px 12px rgba(0,0,0,0.5); background: var(--bg-inner); padding: 8px; border-radius: 6px; }
+.bdr-shadow-inset { box-shadow: inset 0 0 10px rgba(0,0,0,0.5); background: var(--bg-inner); padding: 8px; border-radius: 6px; }
+.bdr-shadow-multi { box-shadow: 3px 3px 0 #e74c3c, 6px 6px 0 #f39c12, 9px 9px 0 #2ecc71; background: var(--bg-inner); padding: 8px; border-radius: 4px; }
+.bdr-outline { outline: 2px solid #e74c3c; outline-offset: 3px; background: var(--bg-inner); padding: 8px; border-radius: 4px; }
+
+/* ============================================================
+   6. FLEXBOX
+   ============================================================ */
+.flex-row { display: flex; flex-direction: row; gap: 4px; }
+.flex-col { display: flex; flex-direction: column; gap: 4px; }
+.flex-row-rev { display: flex; flex-direction: row-reverse; gap: 4px; }
+.flex-wrap-test { display: flex; flex-wrap: wrap; gap: 4px; width: 200px; }
+.flex-jc-between { display: flex; justify-content: space-between; }
+.flex-jc-around { display: flex; justify-content: space-around; }
+.flex-jc-evenly { display: flex; justify-content: space-evenly; }
+.flex-jc-center { display: flex; justify-content: center; }
+.flex-ai-center { display: flex; align-items: center; min-height: 50px; }
+.flex-ai-stretch { display: flex; align-items: stretch; min-height: 50px; }
+.flex-grow-test { display: flex; gap: 4px; }
+.flex-grow-test > .grow1 { flex-grow: 1; }
+.flex-grow-test > .grow2 { flex-grow: 2; }
+.flex-grow-test > .grow3 { flex-grow: 3; }
+.flex-order > :nth-child(1) { order: 3; }
+.flex-order > :nth-child(2) { order: 1; }
+.flex-order > :nth-child(3) { order: 2; }
+.flex-self > .self-end { align-self: flex-end; }
+.flex-self > .self-center { align-self: center; }
+.flex-item { background: var(--bg-inner); padding: 4px 8px; border-radius: 3px; font-size: 10px; color: var(--text-dim); }
+
+/* ============================================================
+   7. GRID
+   ============================================================ */
+.grid-basic { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+.grid-fr { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 4px; }
+.grid-repeat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.grid-auto { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 30px; gap: 4px; }
+.grid-span { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.grid-span > .span2 { grid-column: span 2; }
+.grid-span > .span-row { grid-row: span 2; }
+.grid-areas {
+  display: grid;
+  grid-template-areas:
+    "hd hd hd"
+    "sb main main"
+    "ft ft ft";
+  grid-template-columns: 80px 1fr 1fr;
+  grid-template-rows: 30px 50px 25px;
+  gap: 3px;
+}
+.grid-areas > .g-hd { grid-area: hd; }
+.grid-areas > .g-sb { grid-area: sb; }
+.grid-areas > .g-main { grid-area: main; }
+.grid-areas > .g-ft { grid-area: ft; }
+.grid-item { background: var(--bg-inner); padding: 4px; border-radius: 3px; font-size: 10px; text-align: center; color: var(--text-dim); }
+.grid-flow { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-flow: dense; gap: 4px; }
+
+/* ============================================================
+   8. VISUAL EFFECTS
+   ============================================================ */
+.ve-opacity-50 { opacity: 0.5; }
+.ve-opacity-25 { opacity: 0.25; }
+.ve-hidden { visibility: hidden; width: 40px; height: 20px; }
+.ve-overflow-hidden { overflow: hidden; width: 80px; height: 30px; background: var(--bg-inner); border-radius: 4px; padding: 4px; }
+.ve-overflow-scroll { overflow-y: auto; width: 100px; height: 50px; background: var(--bg-inner); border-radius: 4px; padding: 4px; font-size: 10px; }
+.ve-filter-blur { filter: blur(2px); }
+.ve-filter-gray { filter: grayscale(100%); }
+.ve-filter-sepia { filter: sepia(100%); }
+.ve-filter-bright { filter: brightness(1.5); }
+.ve-filter-contrast { filter: contrast(2); }
+.ve-filter-hue { filter: hue-rotate(90deg); }
+.ve-filter-invert { filter: invert(100%); }
+.ve-filter-saturate { filter: saturate(3); }
+.ve-filter-shadow { filter: drop-shadow(3px 3px 4px rgba(0,0,0,0.7)); }
+.ve-filter-multi { filter: brightness(1.2) contrast(1.1) saturate(1.3); }
+.ve-backdrop { backdrop-filter: blur(4px); background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; }
+.ve-blend-multiply { mix-blend-mode: multiply; }
+.ve-blend-screen { mix-blend-mode: screen; }
+.ve-blend-overlay { mix-blend-mode: overlay; }
+.ve-clip-circle { clip-path: circle(50%); }
+.ve-objfit-cover { object-fit: cover; width: 60px; height: 40px; }
+.ve-objfit-contain { object-fit: contain; width: 60px; height: 40px; }
+.ve-cursor-pointer { cursor: pointer; }
+.ve-pointer-none { pointer-events: none; opacity: 0.5; }
+.ve-user-select-none { user-select: none; }
+.ve-resize { resize: both; overflow: auto; min-width: 60px; min-height: 30px; }
+
+/* ============================================================
+   9. TRANSFORMS
+   ============================================================ */
+.tf-translate { transform: translate(10px, 5px); }
+.tf-scale { transform: scale(1.2); }
+.tf-rotate { transform: rotate(15deg); }
+.tf-skew { transform: skewX(10deg); }
+.tf-matrix { transform: matrix(1, 0.1, -0.1, 1, 0, 0); }
+.tf-origin { transform: rotate(20deg); transform-origin: top left; }
+.tf-multi { transform: translateX(5px) rotate(10deg) scale(0.95); }
+.tf-3d-rotX { transform: perspective(200px) rotateX(20deg); }
+.tf-3d-rotY { transform: perspective(200px) rotateY(25deg); }
+.tf-3d-translate { transform: perspective(300px) translate3d(5px, 5px, 20px); }
+
+/* ============================================================
+   10. TRANSITIONS & ANIMATIONS
+   ============================================================ */
+.trans-color { transition: background-color 0.3s ease; background: var(--bg-inner); padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+.trans-color:hover { background-color: #e74c3c; }
+.trans-size { transition: transform 0.3s ease-in-out; display: inline-block; cursor: pointer; }
+.trans-size:hover { transform: scale(1.15); }
+.trans-multi { transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s; padding: 6px 10px; border-radius: 4px; background: var(--bg-inner); cursor: pointer; }
+.trans-multi:hover { background: #2ecc71; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46,204,113,0.3); }
+.trans-delay { transition: opacity 0.5s ease 0.2s; opacity: 0.5; cursor: pointer; }
+.trans-delay:hover { opacity: 1; }
+.anim-pulse { animation: pulse 2s ease-in-out infinite; }
+.anim-slide { animation: slideIn 1s ease-out forwards; }
+.anim-color { animation: colorCycle 4s linear infinite; padding: 4px 8px; border-radius: 4px; color: white; font-size: 11px; }
+.anim-spin { animation: spin 3s linear infinite; display: inline-block; }
+.anim-paused { animation: pulse 2s ease-in-out infinite; animation-play-state: paused; }
+
+/* ============================================================
+   11. MULTI-COLUMN
+   ============================================================ */
+.multicol-2 { column-count: 2; column-gap: 16px; font-size: 11px; }
+.multicol-3 { column-count: 3; column-gap: 12px; column-rule: 1px solid #444; font-size: 11px; }
+.multicol-width { column-width: 100px; column-gap: 12px; font-size: 11px; }
+
+/* ============================================================
+   12. OVERFLOW & SCROLL
+   ============================================================ */
+.scroll-container { overflow: auto; max-height: 60px; background: var(--bg-inner); border-radius: 4px; padding: 4px; font-size: 11px; scrollbar-color: var(--primary) var(--bg-inner); scrollbar-width: thin; }
+
+/* ============================================================
+   13. LISTS
+   ============================================================ */
+.list-disc { list-style-type: disc; padding-left: 20px; font-size: 12px; }
+.list-decimal { list-style-type: decimal; padding-left: 20px; font-size: 12px; }
+.list-square { list-style-type: square; padding-left: 20px; font-size: 12px; }
+.list-inside { list-style-position: inside; list-style-type: circle; font-size: 12px; }
+
+/* ============================================================
+   14. TABLE
+   ============================================================ */
+.tbl { display: table; width: 100%; border-collapse: collapse; font-size: 11px; }
+.tbl-row { display: table-row; }
+.tbl-cell { display: table-cell; padding: 4px 8px; border: 1px solid #333; }
+.tbl-header { background: var(--bg-inner); font-weight: bold; color: var(--primary); }
+
+/* ============================================================
+   15. COLORS
+   ============================================================ */
+.clr-hex3 { color: #f00; }
+.clr-hex6 { color: #ff6600; }
+.clr-hex8 { color: #3498dbcc; }
+.clr-rgb { color: rgb(46, 204, 113); }
+.clr-rgba { color: rgba(155, 89, 182, 0.8); }
+.clr-hsl { color: hsl(200, 80%, 60%); }
+.clr-hsla { color: hsla(340, 80%, 60%, 0.9); }
+.clr-named { color: coral; }
+.clr-transparent { background: transparent; border: 1px dashed #666; }
+.clr-current { color: #e74c3c; border-bottom: 2px solid currentColor; }
+.clr-hwb { color: hwb(120 10% 20%); }
+.clr-lab { color: lab(60 50 -30); }
+.clr-oklch { color: oklch(0.7 0.15 200); }
+.clr-mix { color: color-mix(in srgb, #e74c3c 50%, #3498db); }
+
+/* ============================================================
+   16. MISC: aspect-ratio, calc, counters, etc.
+   ============================================================ */
+.ar-16-9 { aspect-ratio: 16 / 9; width: 80px; background: var(--bg-inner); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.ar-1-1 { aspect-ratio: 1 / 1; width: 50px; background: var(--bg-inner); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.calc-width { width: calc(100% - 40px); background: var(--bg-inner); padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+.clamp-width { width: clamp(80px, 50%, 200px); background: var(--bg-inner); padding: 4px 8px; border-radius: 4px; font-size: 11px; }
+.vw-unit { width: 20vw; background: var(--bg-inner); padding: 4px; border-radius: 4px; font-size: 10px; text-align: center; }
+.vh-unit { height: 5vh; background: var(--bg-inner); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.vmin-unit { width: 10vmin; background: var(--bg-inner); padding: 4px; border-radius: 4px; font-size: 10px; text-align: center; }
+.rem-unit { font-size: 1.2rem; }
+.em-unit { font-size: 0.9em; }
+
+/* Counters */
+.counter-list { counter-reset: item; list-style: none; padding: 0; font-size: 12px; }
+.counter-list li { counter-increment: item; }
+.counter-list li::before { content: counter(item) ") "; color: var(--accent); font-weight: bold; }
+
+/* will-change, contain, isolation */
+.wc-test { will-change: transform; }
+.contain-test { contain: layout; }
+.isolation-test { isolation: isolate; }
+
+/* Important test */
+.important-test { color: #999 !important; }
+.important-override { color: #e74c3c; }
+
+</style>
+</head>
+<body>
+
+<h1>KUI CSS Full Coverage Test</h1>
+
+<!-- ============================================================ -->
+<h2>Selectors</h2>
+<div class="section">
+  <h3>Type / Class / ID</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <span id="sel-id-test">#id</span>
+    <span class="sel-class-test">.class</span>
+    <span>type</span>
+  </div>
+
+  <h3>Attribute Selectors</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <span data-test>[attr]</span>
+    <span data-test="exact">[=exact]</span>
+    <span data-test="prefix">[^=pre]</span>
+    <span data-test="has-mid-dle">[*=mid]</span>
+    <span data-test="endsuf">[$=suf]</span>
+  </div>
+
+  <h3>Combinators</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <div class="comb-parent">
+      <span class="comb-child">child &gt;</span>
+      <span><span class="comb-desc">desc</span></span>
+    </div>
+    <span class="comb-adj">adj</span><span class="comb-adj-next">+next</span>
+    <span class="comb-gen">gen</span><span>x</span><span class="comb-gen-sib">~sib</span>
+  </div>
+
+  <h3>Structural Pseudo-classes</h3>
+  <div class="nth-test row" style="gap:4px; margin-bottom:8px;">
+    <div class="box">1st</div>
+    <div class="box">2nd</div>
+    <div class="box">3rd</div>
+    <div class="box">last</div>
+  </div>
+
+  <h3>:not / :is / :has / :empty</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <div class="pseudo-logic row" style="gap:4px;">
+      <div style="padding:2px 6px;">A</div>
+      <div class="skip" style="padding:2px 6px; background:#333;">skip</div>
+      <div class="highlight" style="padding:2px 6px;">:is</div>
+    </div>
+    <div class="has-test" style="padding:4px;">
+      <span class="trigger">:has trigger</span>
+    </div>
+    <div class="empty-test"></div>
+    <div class="empty-test">not empty</div>
+  </div>
+
+  <h3>::before / ::after</h3>
+  <div class="pseudo-el">pseudo-element content</div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Box Model</h2>
+<div class="section">
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <div>
+      <div class="bm-content"><span class="label">content-box</span></div>
+      <div class="label">80px + pad + bdr</div>
+    </div>
+    <div>
+      <div class="bm-border"><span class="label">border-box</span></div>
+      <div class="label">80px total</div>
+    </div>
+    <div class="bm-margin">margin: 8px</div>
+  </div>
+  <div class="bm-auto">margin: 0 auto</div>
+  <div style="margin-top:8px;">
+    <div class="bm-minmax">min-w:60 max-w:150 min-h:20 max-h:60 — This text might overflow if too long for the container.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Positioning</h2>
+<div class="section">
+  <div class="pos-container">
+    <div class="pos-rel">relative</div>
+    <div class="pos-abs">absolute</div>
+    <div class="pos-inset">inset</div>
+    <div class="pos-fixed-demo" style="margin-top:30px; margin-left:8px;">fixed-like</div>
+  </div>
+  <div style="height:40px; overflow:auto; margin-top:8px; background:var(--bg-inner); border-radius:4px; padding:4px;">
+    <div class="pos-sticky-demo">sticky top:0</div>
+    <div style="height:80px; font-size:10px; color:#666; padding:4px;">scroll content...</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Typography</h2>
+<div class="section">
+  <h3>Font Size & Weight</h3>
+  <div class="row" style="gap:8px; align-items:baseline; margin-bottom:8px;">
+    <span class="typo-size-sm">10px</span>
+    <span class="typo-size-md">14px</span>
+    <span class="typo-size-lg">18px</span>
+    <span class="typo-size-em">1.2em</span>
+    <span class="typo-weight-300">w300</span>
+    <span class="typo-weight-700">w700</span>
+    <span class="typo-weight-900">w900</span>
+    <span class="typo-italic">italic</span>
+  </div>
+
+  <h3>Text Decoration</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <span class="typo-underline">underline</span>
+    <span class="typo-overline">overline</span>
+    <span class="typo-linethrough">line-through</span>
+    <span class="typo-deco-color">color</span>
+    <span class="typo-deco-wavy">wavy</span>
+  </div>
+
+  <h3>Text Transform & Spacing</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <span class="typo-upper">upper</span>
+    <span class="typo-lower">LOWER</span>
+    <span class="typo-cap">capitalize me</span>
+    <span class="typo-spacing">spacing</span>
+    <span class="typo-word-spacing">word space</span>
+  </div>
+
+  <h3>Alignment & Wrapping</h3>
+  <div style="display:flex; gap:4px; margin-bottom:8px;">
+    <div class="box typo-align-left" style="width:80px;">left</div>
+    <div class="box typo-align-center" style="width:80px;">center</div>
+    <div class="box typo-align-right" style="width:80px;">right</div>
+    <div class="box typo-nowrap">very long text that should be ellipsis</div>
+  </div>
+
+  <h3>Line Height / Indent / Shadow / Direction</h3>
+  <div class="row" style="gap:8px;">
+    <div class="box typo-lh" style="width:100px;">line-height: 2.0 text</div>
+    <div class="box typo-indent" style="width:120px;">indented paragraph text here</div>
+    <div class="box typo-shadow">text-shadow</div>
+    <div class="box typo-direction-rtl" style="width:80px;">RTL text</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Backgrounds & Borders</h2>
+<div class="section">
+  <h3>Backgrounds</h3>
+  <div class="row" style="gap:6px; margin-bottom:8px;">
+    <div class="bg-solid box">solid</div>
+    <div class="bg-linear box">linear</div>
+    <div class="bg-radial box">radial</div>
+    <div class="bg-conic"></div>
+    <div class="bg-repeat-linear box">repeat</div>
+    <div class="bg-clip-content box">clip</div>
+  </div>
+
+  <h3>Border Styles</h3>
+  <div class="row" style="gap:6px; margin-bottom:8px;">
+    <div class="bdr-solid box">solid</div>
+    <div class="bdr-dashed box">dashed</div>
+    <div class="bdr-dotted box">dotted</div>
+    <div class="bdr-double box">double</div>
+    <div class="bdr-groove box">groove</div>
+    <div class="bdr-ridge box">ridge</div>
+    <div class="bdr-mixed box">mixed</div>
+  </div>
+
+  <h3>Border Radius & Shadows</h3>
+  <div class="row" style="gap:6px; margin-bottom:8px;">
+    <div class="bdr-radius-all">12px all</div>
+    <div class="bdr-radius-tl">TL only</div>
+    <div class="bdr-radius-50">50%</div>
+    <div class="bdr-shadow">shadow</div>
+    <div class="bdr-shadow-inset">inset</div>
+    <div class="bdr-shadow-multi">multi</div>
+    <div class="bdr-outline">outline</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Flexbox</h2>
+<div class="section">
+  <h3>Direction & Wrap</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <div style="width:140px;">
+      <div class="flex-row"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+      <div class="label">row</div>
+    </div>
+    <div style="width:50px;">
+      <div class="flex-col"><div class="flex-item">A</div><div class="flex-item">B</div></div>
+      <div class="label">column</div>
+    </div>
+    <div style="width:140px;">
+      <div class="flex-row-rev"><div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div></div>
+      <div class="label">row-reverse</div>
+    </div>
+    <div>
+      <div class="flex-wrap-test">
+        <div class="flex-item">1</div><div class="flex-item">2</div><div class="flex-item">3</div>
+        <div class="flex-item">4</div><div class="flex-item">5</div><div class="flex-item">6</div>
+      </div>
+      <div class="label">wrap</div>
+    </div>
+  </div>
+
+  <h3>Justify Content</h3>
+  <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:8px;">
+    <div class="flex-jc-between" style="background:var(--bg-inner); padding:4px; border-radius:4px;">
+      <div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div>
+    </div>
+    <div class="flex-jc-around" style="background:var(--bg-inner); padding:4px; border-radius:4px;">
+      <div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div>
+    </div>
+    <div class="flex-jc-evenly" style="background:var(--bg-inner); padding:4px; border-radius:4px;">
+      <div class="flex-item">A</div><div class="flex-item">B</div><div class="flex-item">C</div>
+    </div>
+  </div>
+
+  <h3>Align Items & Flex Grow & Order</h3>
+  <div class="row" style="gap:8px;">
+    <div style="width:140px;">
+      <div class="flex-ai-center" style="background:var(--bg-inner); padding:4px; border-radius:4px;">
+        <div class="flex-item" style="height:30px;">tall</div>
+        <div class="flex-item">center</div>
+      </div>
+      <div class="label">ai:center</div>
+    </div>
+    <div style="flex:1;">
+      <div class="flex-grow-test" style="background:var(--bg-inner); padding:4px; border-radius:4px;">
+        <div class="flex-item grow1">1x</div>
+        <div class="flex-item grow2">2x</div>
+        <div class="flex-item grow3">3x</div>
+      </div>
+      <div class="label">flex-grow 1:2:3</div>
+    </div>
+    <div style="width:120px;">
+      <div class="flex-order row" style="gap:4px; background:var(--bg-inner); padding:4px; border-radius:4px;">
+        <div class="flex-item">A→3</div>
+        <div class="flex-item">B→1</div>
+        <div class="flex-item">C→2</div>
+      </div>
+      <div class="label">order: 3,1,2</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Grid</h2>
+<div class="section">
+  <h3>Basic / FR / Repeat</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <div style="width:180px;">
+      <div class="grid-basic"><div class="grid-item">1</div><div class="grid-item">2</div><div class="grid-item">3</div></div>
+      <div class="label">1fr 1fr 1fr</div>
+    </div>
+    <div style="width:180px;">
+      <div class="grid-fr"><div class="grid-item">1fr</div><div class="grid-item">2fr</div><div class="grid-item">1fr</div></div>
+      <div class="label">1fr 2fr 1fr</div>
+    </div>
+    <div style="width:200px;">
+      <div class="grid-repeat"><div class="grid-item">1</div><div class="grid-item">2</div><div class="grid-item">3</div><div class="grid-item">4</div></div>
+      <div class="label">repeat(4, 1fr)</div>
+    </div>
+  </div>
+
+  <h3>Span & Areas</h3>
+  <div class="row" style="gap:8px;">
+    <div style="width:180px;">
+      <div class="grid-span">
+        <div class="grid-item span2">span 2</div>
+        <div class="grid-item">3</div>
+        <div class="grid-item">4</div>
+        <div class="grid-item">5</div>
+      </div>
+      <div class="label">grid-column: span 2</div>
+    </div>
+    <div style="flex:1;">
+      <div class="grid-areas">
+        <div class="grid-item g-hd" style="background:#e74c3c;">header</div>
+        <div class="grid-item g-sb" style="background:#3498db;">side</div>
+        <div class="grid-item g-main" style="background:#2ecc71;">main</div>
+        <div class="grid-item g-ft" style="background:#9b59b6;">footer</div>
+      </div>
+      <div class="label">grid-template-areas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Visual Effects</h2>
+<div class="section">
+  <h3>Opacity & Visibility</h3>
+  <div class="row" style="gap:6px; margin-bottom:8px;">
+    <div class="box ve-opacity-50">50%</div>
+    <div class="box ve-opacity-25">25%</div>
+    <div class="box">100%</div>
+    <div class="box ve-hidden">hidden</div>
+    <div class="box">(vis:hidden gap)</div>
+  </div>
+
+  <h3>Overflow</h3>
+  <div class="row" style="gap:6px; margin-bottom:8px;">
+    <div class="ve-overflow-hidden">overflow hidden text that is too long</div>
+    <div class="ve-overflow-scroll">Line 1<br>Line 2<br>Line 3<br>Line 4<br>Line 5<br>Line 6</div>
+  </div>
+
+  <h3>Filters</h3>
+  <div class="row" style="gap:4px; margin-bottom:8px;">
+    <div class="box" style="background:#e74c3c; color:white;">orig</div>
+    <div class="box ve-filter-blur" style="background:#e74c3c; color:white;">blur</div>
+    <div class="box ve-filter-gray" style="background:#e74c3c; color:white;">gray</div>
+    <div class="box ve-filter-sepia" style="background:#e74c3c; color:white;">sepia</div>
+    <div class="box ve-filter-bright" style="background:#e74c3c; color:white;">bright</div>
+    <div class="box ve-filter-contrast" style="background:#e74c3c; color:white;">contrast</div>
+    <div class="box ve-filter-hue" style="background:#e74c3c; color:white;">hue</div>
+    <div class="box ve-filter-invert" style="background:#e74c3c; color:white;">invert</div>
+    <div class="box ve-filter-saturate" style="background:#e74c3c; color:white;">saturate</div>
+    <div class="box ve-filter-shadow" style="background:#e74c3c; color:white;">drop-sh</div>
+  </div>
+
+  <h3>Backdrop Filter / Blend / Clip</h3>
+  <div class="row" style="gap:6px; position:relative;">
+    <div style="background:linear-gradient(#e74c3c,#3498db); padding:4px; border-radius:4px; width:100px; height:40px; position:relative;">
+      <div class="ve-backdrop" style="font-size:10px;">backdrop blur</div>
+    </div>
+    <div class="box ve-clip-circle" style="background:#2ecc71; width:50px; height:50px; color:white;">clip</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Transforms</h2>
+<div class="section">
+  <div class="row" style="gap:12px;">
+    <div class="box tf-translate">translate</div>
+    <div class="box tf-scale">scale</div>
+    <div class="box tf-rotate">rotate</div>
+    <div class="box tf-skew">skew</div>
+    <div class="box tf-matrix">matrix</div>
+    <div class="box tf-origin">origin TL</div>
+    <div class="box tf-multi">multi</div>
+    <div class="box tf-3d-rotX">rotX</div>
+    <div class="box tf-3d-rotY">rotY</div>
+    <div class="box tf-3d-translate">3d</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Transitions & Animations</h2>
+<div class="section">
+  <h3>Transitions (hover to test)</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <div class="trans-color">color</div>
+    <div class="trans-size box">scale</div>
+    <div class="trans-multi">multi</div>
+    <div class="trans-delay box">delay</div>
+  </div>
+
+  <h3>Animations</h3>
+  <div class="row" style="gap:8px;">
+    <div class="box anim-pulse">pulse</div>
+    <div class="box anim-slide">slideIn</div>
+    <div class="anim-color">colorCycle</div>
+    <div class="anim-spin" style="width:30px; height:30px; background:var(--bg-inner); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:16px;">⟳</div>
+    <div class="box anim-paused">paused</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Multi-Column Layout</h2>
+<div class="section">
+  <div class="row" style="gap:12px;">
+    <div style="flex:1;">
+      <div class="multicol-2" style="background:var(--bg-inner); padding:8px; border-radius:4px;">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+      </div>
+      <div class="label">column-count: 2</div>
+    </div>
+    <div style="flex:1;">
+      <div class="multicol-3" style="background:var(--bg-inner); padding:8px; border-radius:4px;">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+      </div>
+      <div class="label">column-count: 3 + rule</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Overflow & Scroll</h2>
+<div class="section">
+  <div class="scroll-container">
+    <div>Scrollable content line 1</div>
+    <div>Scrollable content line 2</div>
+    <div>Scrollable content line 3</div>
+    <div>Scrollable content line 4</div>
+    <div>Scrollable content line 5</div>
+    <div>Scrollable content line 6</div>
+    <div>Scrollable content line 7</div>
+    <div>Scrollable content line 8</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Lists</h2>
+<div class="section">
+  <div class="row" style="gap:16px;">
+    <div>
+      <ul class="list-disc"><li>disc A</li><li>disc B</li></ul>
+    </div>
+    <div>
+      <ol class="list-decimal"><li>decimal 1</li><li>decimal 2</li></ol>
+    </div>
+    <div>
+      <ul class="list-square"><li>square</li><li>items</li></ul>
+    </div>
+    <div>
+      <ul class="list-inside"><li>inside pos</li><li>circle</li></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Tables</h2>
+<div class="section">
+  <div class="tbl">
+    <div class="tbl-row">
+      <div class="tbl-cell tbl-header">Name</div>
+      <div class="tbl-cell tbl-header">Type</div>
+      <div class="tbl-cell tbl-header">Status</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-cell">Flexbox</div>
+      <div class="tbl-cell">Layout</div>
+      <div class="tbl-cell" style="color:#2ecc71;">100%</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-cell">Grid</div>
+      <div class="tbl-cell">Layout</div>
+      <div class="tbl-cell" style="color:#2ecc71;">89%</div>
+    </div>
+    <div class="tbl-row">
+      <div class="tbl-cell">Transforms</div>
+      <div class="tbl-cell">Visual</div>
+      <div class="tbl-cell" style="color:#2ecc71;">100%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Colors</h2>
+<div class="section">
+  <div class="row" style="gap:6px; flex-wrap:wrap;">
+    <span class="box clr-hex3">#f00</span>
+    <span class="box clr-hex6">#ff6600</span>
+    <span class="box clr-hex8">#..cc</span>
+    <span class="box clr-rgb">rgb()</span>
+    <span class="box clr-rgba">rgba()</span>
+    <span class="box clr-hsl">hsl()</span>
+    <span class="box clr-hsla">hsla()</span>
+    <span class="box clr-named">coral</span>
+    <span class="box clr-transparent">transparent</span>
+    <span class="box clr-current">currentColor</span>
+    <span class="box clr-hwb">hwb()</span>
+    <span class="box clr-lab">lab()</span>
+    <span class="box clr-oklch">oklch()</span>
+    <span class="box clr-mix">color-mix()</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Misc: Units, calc(), aspect-ratio, counters</h2>
+<div class="section">
+  <h3>Aspect Ratio</h3>
+  <div class="row" style="gap:8px; margin-bottom:8px;">
+    <div class="ar-16-9">16:9</div>
+    <div class="ar-1-1">1:1</div>
+  </div>
+
+  <h3>calc() / clamp() / Units</h3>
+  <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:8px;">
+    <div class="calc-width">width: calc(100% - 40px)</div>
+    <div class="clamp-width">width: clamp(80px, 50%, 200px)</div>
+    <div class="vw-unit">20vw</div>
+    <div class="vh-unit">5vh</div>
+    <div class="vmin-unit">10vmin</div>
+  </div>
+
+  <h3>Counters</h3>
+  <ul class="counter-list">
+    <li>First item</li>
+    <li>Second item</li>
+    <li>Third item</li>
+  </ul>
+
+  <h3>@media / @supports</h3>
+  <div class="row" style="gap:8px; margin-top:8px;">
+    <div class="box media-test">@media min-width</div>
+    <div class="box supports-test">@supports flex</div>
+  </div>
+
+  <h3>!important / Inheritance / var()</h3>
+  <div class="row" style="gap:8px; margin-top:8px;">
+    <span class="important-test important-override">!important wins</span>
+    <span style="color: var(--accent);">var(--accent)</span>
+    <span class="rem-unit">1.2rem</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>SVG Images</h2>
+<div class="section">
+  <div class="row" style="gap:8px;">
+    <div class="box" style="padding:4px;">
+      <img src="sample_icon.svg" style="width:48px; height:48px;">
+      <div class="label">SVG file</div>
+    </div>
+    <div class="box" style="padding:4px;">
+      <img src="sample_star.svg" style="width:48px; height:48px;">
+      <div class="label">SVG star</div>
+    </div>
+    <div class="box" style="padding:4px;">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCI+PGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMjAiIGZpbGw9IiM5YjU5YjYiLz48dGV4dCB4PSIyNCIgeT0iMjkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjEyIj5TVkc8L3RleHQ+PC9zdmc+" style="width:48px; height:48px;">
+      <div class="label">data: URI</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

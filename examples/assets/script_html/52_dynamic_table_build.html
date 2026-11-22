@@ -1,0 +1,72 @@
+<html><body>
+<div id="container"></div>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test building a complex table-like structure with DOM
+local container = document:getElementById("container")
+local ok = true
+local detail = ""
+
+-- Build header row
+local header = document:createElement("div")
+header:setAttribute("id", "header")
+local cols = {"Name", "Score", "Status", "Action"}
+for _, colName in ipairs(cols) do
+    local cell = document:createElement("span")
+    cell.textContent = colName
+    header:appendChild(cell)
+end
+container:appendChild(header)
+
+-- Build 5 data rows
+local names = {"Alice", "Bob", "Charlie", "Diana", "Eve"}
+local scores = {"95", "42", "78", "88", "55"}
+for i = 1, 5 do
+    local rowEl = document:createElement("div")
+    rowEl:setAttribute("id", "row-" .. tostring(i))
+
+    local nameCell = document:createElement("span")
+    nameCell.textContent = names[i]
+    rowEl:appendChild(nameCell)
+
+    local scoreCell = document:createElement("span")
+    scoreCell.textContent = scores[i]
+    rowEl:appendChild(scoreCell)
+
+    container:appendChild(rowEl)
+end
+
+-- Verify header via getElementById
+local hdr = document:getElementById("header")
+ok = ok and (hdr ~= nil)
+detail = detail .. "header=" .. tostring(hdr ~= nil) .. "; "
+
+-- Verify header has 4 cells
+if hdr then
+    local hdrCh = hdr:children()
+    ok = ok and (#hdrCh == 4)
+    detail = detail .. "hdr_cells=" .. tostring(#hdrCh) .. "; "
+end
+
+-- Verify specific row
+local row2 = document:getElementById("row-2")
+ok = ok and (row2 ~= nil)
+if row2 then
+    local text = row2.textContent
+    ok = ok and (text:find("Bob") ~= nil)
+    ok = ok and (text:find("42") ~= nil)
+    detail = detail .. "row2_bob=" .. tostring(text:find("Bob") ~= nil) .. "; "
+end
+
+-- Total child count: 1 header + 5 data rows
+local ch = container:children()
+ok = ok and (#ch == 6)
+detail = detail .. "total=" .. tostring(#ch)
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>

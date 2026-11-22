@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    padding: 16px;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #0f172a; color: #e2e8f0; min-height: 100vh;
+}
+header { display: flex; align-items: baseline; justify-content: space-between;
+         margin-bottom: 8px; }
+h1 { font-size: 18px; }
+.subtitle { color: #94a3b8; font-size: 12px; }
+.note {
+    margin: 0 0 10px 0; padding: 8px 12px;
+    background: #1e293b; border: 1px solid #334155; border-radius: 6px;
+    color: #cbd5e1; font-size: 12px; line-height: 1.6;
+}
+.note b { color: #f1f5f9; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+           margin-bottom: 10px; }
+.toolbar button {
+    padding: 6px 12px; border-radius: 4px; border: 1px solid #334155;
+    background: #334155; color: #e2e8f0; font: 13px "Segoe UI"; cursor: pointer;
+}
+.toolbar button:hover { background: #475569; }
+.toolbar button.active { background: #3b82f6; color: #fff; border-color: #2563eb; }
+.work { display: flex; gap: 0; height: 520px;
+        border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+kui-editor { flex: 1 1 60%; height: 100%; min-width: 0;
+             background: #1e293b; border-right: 1px solid #334155;
+             font-family: "Cascadia Code", "Consolas", monospace; }
+.tokens { flex: 0 0 40%; background: #181825; display: flex; flex-direction: column; }
+.tokens .hdr { padding: 8px 12px; background: #1e293b; border-bottom: 1px solid #334155;
+               font-size: 12px; color: #cdd6f4; font-weight: 600; }
+.tokens .body { flex: 1; padding: 10px 12px; overflow: auto;
+                font: 11px "Consolas", monospace; color: #a6adc8;
+                white-space: pre; line-height: 1.5; }
+</style></head>
+<body>
+<header>
+  <h1>kui-editor — comment/string brackets keep their color</h1>
+  <span class="subtitle">SDK 3.15.0 • KUI-037 • setBracketColorsEnabled / getLineTokens</span>
+</header>
+
+<p class="note">
+  <b>KUI-037:</b> the rainbow-bracket colorizer now checks each bracket's
+  token kind and <b>skips</b> brackets inside <b>comments</b> and <b>string
+  literals</b> — they keep the comment / string theme color instead of being
+  painted as live code. Real code brackets still get rainbow depth colors.
+  Toggle the colorizer below and watch the <code>(</code> <code>[</code>
+  <code>{</code> in the comment and the string stay comment/string-colored.
+</p>
+
+<div class="toolbar">
+  <button id="rainbow-on" class="active">Rainbow brackets: ON</button>
+  <button id="rainbow-off">OFF</button>
+  <span style="color:#94a3b8;font-size:12px;">(Line 2 = comment with brackets · Line 5 = string with brackets · Line 8 = real code brackets)</span>
+</div>
+
+<div class="work">
+  <kui-editor id="ed" line-numbers="true"></kui-editor>
+  <div class="tokens">
+    <div class="hdr">getLineTokens(caret line) — token kind per run</div>
+    <div class="body" id="tok">…</div>
+  </div>
+</div>
+
+<script>
+local ed  = document:getElementById("ed")
+local tok = document:getElementById("tok")
+
+-- Three cases, one per "bracket location":
+--   comment brackets, string brackets, real code brackets.
+local sample = table.concat({
+    "// KUI-037 demo: brackets in comments and strings should NOT be rainbow-colored.",
+    "// comment brackets here: ( [ { } ] )   <- should stay comment-colored",
+    "function build(items) {",
+    "    // a real code bracket scope opens above on the function line",
+    [[    const label = "literal with brackets ( [ { } ] ) inside a string";]],
+    "    const counts = items.map((it) => [it.id, it.value]);",
+    "    return { label, counts };   // real code brackets get rainbow depth colors",
+    "}",
+}, "\n")
+
+ed:setValue(sample)
+ed:setLanguage("javascript")
+ed:setTheme("mocha")
+ed:setBracketColorsEnabled(true)        -- KUI-037: editor_lua_api.cpp:2948
+ed:setCaret(1, 0)                        -- park on the comment line
+ed:focus()
+
+local RB_BTNS = { "rainbow-on", "rainbow-off" }
+local function setActiveRb(on)
+    for _, id in ipairs(RB_BTNS) do
+        local b = document:getElementById(id)
+        if b then
+            local want = on and "rainbow-on" or "rainbow-off"
+            if id == want then b:addClass("active") else b:removeClass("active") end
+        end
+    end
+end
+
+document:getElementById("rainbow-on"):addEventListener("click", function()
+    ed:setBracketColorsEnabled(true)
+    setActiveRb(true); ed:focus()
+end)
+document:getElementById("rainbow-off"):addEventListener("click", function()
+    ed:setBracketColorsEnabled(false)
+    setActiveRb(false); ed:focus()
+end)
+
+-- Show the tokenization of the caret line so the comment/string brackets are
+-- visibly classified as comment/string runs (not code).
+local lastDump = nil
+setInterval(function()
+    local line = ed:getCaretLine()
+    local dump = string.format("caret line %d:\n%s\n\nrainbow=%s\n\ntokens(JSON):\n%s",
+        line,
+        ed:getLineText(line) or "",
+        tostring(ed:getBracketColorsEnabled()),     -- :2949
+        ed:getLineTokens(line) or "[]")             -- :2752
+    if dump ~= lastDump then
+        lastDump = dump
+        tok.textContent = dump
+    end
+end, 150)
+
+print("[syntax-highlight demo] ready — toggle rainbow brackets; comment/string brackets keep their color")
+</script>
+</body></html>

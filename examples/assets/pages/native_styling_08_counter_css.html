@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px}
+.card h3{font-size:13px;color:#64748b;margin-bottom:12px}
+.auto-list{counter-reset:item;list-style:none;padding:0}
+.auto-list li{counter-increment:item;padding:10px 14px 10px 40px;font-size:14px;color:#475569;border-bottom:1px solid #f1f5f9;position:relative}
+.auto-list li::before{content:counter(item);position:absolute;left:0;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:#3b82f6;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.nested-list{counter-reset:section;list-style:none;padding:0}
+.nested-list li{counter-increment:section;padding:8px 0;font-size:14px;color:#1e293b;font-weight:600}
+.nested-list li::before{content:counters(section,".") " ";color:#3b82f6;font-weight:700}
+.nested-list ul{counter-reset:section;list-style:none;padding-left:24px}
+.nested-list ul li{font-weight:400;color:#475569;font-size:13px}
+.info{background:#f1f5f9;border-radius:8px;padding:10px;font-size:12px;color:#64748b;margin-top:12px}
+</style></head><body>
+<h2>CSS Counters</h2>
+<div class="card"><h3>Auto-numbered List</h3>
+<ul class="auto-list">
+<li>Platform initialization</li><li>Window creation</li><li>HTML content loading</li>
+<li>CSS parsing and styling</li><li>Layout computation</li><li>Paint and render</li>
+</ul>
+<div class="info">counter-reset + counter-increment + content:counter() for auto numbering</div></div>
+<div class="card"><h3>Nested Counters</h3>
+<ol class="nested-list">
+<li>Getting Started<ul><li>Installation</li><li>First Window</li></ul></li>
+<li>Layout<ul><li>Block Flow</li><li>Flexbox</li><li>Grid</li></ul></li>
+<li>Styling<ul><li>Colors</li><li>Typography</li></ul></li>
+</ol>
+<div class="info">counters(section,".") creates hierarchical numbering: 1.1, 1.2...</div></div>
+</body></html>

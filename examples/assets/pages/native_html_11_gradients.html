@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { padding: 24px; font-family: "Segoe UI", sans-serif; background: #0f172a; color: #f8fafc; }
+h2 { margin-bottom: 16px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.swatch { height: 120px; border-radius: 12px; display: flex; align-items: flex-end;
+          padding: 12px; font-size: 12px; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.s1 { background: linear-gradient(135deg, #667eea, #764ba2); }
+.s2 { background: linear-gradient(to right, #f12711, #f5af19); }
+.s3 { background: linear-gradient(180deg, #00c6ff, #0072ff); }
+.s4 { background: linear-gradient(45deg, #11998e, #38ef7d); }
+.s5 { background: linear-gradient(to bottom right, #fc5c7d, #6a82fb); }
+.s6 { background: radial-gradient(circle, #667eea, #764ba2); }
+.s7 { background: linear-gradient(90deg, #ff0000, #ff7700, #ffff00, #00ff00, #0000ff, #8b00ff); }
+.s8 { background: linear-gradient(135deg, #1e293b 25%, transparent 25%, transparent 75%, #1e293b 75%),
+                  linear-gradient(135deg, #1e293b 25%, #334155 25%, #334155 75%, #1e293b 75%);
+      background-size: 20px 20px; background-position: 0 0, 10px 10px; }
+.s9 { background: radial-gradient(circle at 30% 30%, #fbbf24, #f97316, #dc2626); }
+</style></head><body>
+<h2>CSS Gradients</h2>
+<div class="grid">
+  <div class="swatch s1">linear 135deg</div>
+  <div class="swatch s2">linear to right</div>
+  <div class="swatch s3">linear 180deg</div>
+  <div class="swatch s4">linear 45deg</div>
+  <div class="swatch s5">linear to bottom right</div>
+  <div class="swatch s6">radial circle</div>
+  <div class="swatch s7">rainbow</div>
+  <div class="swatch s8">checkerboard</div>
+  <div class="swatch s9">radial offset</div>
+</div>
+</body></html>

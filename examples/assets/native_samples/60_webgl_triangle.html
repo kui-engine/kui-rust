@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    margin: 0;
+    padding: 20px;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: "Segoe UI", sans-serif;
+}
+h2 { color: #00d4ff; margin-bottom: 10px; }
+.info { color: #888; font-size: 13px; margin-bottom: 8px; }
+.container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.panel {
+    background: #16213e;
+    border: 1px solid #0f3460;
+    border-radius: 8px;
+    padding: 16px;
+}
+canvas {
+    display: block;
+    border: 1px solid #0f3460;
+    border-radius: 4px;
+}
+.perf {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #aaa;
+    font-family: "Consolas", monospace;
+}
+</style>
+</head>
+<body>
+    <h2>WebGL Triangle Demo</h2>
+    <p class="info">KUI WebGL rendering context — Lua-driven OpenGL ES 2.0</p>
+
+    <div class="container">
+        <div class="panel">
+            <canvas id="gl-canvas" width="400" height="400"></canvas>
+            <div id="perf-info" class="perf">Initializing...</div>
+        </div>
+
+        <div class="panel" style="max-width: 320px;">
+            <h3 style="color: #e94560; margin-top: 0;">Controls</h3>
+            <p class="info">This demo renders a colored triangle using WebGL shaders.</p>
+            <p class="info">The triangle rotates via a uniform updated each frame.</p>
+            <div id="status" class="perf">Status: loading...</div>
+        </div>
+    </div>
+
+<script>
+-- WebGL Triangle Demo — Lua
+-- Renders a rotating colored triangle using vertex/fragment shaders
+
+local canvas = document:getElementById("gl-canvas")
+local perfDiv = document:getElementById("perf-info")
+local statusDiv = document:getElementById("status")
+
+if not canvas then
+    statusDiv.textContent = "Status: ERROR — canvas not found"
+    return
+end
+
+local gl = canvas:getContext("webgl")
+if not gl then
+    statusDiv.textContent = "Status: ERROR — WebGL not available (GPU required)"
+    return
+end
+
+statusDiv.textContent = "Status: WebGL context created"
+
+-- Vertex shader: position + color, with rotation uniform
+local vsSource = [[
+    attribute vec2 aPosition;
+    attribute vec3 aColor;
+    varying vec3 vColor;
+    uniform float uAngle;
+    void main() {
+        float c = cos(uAngle);
+        float s = sin(uAngle);
+        mat2 rot = mat2(c, s, -s, c);
+        gl_Position = vec4(rot * aPosition, 0.0, 1.0);
+        vColor = aColor;
+    }
+]]
+
+local fsSource = [[
+    varying vec3 vColor;
+    void main() {
+        gl_FragColor = vec4(vColor, 1.0);
+    }
+]]
+
+-- Compile shader helper
+local function compileShader(type, source)
+    local shader = gl:createShader(type)
+    gl:shaderSource(shader, source)
+    gl:compileShader(shader)
+    if gl:getShaderParameter(shader, gl.COMPILE_STATUS) == 0 then
+        local log = gl:getShaderInfoLog(shader)
+        print("Shader compile error: " .. log)
+        gl:deleteShader(shader)
+        return nil
+    end
+    return shader
+end
+
+local vs = compileShader(gl.VERTEX_SHADER, vsSource)
+local fs = compileShader(gl.FRAGMENT_SHADER, fsSource)
+
+if not vs or not fs then
+    statusDiv.textContent = "Status: ERROR — shader compile failed"
+    return
+end
+
+local program = gl:createProgram()
+gl:attachShader(program, vs)
+gl:attachShader(program, fs)
+gl:linkProgram(program)
+
+if gl:getProgramParameter(program, gl.LINK_STATUS) == 0 then
+    statusDiv.textContent = "Status: ERROR — program link failed: " .. gl:getProgramInfoLog(program)
+    return
+end
+
+gl:useProgram(program)
+
+-- Triangle vertices: position (x,y) + color (r,g,b)
+local vertices = {
+    -- pos x, pos y, r, g, b
+     0.0,  0.7,   1.0, 0.0, 0.0,  -- top (red)
+    -0.7, -0.5,   0.0, 1.0, 0.0,  -- bottom-left (green)
+     0.7, -0.5,   0.0, 0.0, 1.0,  -- bottom-right (blue)
+}
+
+local vbo = gl:createBuffer()
+gl:bindBuffer(gl.ARRAY_BUFFER, vbo)
+gl:bufferDataFloat(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
+
+-- Attribute setup
+local aPos = gl:getAttribLocation(program, "aPosition")
+local aCol = gl:getAttribLocation(program, "aColor")
+local uAngle = gl:getUniformLocation(program, "uAngle")
+
+-- stride = 5 floats * 4 bytes = 20
+gl:enableVertexAttribArray(aPos)
+gl:vertexAttribPointer(aPos, 2, gl.FLOAT, false, 20, 0)
+
+gl:enableVertexAttribArray(aCol)
+gl:vertexAttribPointer(aCol, 3, gl.FLOAT, false, 20, 8)
+
+statusDiv.textContent = "Status: Rendering..."
+
+local angle = 0.0
+local frameCount = 0
+
+local function render()
+    gl:beginFrame()
+
+    gl:clearColor(0.06, 0.06, 0.15, 1.0)
+    gl:clear(gl.COLOR_BUFFER_BIT)
+
+    angle = angle + 0.02
+    gl:uniform1f(uAngle, angle)
+
+    gl:drawArrays(gl.TRIANGLES, 0, 3)
+
+    gl:endFrame()
+
+    frameCount = frameCount + 1
+    if frameCount % 60 == 0 then
+        local perf = gl:perfCounters()
+        perfDiv.textContent = string.format(
+            "DrawCalls: %d | Triangles: %d | Buffers: %d | Frame: %d",
+            perf.drawCalls, perf.triangles, perf.bufferUploads, frameCount
+        )
+    end
+
+    requestAnimationFrame(render)
+end
+
+requestAnimationFrame(render)
+</script>
+</body>
+</html>

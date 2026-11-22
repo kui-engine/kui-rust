@@ -1,0 +1,125 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<canvas id="c" width="200" height="200"></canvas>
+<script type="text/lua">
+local ok = true
+local msg = ""
+local function fail(s) ok = false; msg = msg .. s .. "; " end
+
+local el = document:getElementById("c")
+if el == nil then fail("no canvas") else
+local ctx = el:getContext("2d")
+if ctx == nil then fail("no ctx") else
+
+-- T1: linearGradient horizontal red→blue
+ctx:clearRect(0, 0, 200, 200)
+local lg = ctx:createLinearGradient(0, 0, 100, 0)
+lg:addColorStop(0, "#ff0000")
+lg:addColorStop(1, "#0000ff")
+ctx.fillStyle = lg
+ctx:fillRect(0, 0, 100, 50)
+-- Left should be red-ish
+local pxL = ctx:getImageData(5, 25, 1, 1)
+-- Right should be blue-ish
+local pxR = ctx:getImageData(95, 25, 1, 1)
+if pxL == nil or pxR == nil then fail("T1: nil")
+else
+    local rL = pxL:get(1); local bL = pxL:get(3)
+    local rR = pxR:get(1); local bR = pxR:get(3)
+    if rL < 200 then fail("T1: left red="..tostring(rL)) end
+    if bR < 200 then fail("T1: right blue="..tostring(bR)) end
+    if rL <= rR then fail("T1: gradient direction rL="..tostring(rL).." rR="..tostring(rR)) end
+end
+
+-- T2: linearGradient vertical green→black
+ctx:clearRect(0, 0, 200, 200)
+local lg2 = ctx:createLinearGradient(0, 0, 0, 100)
+lg2:addColorStop(0, "#00ff00")
+lg2:addColorStop(1, "#000000")
+ctx.fillStyle = lg2
+ctx:fillRect(0, 0, 50, 100)
+local pxT = ctx:getImageData(25, 5, 1, 1)
+local pxB = ctx:getImageData(25, 95, 1, 1)
+if pxT == nil or pxB == nil then fail("T2: nil")
+else
+    local gT = pxT:get(2); local gB = pxB:get(2)
+    if gT < 200 then fail("T2: top green="..tostring(gT)) end
+    if gB > 50 then fail("T2: bottom green="..tostring(gB)) end
+end
+
+-- T3: radialGradient center→edge
+ctx:clearRect(0, 0, 200, 200)
+local rg = ctx:createRadialGradient(100, 100, 0, 100, 100, 50)
+rg:addColorStop(0, "#ffffff")
+rg:addColorStop(1, "#000000")
+ctx.fillStyle = rg
+ctx:fillRect(50, 50, 100, 100)
+local pxC = ctx:getImageData(100, 100, 1, 1)
+if pxC == nil then fail("T3: nil")
+else
+    local r = pxC:get(1)
+    if r < 200 then fail("T3: center white="..tostring(r)) end
+end
+
+-- T4: conicGradient
+ctx:clearRect(0, 0, 200, 200)
+local cg = ctx:createConicGradient(0, 100, 100)
+cg:addColorStop(0, "#ff0000")
+cg:addColorStop(0.5, "#00ff00")
+cg:addColorStop(1, "#ff0000")
+ctx.fillStyle = cg
+ctx:fillRect(60, 60, 80, 80)
+-- Center should have some color (not transparent)
+local px4 = ctx:getImageData(100, 100, 1, 1)
+if px4 == nil then fail("T4: nil")
+else
+    local a = px4:get(4)
+    if a < 200 then fail("T4: conic alpha="..tostring(a)) end
+end
+
+-- T5: gradient as strokeStyle
+ctx:clearRect(0, 0, 200, 200)
+local sg = ctx:createLinearGradient(0, 0, 100, 0)
+sg:addColorStop(0, "#ff00ff")
+sg:addColorStop(1, "#00ffff")
+ctx.strokeStyle = sg
+ctx.lineWidth = 4
+ctx:strokeRect(10, 10, 80, 40)
+local px5 = ctx:getImageData(10, 30, 1, 1)
+if px5 == nil then fail("T5: nil")
+else
+    local a = px5:get(4)
+    if a < 100 then fail("T5: gradient stroke alpha="..tostring(a)) end
+end
+
+-- T6: multiple color stops
+ctx:clearRect(0, 0, 200, 200)
+local mg = ctx:createLinearGradient(0, 0, 200, 0)
+mg:addColorStop(0, "#ff0000")
+mg:addColorStop(0.33, "#00ff00")
+mg:addColorStop(0.66, "#0000ff")
+mg:addColorStop(1, "#ffff00")
+ctx.fillStyle = mg
+ctx:fillRect(0, 0, 200, 50)
+local pxM1 = ctx:getImageData(10, 25, 1, 1)
+local pxM2 = ctx:getImageData(130, 25, 1, 1)
+if pxM1 == nil or pxM2 == nil then fail("T6: nil")
+else
+    local r1 = pxM1:get(1)
+    local b2 = pxM2:get(3)
+    if r1 < 200 then fail("T6: stop0 red="..tostring(r1)) end
+    if b2 < 100 then fail("T6: stop2 blue="..tostring(b2)) end
+end
+
+end end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+    document:getElementById("detail").textContent = "gradient ok"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

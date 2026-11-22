@@ -1,0 +1,17 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;background:#0f172a;color:#e2e8f0;padding:20px;height:100vh;display:flex;flex-direction:column}
+h2{font-size:16px;margin-bottom:6px}
+.hint{font-size:12px;color:#94a3b8;margin-bottom:14px}
+#zone{flex:1;min-height:160px;border:2px dashed #475569;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#64748b;font-size:15px;text-align:center;transition:background .15s,border-color .15s;margin-bottom:14px}
+#zone.over{border-color:#3b82f6;background:#1e3a8a33;color:#93c5fd}
+#list{background:#020617;border:1px solid #334155;border-radius:6px;padding:10px 12px;font:12px "Cascadia Code","Consolas",monospace;color:#cbd5e1;height:200px;overflow:auto}
+.row{padding:3px 0;border-bottom:1px solid #1e293b;word-break:break-all}
+.empty{color:#475569}
+.count{color:#38bdf8}
+</style></head><body>
+<h2>外部文件拖放 (KUI-026)</h2>
+<p class="hint">从资源管理器拖拽一个或多个文件/文件夹到下方区域,松手后显示完整路径(UTF-8)。</p>
+<div id="zone">把文件拖到这里 ↓</div>
+<div id="list"><span class="empty">尚未拖入任何文件</span></div>
+</body></html>

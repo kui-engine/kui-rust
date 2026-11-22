@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding:24px;font-family:"Segoe UI",sans-serif;background:#f8fafc}
+h2{color:#1e293b;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:white;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card h3{font-size:13px;color:#64748b;margin-bottom:10px}
+.box{width:200px;padding:12px;background:#f1f5f9;border-radius:8px;font-size:13px;color:#475569;line-height:1.5;margin-bottom:8px;border:1px solid #e2e8f0}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#dbeafe;color:#1e40af;margin-top:4px}
+</style></head><body>
+<h2>Word Wrap & Overflow</h2>
+<div class="grid">
+<div class="card"><h3>overflow-wrap: normal</h3>
+<div class="box" style="overflow-wrap:normal">Superlongwordwithoutbreaks overflows the container edge.</div>
+<div class="tag">overflow-wrap: normal</div></div>
+<div class="card"><h3>overflow-wrap: break-word</h3>
+<div class="box" style="overflow-wrap:break-word">Superlongwordwithoutbreaks will break inside the word.</div>
+<div class="tag">overflow-wrap: break-word</div></div>
+<div class="card"><h3>white-space: nowrap</h3>
+<div class="box" style="white-space:nowrap;overflow:hidden">This text stays on one line and overflows.</div>
+<div class="tag">white-space: nowrap</div></div>
+<div class="card"><h3>text-overflow: ellipsis</h3>
+<div class="box" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Long text truncated with ellipsis when overflowing container.</div>
+<div class="tag">text-overflow: ellipsis</div></div>
+<div class="card"><h3>word-break: break-all</h3>
+<div class="box" style="word-break:break-all">CSSWordBreakAllowsBreakingAtAnyCharacter position.</div>
+<div class="tag">word-break: break-all</div></div>
+<div class="card"><h3>Max-height clamp</h3>
+<div class="box" style="max-height:72px;overflow:hidden">Multi-line clamp: content exceeding max-height is clipped. Useful for card descriptions in list views. Extra text hidden.</div>
+<div class="tag">max-height + overflow</div></div>
+</div>
+</body></html>

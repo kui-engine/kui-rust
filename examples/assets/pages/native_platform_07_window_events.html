@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;background:#0f172a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column}
+/* 自绘标题栏:整条声明为可拖拽区(拖动它移动窗口) */
+.titlebar{-kui-app-region:drag;-webkit-app-region:drag;height:40px;background:#1e293b;border-bottom:1px solid #334155;display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0}
+.titlebar .title{font-size:13px;font-weight:600;color:#cbd5e1;flex:1}
+/* 按钮区设为 no-drag,否则点不到 */
+.win-btn{-kui-app-region:no-drag;-webkit-app-region:no-drag;width:28px;height:24px;border:none;border-radius:4px;background:#334155;color:#e2e8f0;font-size:13px;cursor:pointer}
+.win-btn:hover{background:#475569}
+.win-btn.close:hover{background:#ef4444}
+.content{flex:1;padding:20px;overflow:auto}
+h2{font-size:16px;margin-bottom:6px}
+.hint{font-size:12px;color:#94a3b8;margin-bottom:14px;line-height:1.6}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.badge{padding:4px 10px;border-radius:999px;font-size:12px;background:#1e293b;border:1px solid #334155}
+.badge.active{background:#1e3a8a;border-color:#2563eb;color:#fff}
+#log{background:#020617;border:1px solid #334155;border-radius:6px;padding:10px 12px;font:12px "Cascadia Code","Consolas",monospace;color:#cbd5e1;height:280px;overflow-y:auto;white-space:pre-wrap}
+.t{color:#64748b}
+</style></head><body>
+<div class="titlebar">
+  <span class="title">KUI Frameless — 拖动此标题栏移动窗口</span>
+  <button class="win-btn" id="btn-min" title="最小化">_</button>
+  <button class="win-btn close" id="btn-close" title="关闭">x</button>
+</div>
+<div class="content">
+  <h2>窗口级事件演示 (KUI-013 / KUI-015)</h2>
+  <p class="hint">
+    • 点击其它窗口让本窗口失活 → <b>blur</b>;点回本窗口 → <b>focus</b>。<br>
+    • 按住标题栏拖动窗口 → <b>movestart → move… → moveend</b>。<br>
+    • 仅按下标题栏(不拖动) → <b>dragregionpointerdown</b>(注意:纯点击不会触发 movestart)。
+  </p>
+  <div class="badges">
+    <span class="badge" id="b-focus">app: focus</span>
+    <span class="badge" id="b-move">move: idle</span>
+  </div>
+  <div id="log"></div>
+</div>
+</body></html>

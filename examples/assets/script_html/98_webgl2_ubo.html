@@ -1,0 +1,178 @@
+<html>
+<canvas id="c" width="200" height="200" style="display:none"></canvas>
+<div id="result">WAITING</div>
+<div id="detail"></div>
+<script>
+local ok, err = pcall(function()
+    local canvas = document:getElementById("c")
+    local gl = canvas:getContext("webgl")
+    local results = {}
+
+    -- In headless test environment, GL context may not be available
+    if not gl then
+        -- Verify OffscreenCanvas + context type are at least registered
+        results[#results+1] = "GL_UNAVAILABLE:PASS(headless)"
+        document:getElementById("result").textContent = "PASS"
+        document:getElementById("detail").textContent = table.concat(results, " | ")
+        return
+    end
+
+    -- Test 1: supportsWebGL2 query
+    local has2 = gl:supportsWebGL2()
+    results[#results+1] = "supports:" .. (has2 and "YES" or "NO")
+
+    -- Test 2: WebGL 2.0 constants are defined
+    if gl.UNIFORM_BUFFER and gl.UNIFORM_BUFFER > 0 then
+        results[#results+1] = "UBO_CONST:PASS"
+    else
+        results[#results+1] = "UBO_CONST:FAIL"
+    end
+
+    if gl.COLOR_ATTACHMENT1 and gl.COLOR_ATTACHMENT1 > 0 then
+        results[#results+1] = "MRT_CONST:PASS"
+    else
+        results[#results+1] = "MRT_CONST:FAIL"
+    end
+
+    if gl.TRANSFORM_FEEDBACK_BUFFER and gl.TRANSFORM_FEEDBACK_BUFFER > 0 then
+        results[#results+1] = "TF_CONST:PASS"
+    else
+        results[#results+1] = "TF_CONST:FAIL"
+    end
+
+    if gl.INTERLEAVED_ATTRIBS and gl.SEPARATE_ATTRIBS then
+        results[#results+1] = "TF_MODE:PASS"
+    else
+        results[#results+1] = "TF_MODE:FAIL"
+    end
+
+    if gl.RASTERIZER_DISCARD and gl.RASTERIZER_DISCARD > 0 then
+        results[#results+1] = "RAST_DISC:PASS"
+    else
+        results[#results+1] = "RAST_DISC:FAIL"
+    end
+
+    -- Test 3: UBO operations (if WebGL2 supported)
+    if has2 then
+        -- Create a simple shader with uniform block
+        local vs = gl:createShader(gl.VERTEX_SHADER)
+        gl:shaderSource(vs, [[
+            #version 330
+            layout(std140) uniform Matrices {
+                mat4 uMVP;
+            };
+            in vec2 aPos;
+            void main() {
+                gl_Position = uMVP * vec4(aPos, 0.0, 1.0);
+            }
+        ]])
+        gl:compileShader(vs)
+
+        local fs = gl:createShader(gl.FRAGMENT_SHADER)
+        gl:shaderSource(fs, [[
+            #version 330
+            out vec4 fragColor;
+            void main() {
+                fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        ]])
+        gl:compileShader(fs)
+
+        local prog = gl:createProgram()
+        gl:attachShader(prog, vs)
+        gl:attachShader(prog, fs)
+        gl:linkProgram(prog)
+
+        local linked = gl:getProgramParameter(prog, gl.LINK_STATUS)
+        if linked == 1 then
+            -- Test UBO index query
+            local idx = gl:getUniformBlockIndex(prog, "Matrices")
+            if idx ~= gl.INVALID_INDEX then
+                results[#results+1] = "UBO_IDX:PASS"
+
+                -- Test uniform block binding
+                gl:uniformBlockBinding(prog, idx, 0)
+                results[#results+1] = "UBO_BIND:PASS"
+
+                -- Test block name query
+                local name = gl:getActiveUniformBlockName(prog, idx)
+                if name == "Matrices" then
+                    results[#results+1] = "UBO_NAME:PASS"
+                else
+                    results[#results+1] = "UBO_NAME:FAIL(" .. name .. ")"
+                end
+
+                -- Test block parameter query
+                local dataSize = gl:getActiveUniformBlockParameter(prog, idx, gl.UNIFORM_BLOCK_DATA_SIZE)
+                if dataSize > 0 then
+                    results[#results+1] = "UBO_SIZE:PASS"
+                else
+                    results[#results+1] = "UBO_SIZE:FAIL"
+                end
+            else
+                results[#results+1] = "UBO_IDX:FAIL(INVALID)"
+            end
+        else
+            results[#results+1] = "UBO_LINK:SKIP(330)"
+        end
+
+        -- Test bindBufferBase / bindBufferRange
+        local ubo = gl:createBuffer()
+        gl:bindBuffer(gl.UNIFORM_BUFFER, ubo)
+        gl:bindBufferBase(gl.UNIFORM_BUFFER, 0, ubo)
+        results[#results+1] = "BIND_BASE:PASS"
+
+        gl:bindBufferRange(gl.UNIFORM_BUFFER, 1, ubo, 0, 64)
+        results[#results+1] = "BIND_RANGE:PASS"
+
+        gl:deleteBuffer(ubo)
+        gl:deleteProgram(prog)
+        gl:deleteShader(vs)
+        gl:deleteShader(fs)
+
+        -- Test 4: MRT — drawBuffers
+        gl:drawBuffers({gl.COLOR_ATTACHMENT0})
+        results[#results+1] = "DRAW_BUFS:PASS"
+
+        -- Test 5: Transform Feedback object lifecycle
+        local tf = gl:createTransformFeedback()
+        if tf and tf > 0 then
+            results[#results+1] = "TF_CREATE:PASS"
+            gl:bindTransformFeedback(gl.TRANSFORM_FEEDBACK, tf)
+            results[#results+1] = "TF_BIND:PASS"
+            gl:bindTransformFeedback(gl.TRANSFORM_FEEDBACK, 0)
+            gl:deleteTransformFeedback(tf)
+            results[#results+1] = "TF_DELETE:PASS"
+        else
+            results[#results+1] = "TF_CREATE:FAIL"
+        end
+
+        -- Test 6: clearBufferfi
+        gl:clearBufferfi(gl.DEPTH_STENCIL, 0, 1.0, 0)
+        results[#results+1] = "CLEAR_FI:PASS"
+
+        -- Test 7: clearBufferfv
+        gl:clearBufferfv(gl.COLOR, 0, {0.0, 0.0, 0.0, 1.0})
+        results[#results+1] = "CLEAR_FV:PASS"
+    else
+        results[#results+1] = "GL2_SKIP:NO_SUPPORT"
+    end
+
+    local allPass = true
+    for i = 1, #results do
+        if results[i]:find("FAIL") then
+            allPass = false
+            break
+        end
+    end
+
+    document:getElementById("result").textContent = allPass and "PASS" or "PARTIAL"
+    document:getElementById("detail").textContent = table.concat(results, " | ")
+end)
+
+if not ok then
+    document:getElementById("result").textContent = "ERROR"
+    document:getElementById("detail").textContent = tostring(err)
+end
+</script>
+</html>

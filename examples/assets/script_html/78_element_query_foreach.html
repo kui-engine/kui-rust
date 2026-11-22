@@ -1,0 +1,55 @@
+<html><body>
+<div id="result">FAIL</div>
+<div id="detail"></div>
+<div id="container">
+    <p class="item">A</p>
+    <p class="item">B</p>
+    <span class="other">C</span>
+    <p class="item">D</p>
+</div>
+<script type="text/lua">
+local ok = true
+local msg = ""
+
+local container = document:getElementById("container")
+
+-- Element-level querySelector (not Document)
+local first = container:querySelector(".item")
+if first == nil then ok = false; msg = msg .. "querySelector nil; "
+elseif first.textContent ~= "A" then ok = false; msg = msg .. "querySelector text=" .. first.textContent .. "; "
+end
+
+-- Element-level querySelectorAll
+local items = container:querySelectorAll(".item")
+if items:length() ~= 3 then ok = false; msg = msg .. "querySelectorAll len=" .. items:length() .. "; " end
+
+-- NodeList:forEach
+local collected = {}
+items:forEach(function(el, i)
+    collected[#collected + 1] = el.textContent
+end)
+if #collected ~= 3 then ok = false; msg = msg .. "forEach count=" .. #collected .. "; "
+elseif collected[1] ~= "A" then ok = false; msg = msg .. "forEach[1]=" .. collected[1] .. "; "
+elseif collected[2] ~= "B" then ok = false; msg = msg .. "forEach[2]=" .. collected[2] .. "; "
+elseif collected[3] ~= "D" then ok = false; msg = msg .. "forEach[3]=" .. collected[3] .. "; "
+end
+
+-- NodeList # operator
+if #items ~= 3 then ok = false; msg = msg .. "#items=" .. #items .. "; " end
+
+-- querySelectorAll with no match
+local empty = container:querySelectorAll(".nonexistent")
+if empty:length() ~= 0 then ok = false; msg = msg .. "empty len=" .. empty:length() .. "; " end
+
+-- querySelector with no match
+local none = container:querySelector(".nonexistent")
+if none ~= nil then ok = false; msg = msg .. "none not nil; " end
+
+if ok then
+    document:getElementById("result").textContent = "PASS"
+else
+    document:getElementById("result").textContent = "FAIL"
+    document:getElementById("detail").textContent = msg
+end
+</script>
+</body></html>

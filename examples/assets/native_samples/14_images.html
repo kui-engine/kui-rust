@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f172a; color: #e2e8f0; font-family: "Segoe UI", sans-serif; padding: 24px; }
+    h2 { font-size: 20px; color: #38bdf8; margin-bottom: 16px; }
+    h3 { font-size: 14px; color: #94a3b8; margin: 16px 0 8px; }
+    .section { background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .label { font-size: 11px; color: #64748b; margin-top: 6px; text-align: center; }
+    .row { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; align-items: flex-start; }
+
+    .note {
+        font-size: 12px; color: #94a3b8;
+        background: #162032; padding: 12px;
+        border-radius: 6px; border-left: 3px solid #3b82f6;
+        margin-bottom: 16px;
+    }
+</style>
+</head>
+<body>
+    <h2>Images — Sources &amp; Formats</h2>
+
+    <!-- 1. Local file image -->
+    <h3>1. Local File (relative path)</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <img src="sample_image.png" style="width:128px; height:128px; object-fit:cover; border-radius:8px;" />
+                <div class="label">cover 128×128</div>
+            </div>
+            <div>
+                <img src="sample_image.png" style="width:64px; height:64px; object-fit:contain; background:#334155; border-radius:8px;" />
+                <div class="label">contain 64×64</div>
+            </div>
+            <div>
+                <img src="sample_image.png" style="width:200px; height:80px; object-fit:fill; border-radius:8px;" />
+                <div class="label">fill 200×80</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Network image -->
+    <h3>2. Network Image (HTTPS)</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <img src="https://www.w3schools.com/css/img_5terre.jpg"
+                     style="width:100px; height:100px; object-fit:cover; border-radius:8px;" />
+                <div class="label">Remote JPEG (cover)</div>
+            </div>
+            <div>
+                <img src="https://www.w3schools.com/html/pic_trulli.jpg"
+                     style="width:150px; height:100px; object-fit:cover; border-radius:8px;" />
+                <div class="label">Remote JPEG 150×100</div>
+            </div>
+        </div>
+        <div class="note" style="margin-top:8px;">
+            Network images are fetched synchronously via HTTP. First load may be slow.
+        </div>
+    </div>
+
+    <!-- 3. Data URI -->
+    <h3>3. Data URI (Base64 inline)</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAOklEQVQYV2N89+7dfwYGBgZGRkYGBgYmBjTAxMDAwMTIyMjAwMDEgA6YGBgYmBgZGRkYGJgY0AEA0doFAX3YzCkAAAAASUVORK5CYII="
+                     style="width:80px; height:80px; border-radius:8px; background:#334155;" />
+                <div class="label">10×10 PNG (data URI)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Animated GIF -->
+    <h3>4. Animated GIF</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <img src="sample_anim.gif" style="width:96px; height:96px; border-radius:8px; background:#334155;" />
+                <div class="label">Local GIF 96×96</div>
+            </div>
+            <div>
+                <img src="sample_anim.gif" style="width:64px; height:64px; border-radius:8px; background:#334155;" />
+                <div class="label">Local GIF 64×64</div>
+            </div>
+            <div>
+                <img src="sample_anim.gif" style="width:160px; height:96px; object-fit:contain; border-radius:8px; background:#334155;" />
+                <div class="label">contain 160×96</div>
+            </div>
+        </div>
+        <div class="note" style="margin-top:8px;">
+            Animated GIF frames are decoded via SkCodec and advanced by the animation timer (~60fps).
+            Also works with animated WebP and APNG.
+        </div>
+    </div>
+
+    <!-- 5. background-image -->
+    <h3>5. CSS background-image</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <div style="width:120px; height:120px; border-radius:8px; background-image:url(sample_image.png); background-size:cover; background-position:center;">
+                </div>
+                <div class="label">background-image (cover)</div>
+            </div>
+            <div>
+                <div style="width:120px; height:120px; border-radius:8px; background:#334155; background-image:url(sample_anim.gif); background-size:contain; background-repeat:no-repeat; background-position:center;">
+                </div>
+                <div class="label">Animated GIF bg</div>
+            </div>
+            <div>
+                <div style="width:120px; height:120px; border-radius:8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                </div>
+                <div class="label">CSS gradient bg</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. object-fit comparison -->
+    <h3>6. object-fit Modes (160×100)</h3>
+    <div class="section">
+        <div class="row">
+            <div>
+                <img src="sample_image.png" style="width:160px; height:100px; object-fit:fill; border-radius:8px;" />
+                <div class="label">fill</div>
+            </div>
+            <div>
+                <img src="sample_image.png" style="width:160px; height:100px; object-fit:contain; border-radius:8px; background:#334155;" />
+                <div class="label">contain</div>
+            </div>
+            <div>
+                <img src="sample_image.png" style="width:160px; height:100px; object-fit:cover; border-radius:8px;" />
+                <div class="label">cover</div>
+            </div>
+            <div>
+                <img src="sample_image.png" style="width:160px; height:100px; object-fit:none; border-radius:8px; background:#334155;" />
+                <div class="label">none</div>
+            </div>
+            <div>
+                <img src="sample_image.png" style="width:160px; height:100px; object-fit:scale-down; border-radius:8px; background:#334155;" />
+                <div class="label">scale-down</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

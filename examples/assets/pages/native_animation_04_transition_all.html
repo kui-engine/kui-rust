@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><head><style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { display: flex; align-items: center; justify-content: center; height: 100vh;
+       background: #0f172a; font-family: "Segoe UI", sans-serif; flex-direction: column; }
+h2 { color: #f8fafc; margin-bottom: 24px; }
+.row { display: flex; gap: 20px; }
+.box { width: 80px; height: 80px; background: #3b82f6; border-radius: 12px;
+        transition: all 0.5s ease; cursor: pointer; }
+.box:nth-child(2) { background: #10b981; }
+.box:nth-child(3) { background: #f59e0b; }
+.box:nth-child(4) { background: #ef4444; }
+.box:hover { transform: scale(1.2) rotate(15deg); border-radius: 50%; opacity: 0.8; }
+.info { color: #94a3b8; font-size: 13px; margin-top: 16px; }
+</style></head><body>
+<h2>Transition All Properties</h2>
+<div class="row">
+  <div class="box"></div><div class="box"></div><div class="box"></div><div class="box"></div>
+</div>
+<p class="info">Hover over boxes to see transition all in action</p>
+</body></html>

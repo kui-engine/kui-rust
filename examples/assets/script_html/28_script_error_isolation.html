@@ -1,0 +1,12 @@
+<html><body>
+<div id="result"></div>
+<script>
+-- Script 1: this will cause an error
+error("intentional error")
+</script>
+<script>
+-- Script 2: should still execute despite Script 1 error
+local r = document:getElementById("result")
+r.textContent = "PASS"
+</script>
+</body></html>

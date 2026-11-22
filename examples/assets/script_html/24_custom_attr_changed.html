@@ -1,0 +1,27 @@
+<html><body>
+<div id="container"></div>
+<div id="result"></div>
+<script>
+attrLog = ""
+document:defineElement("my-box", {
+    attributeChanged = function(el, name, oldVal, newVal)
+        attrLog = attrLog .. name .. ":" .. tostring(newVal) .. ";"
+    end
+})
+
+local c = document:getElementById("container")
+local box = document:createElement("my-box")
+c:appendChild(box)
+box:setAttribute("color", "red")
+box:setAttribute("size", "10")
+</script>
+<script>
+local r = document:getElementById("result")
+-- Expect attributeChanged to be called for each setAttribute
+if attrLog:find("color:red") and attrLog:find("size:10") then
+    r.textContent = "PASS"
+else
+    r.textContent = "FAIL: " .. attrLog
+end
+</script>
+</body></html>

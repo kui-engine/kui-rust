@@ -1,0 +1,52 @@
+<html><body>
+<div id="result"></div>
+<div id="detail"></div>
+<script>
+-- Test dynamic stylesheet creation and rule manipulation
+document:addStylesheet(".test { font-size: 12px; }")
+
+local sheets = document.styleSheets
+local ok = (#sheets >= 1)
+local detail = "sheets=" .. tostring(#sheets) .. "; "
+
+-- Find the stylesheet we just added (should be last)
+local sheet = sheets[#sheets]
+if sheet then
+    local rc = sheet.ruleCount
+    detail = detail .. "ruleCount=" .. tostring(rc) .. "; "
+    ok = ok and (rc >= 1)
+
+    -- Read cssRules
+    local rules = sheet:cssRules()
+    if #rules >= 1 then
+        local rule = rules[1]
+        detail = detail .. "type=" .. tostring(rule.type) .. "; "
+        detail = detail .. "sel=[" .. rule.selectorText .. "]; "
+        detail = detail .. "cssText=[" .. rule.cssText .. "]; "
+
+        -- Check rule.style
+        local style = rule.style
+        if style then
+            local fs = style:getPropertyValue("font-size")
+            detail = detail .. "fs=[" .. tostring(fs) .. "]; "
+            ok = ok and (fs == "12px")
+        end
+    end
+
+    -- Test insertRule
+    sheet:insertRule(".added { margin: 5px; }")
+    ok = ok and (sheet.ruleCount == rc + 1)
+    detail = detail .. "afterInsert=" .. tostring(sheet.ruleCount) .. "; "
+
+    -- Test deleteRule
+    sheet:deleteRule(sheet.ruleCount - 1)
+    ok = ok and (sheet.ruleCount == rc)
+    detail = detail .. "afterDelete=" .. tostring(sheet.ruleCount) .. "; "
+end
+
+local r = document:getElementById("result")
+local d = document:getElementById("detail")
+if ok then r.textContent = "PASS" else r.textContent = "FAIL" end
+d.textContent = detail
+</script>
+</body></html>
